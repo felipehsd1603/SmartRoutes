@@ -28,6 +28,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyB8AJNjdAut01MZebHa_-I6Q6WeK9w4qP4",
@@ -39,6 +40,8 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const messaging = firebase.messaging();
+        const VAPID_KEY = 'BGAV_tV1lq3-wQywP3kj_GEJuOQ4X2g1rHkug2_yjTgQSlFzkvVCuOY3SZyujPTK_eaIvLzMOkvwN4zKlZfhvyw';
     </script>
     <style>
         :root {
@@ -75,6 +78,7 @@
             --sidebar-width: 280px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { overflow-x: hidden; max-width: 100vw; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
 
         /* Login */
@@ -209,6 +213,25 @@
         .podium-value { font-size: 1.1rem; font-weight: 700; color: var(--orange-primary); text-align: right; flex-shrink: 0; }
         .podium-unit { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
         .empty-ranking { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.9rem; }
+
+        /* Notifications */
+        .notification-bell { position: relative; cursor: pointer; padding: 0.5rem; border-radius: 10px; transition: all 0.2s; }
+        .notification-bell:hover { background: rgba(255,255,255,0.1); }
+        .notification-bell .material-icons { font-size: 1.5rem; color: var(--text-secondary); }
+        .notification-badge { position: absolute; top: 0; right: 0; background: var(--danger); color: white; font-size: 0.65rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .notification-dropdown { position: absolute; top: 100%; right: 0; width: 320px; max-height: 400px; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 1000; display: none; }
+        .notification-dropdown.show { display: block; }
+        .notification-header { padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .notification-header h4 { margin: 0; font-size: 1rem; }
+        .notification-item { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; }
+        .notification-item:hover { background: rgba(255,255,255,0.05); }
+        .notification-item.unread { background: rgba(193, 127, 74, 0.1); border-left: 3px solid var(--orange-primary); }
+        .notification-item-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; }
+        .notification-item-body { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
+        .notification-item-time { font-size: 0.7rem; color: var(--text-muted); }
+        .notification-empty { padding: 2rem; text-align: center; color: var(--text-muted); }
+        .notification-permission { padding: 1rem; background: rgba(193, 127, 74, 0.1); border-radius: 8px; margin: 0.5rem; text-align: center; }
+        .notification-permission button { margin-top: 0.5rem; }
 
         /* Buttons */
         .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem; font-family: inherit; }
@@ -370,7 +393,8 @@
             .login-title { font-size: 1.2rem; }
         }
         @media (max-width: 480px) {
-            body { font-size: 14px; }
+            body { font-size: 14px; overflow-x: hidden; }
+            .main-content, .content-body, .page { overflow-x: hidden; max-width: 100%; }
             .content-body { padding: 0.75rem; padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); }
             .content-header { padding: 1rem; flex-direction: column; gap: 1rem; align-items: stretch; }
             .content-header h1 { font-size: 1.3rem; }
@@ -595,6 +619,10 @@
                         <span class="material-icons">code</span>
                         <span class="nav-item-text">Exportar JSON</span>
                     </div>
+                    <div class="nav-item" onclick="openSendNotification()">
+                        <span class="material-icons">campaign</span>
+                        <span class="nav-item-text">Enviar Notificacao</span>
+                    </div>
                 </div>
             </nav>
             <div class="sidebar-footer">
@@ -618,6 +646,22 @@
                     <h1 class="page-title" id="pageTitle">Dashboard</h1>
                 </div>
                 <div class="header-actions">
+                    <div class="notification-bell" onclick="toggleNotifications(event)">
+                        <span class="material-icons">notifications</span>
+                        <span class="notification-badge" id="notificationBadge" style="display:none;">0</span>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-header">
+                                <h4>Notificacoes</h4>
+                                <button class="btn btn-secondary btn-sm" onclick="markAllRead(event)" style="padding:0.25rem 0.5rem;font-size:0.75rem;">Marcar lidas</button>
+                            </div>
+                            <div id="notificationList">
+                                <div class="notification-empty">
+                                    <span class="material-icons" style="font-size:2rem;opacity:0.3;">notifications_none</span>
+                                    <p>Nenhuma notificacao</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -977,6 +1021,47 @@
             <div class="modal-body" style="max-height:60vh;overflow-y:auto;">
                 <div id="activitiesUserInfo" style="margin-bottom:1rem;padding:1rem;background:var(--card-bg);border-radius:12px;"></div>
                 <div id="activitiesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Enviar Notificacao -->
+    <div class="modal-overlay" id="notificationModal" onclick="closeModal('notificationModal', event)">
+        <div class="modal" style="max-width:500px;" onclick="event.stopPropagation()">
+            <div class="modal-header" style="background:linear-gradient(135deg,#c17f4a,#d4976a);">
+                <h3 class="modal-title"><span class="material-icons" style="vertical-align:middle;margin-right:0.5rem;">campaign</span>Enviar Notificacao</h3>
+                <button class="modal-close" onclick="closeModal('notificationModal')"><span class="material-icons">close</span></button>
+            </div>
+            <div class="modal-body">
+                <form id="notificationForm" onsubmit="sendNotification(event)">
+                    <div style="margin-bottom:1rem;">
+                        <label class="filter-label">Titulo</label>
+                        <input type="text" class="filter-input" id="notifTitle" placeholder="Ex: Nova rota adicionada!" required style="width:100%;">
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <label class="filter-label">Mensagem</label>
+                        <textarea class="filter-input" id="notifBody" placeholder="Descricao da notificacao..." required style="width:100%;min-height:80px;resize:vertical;"></textarea>
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <label class="filter-label">Tipo</label>
+                        <select class="filter-select" id="notifType" style="width:100%;">
+                            <option value="general">Geral</option>
+                            <option value="new_route">Nova Rota</option>
+                            <option value="event">Evento</option>
+                            <option value="update">Atualizacao</option>
+                        </select>
+                    </div>
+                    <div style="background:rgba(193,127,74,0.1);border-radius:8px;padding:1rem;margin-bottom:1rem;">
+                        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                            <span class="material-icons" style="color:var(--orange-primary);">people</span>
+                            <strong id="subscribersCount">0</strong> dispositivos registrados
+                        </div>
+                        <p style="font-size:0.85rem;color:var(--text-muted);">A notificacao sera enviada para todos os usuarios que ativaram as notificacoes.</p>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">
+                        <span class="material-icons">send</span> Enviar Notificacao
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -1662,6 +1747,9 @@
             if (isStravaUser) {
                 setTimeout(() => syncStravaActivities(), 2000);
             }
+
+            // Inicializar notificacoes
+            initNotifications();
 
             if (isAdmin) {
                 const pendingUsers = Object.values(USERS).filter(u => u.status === 'pending').length;
@@ -2951,6 +3039,268 @@
             a.href = url; a.download = filename; a.click();
             URL.revokeObjectURL(url);
             showToast(`Exportado: ${filename}`);
+        }
+
+        // ========== NOTIFICATIONS ==========
+        let userNotifications = [];
+        let fcmToken = null;
+
+        async function initNotifications() {
+            // Registrar service worker do Firebase Messaging
+            try {
+                const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                console.log('[Notifications] Service Worker registrado');
+
+                // Verificar se ja tem permissao
+                if (Notification.permission === 'granted') {
+                    await getAndSaveFCMToken();
+                }
+
+                // Carregar notificacoes do usuario
+                await loadUserNotifications();
+
+                // Escutar mensagens em foreground
+                messaging.onMessage((payload) => {
+                    console.log('[Notifications] Mensagem em foreground:', payload);
+                    showInAppNotification(payload);
+                    loadUserNotifications(); // Recarregar lista
+                });
+
+            } catch (err) {
+                console.error('[Notifications] Erro ao inicializar:', err);
+            }
+        }
+
+        async function requestNotificationPermission() {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    await getAndSaveFCMToken();
+                    showToast('Notificacoes ativadas!');
+                    return true;
+                } else {
+                    showToast('Permissao negada para notificacoes', true);
+                    return false;
+                }
+            } catch (err) {
+                console.error('[Notifications] Erro ao solicitar permissao:', err);
+                return false;
+            }
+        }
+
+        async function getAndSaveFCMToken() {
+            try {
+                fcmToken = await messaging.getToken({ vapidKey: VAPID_KEY });
+                console.log('[Notifications] Token FCM:', fcmToken);
+
+                // Salvar token no Firestore vinculado ao usuario
+                if (currentUser && fcmToken) {
+                    await db.collection('fcm_tokens').doc(fcmToken).set({
+                        userId: currentUser,
+                        token: fcmToken,
+                        createdAt: new Date().toISOString(),
+                        platform: navigator.userAgent.includes('Mobile') ? 'mobile' : 'desktop'
+                    });
+                }
+            } catch (err) {
+                console.error('[Notifications] Erro ao obter token:', err);
+            }
+        }
+
+        async function loadUserNotifications() {
+            if (!currentUser) return;
+
+            try {
+                const snapshot = await db.collection('notifications')
+                    .orderBy('createdAt', 'desc')
+                    .limit(20)
+                    .get();
+
+                userNotifications = [];
+                snapshot.forEach(doc => {
+                    userNotifications.push({ id: doc.id, ...doc.data() });
+                });
+
+                renderNotifications();
+            } catch (err) {
+                console.error('[Notifications] Erro ao carregar:', err);
+            }
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notificationList');
+            const badge = document.getElementById('notificationBadge');
+
+            // Contar nao lidas
+            const readIds = JSON.parse(localStorage.getItem('read_notifications_' + currentUser) || '[]');
+            const unreadCount = userNotifications.filter(n => !readIds.includes(n.id)).length;
+
+            // Atualizar badge
+            if (unreadCount > 0) {
+                badge.style.display = 'flex';
+                badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+            } else {
+                badge.style.display = 'none';
+            }
+
+            if (userNotifications.length === 0) {
+                // Verificar se precisa solicitar permissao
+                if (Notification.permission === 'default') {
+                    list.innerHTML = `
+                        <div class="notification-permission">
+                            <span class="material-icons" style="font-size:2rem;color:var(--orange-primary);">notifications_active</span>
+                            <p style="margin:0.5rem 0;">Ative as notificacoes para receber alertas de novas rotas!</p>
+                            <button class="btn btn-primary btn-sm" onclick="requestNotificationPermission()">Ativar Notificacoes</button>
+                        </div>
+                    `;
+                } else {
+                    list.innerHTML = `
+                        <div class="notification-empty">
+                            <span class="material-icons" style="font-size:2rem;opacity:0.3;">notifications_none</span>
+                            <p>Nenhuma notificacao</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            list.innerHTML = userNotifications.map(n => {
+                const isUnread = !readIds.includes(n.id);
+                const timeAgo = getTimeAgo(n.createdAt);
+                const icon = {
+                    'new_route': 'add_location',
+                    'event': 'event',
+                    'update': 'system_update',
+                    'general': 'info'
+                }[n.type] || 'notifications';
+
+                return `
+                    <div class="notification-item ${isUnread ? 'unread' : ''}" onclick="markNotificationRead('${n.id}')">
+                        <div style="display:flex;gap:0.75rem;">
+                            <span class="material-icons" style="color:var(--orange-primary);font-size:1.2rem;">${icon}</span>
+                            <div style="flex:1;">
+                                <div class="notification-item-title">${n.title}</div>
+                                <div class="notification-item-body">${n.body}</div>
+                                <div class="notification-item-time">${timeAgo}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getTimeAgo(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+
+            if (diff < 60) return 'Agora';
+            if (diff < 3600) return `${Math.floor(diff / 60)} min atras`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)}h atras`;
+            if (diff < 604800) return `${Math.floor(diff / 86400)} dias atras`;
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        function markNotificationRead(id) {
+            const readIds = JSON.parse(localStorage.getItem('read_notifications_' + currentUser) || '[]');
+            if (!readIds.includes(id)) {
+                readIds.push(id);
+                localStorage.setItem('read_notifications_' + currentUser, JSON.stringify(readIds));
+                renderNotifications();
+            }
+        }
+
+        function markAllRead(e) {
+            e.stopPropagation();
+            const readIds = userNotifications.map(n => n.id);
+            localStorage.setItem('read_notifications_' + currentUser, JSON.stringify(readIds));
+            renderNotifications();
+            showToast('Todas marcadas como lidas');
+        }
+
+        function toggleNotifications(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.classList.toggle('show');
+
+            // Fechar ao clicar fora
+            if (dropdown.classList.contains('show')) {
+                setTimeout(() => {
+                    document.addEventListener('click', closeNotificationDropdown, { once: true });
+                }, 100);
+            }
+        }
+
+        function closeNotificationDropdown(e) {
+            const dropdown = document.getElementById('notificationDropdown');
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        }
+
+        function showInAppNotification(payload) {
+            const title = payload.notification?.title || 'Nova notificacao';
+            const body = payload.notification?.body || '';
+
+            // Mostrar toast especial
+            showToast(`${title}: ${body}`);
+
+            // Atualizar badge
+            loadUserNotifications();
+        }
+
+        async function openSendNotification() {
+            if (!isAdmin) return;
+
+            document.getElementById('notificationModal').classList.add('active');
+            document.getElementById('notifTitle').value = '';
+            document.getElementById('notifBody').value = '';
+
+            // Contar dispositivos registrados
+            try {
+                const snapshot = await db.collection('fcm_tokens').get();
+                document.getElementById('subscribersCount').textContent = snapshot.size;
+            } catch (err) {
+                document.getElementById('subscribersCount').textContent = '?';
+            }
+        }
+
+        async function sendNotification(e) {
+            e.preventDefault();
+            if (!isAdmin) return;
+
+            const title = document.getElementById('notifTitle').value.trim();
+            const body = document.getElementById('notifBody').value.trim();
+            const type = document.getElementById('notifType').value;
+
+            if (!title || !body) {
+                showToast('Preencha todos os campos', true);
+                return;
+            }
+
+            try {
+                // Salvar notificacao no Firestore
+                await db.collection('notifications').add({
+                    title,
+                    body,
+                    type,
+                    createdAt: new Date().toISOString(),
+                    sentBy: currentUser
+                });
+
+                // Nota: Para enviar push notifications reais, precisaria de um servidor
+                // Como solucao simples, salvamos no Firestore e os clientes carregam
+
+                closeModal('notificationModal');
+                showToast('Notificacao enviada!');
+
+                // Recarregar lista
+                loadUserNotifications();
+
+            } catch (err) {
+                console.error('[Notifications] Erro ao enviar:', err);
+                showToast('Erro ao enviar notificacao', true);
+            }
         }
 
         function downloadGPX(arquivo, nome) {
