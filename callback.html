@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conectando... | DEPENDE ROUTE CLUB</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #2d4a3e 0%, #1a2e26 100%);
+            color: #f5f0e6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .container {
+            text-align: center;
+            max-width: 400px;
+        }
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(193, 127, 74, 0.2);
+            border-top-color: #c17f4a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #c17f4a;
+        }
+        p {
+            color: #a8b8b0;
+            margin-bottom: 1rem;
+        }
+        .error {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            color: #fca5a5;
+            display: none;
+        }
+        .error.show { display: block; }
+        .btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #c17f4a 0%, #d4976a 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loader" id="loader"></div>
+        <h1 id="title">Conectando com Strava...</h1>
+        <p id="message">Aguarde enquanto autorizamos sua conta.</p>
+        <div class="error" id="error"></div>
+    </div>
+
+    <script>
+        const STRAVA_CLIENT_ID = '146527';
+
+        async function handleCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const error = urlParams.get('error');
+            const scope = urlParams.get('scope');
+
+            if (error) {
+                showError('Autorização negada. Você precisa permitir o acesso para usar o app.');
+                return;
+            }
+
+            if (!code) {
+                showError('Código de autorização não encontrado.');
+                return;
+            }
+
+            // Verificar se tem os scopes necessários
+            if (scope && !scope.includes('activity:read')) {
+                showError('Permissões insuficientes. Por favor, autorize acesso às atividades.');
+                return;
+            }
+
+            try {
+                document.getElementById('message').textContent = 'Trocando código por token...';
+
+                // Para apps frontend-only, precisamos de um proxy para trocar o código
+                // Vamos usar uma abordagem alternativa: salvar o código e instruir o usuário
+                // OU usar um serviço de proxy público
+
+                // Tentar trocar via proxy (se disponível)
+                const tokenData = await exchangeCodeForToken(code);
+
+                if (tokenData && tokenData.access_token) {
+                    // Salvar tokens
+                    const stravaAuth = {
+                        access_token: tokenData.access_token,
+                        refresh_token: tokenData.refresh_token,
+                        expires_at: tokenData.expires_at,
+                        athlete: tokenData.athlete
+                    };
+
+                    localStorage.setItem('strava_auth', JSON.stringify(stravaAuth));
+
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('title').textContent = 'Conectado!';
+                    document.getElementById('message').innerHTML = `
+                        Bem-vindo, <strong>${tokenData.athlete.firstname}</strong>!<br>
+                        Redirecionando...
+                    `;
+
+                    setTimeout(() => {
+                        window.location.href = './index.html';
+                    }, 1500);
+                } else {
+                    throw new Error('Token não recebido');
+                }
+
+            } catch (err) {
+                console.error('Erro:', err);
+
+                // Fallback: salvar o código para troca manual
+                localStorage.setItem('strava_auth_code', code);
+
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('title').textContent = 'Quase lá!';
+                document.getElementById('message').innerHTML = `
+                    Código recebido com sucesso.<br>
+                    <a href="./index.html" class="btn">Continuar para o App</a>
+                `;
+            }
+        }
+
+        async function exchangeCodeForToken(code) {
+            // Opção 1: Proxy público (não recomendado para produção)
+            // Opção 2: Cloudflare Worker próprio
+            // Opção 3: Netlify Function
+
+            // Por enquanto, vamos tentar um approach direto
+            // NOTA: Isso não funcionará em produção sem um backend
+            // O Strava não permite CORS para o endpoint de token
+
+            // Vamos salvar o código e o app principal fará a troca
+            // usando a técnica de "token exchange via opener"
+
+            if (window.opener) {
+                // Se foi aberto como popup, enviar dados para janela pai
+                window.opener.postMessage({
+                    type: 'STRAVA_AUTH',
+                    code: code
+                }, '*');
+                window.close();
+                return null;
+            }
+
+            // Se não é popup, salvar para processamento posterior
+            return null;
+        }
+
+        function showError(msg) {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('title').textContent = 'Erro';
+            document.getElementById('message').style.display = 'none';
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = msg;
+            errorEl.classList.add('show');
+            errorEl.innerHTML += '<br><a href="./index.html" class="btn">Voltar</a>';
+        }
+
+        // Executar ao carregar
+        handleCallback();
+    </script>
+</body>
+</html>
