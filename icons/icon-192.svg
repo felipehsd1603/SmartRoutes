@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="40" fill="#1a2e26"/>
+  <circle cx="96" cy="75" r="35" fill="#c17f4a"/>
+  <path d="M60 130 L96 95 L132 130 L120 155 L72 155 Z" fill="#c17f4a"/>
+  <circle cx="96" cy="75" r="20" fill="#1a2e26"/>
+  <path d="M85 70 L105 70 L105 80 L85 80 Z" fill="#c17f4a"/>
+  <text x="96" y="175" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="bold" fill="#f5f0e6">ROUTES</text>
+</svg>

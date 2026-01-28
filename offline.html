@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Smart Routes</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a1f1c 0%, #2d3830 100%);
+            color: #e8efe8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .container {
+            text-align: center;
+            max-width: 400px;
+        }
+        .icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #c17f4a;
+        }
+        p {
+            color: #a8b8a8;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #c17f4a 0%, #a86835 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(193, 127, 74, 0.4);
+        }
+        .tips {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            text-align: left;
+        }
+        .tips h3 {
+            font-size: 0.9rem;
+            color: #c17f4a;
+            margin-bottom: 0.75rem;
+        }
+        .tips ul {
+            list-style: none;
+            font-size: 0.85rem;
+            color: #8a9a8a;
+        }
+        .tips li {
+            padding: 0.25rem 0;
+        }
+        .tips li::before {
+            content: '✓ ';
+            color: #c17f4a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📡</div>
+        <h1>Você está offline</h1>
+        <p>Não foi possível conectar à internet. As rotas que você já visualizou estão disponíveis em cache.</p>
+        <a href="/" class="btn" onclick="location.reload(); return false;">Tentar novamente</a>
+
+        <div class="tips">
+            <h3>Dica para próximos treinos:</h3>
+            <ul>
+                <li>Acesse as rotas antes de sair</li>
+                <li>Elas ficam salvas automaticamente</li>
+                <li>Baixe o GPX para usar no relógio</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
