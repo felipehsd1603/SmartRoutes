@@ -922,6 +922,20 @@
         </div>
     </div>
 
+    <!-- Modal Atividades Strava -->
+    <div class="modal-overlay" id="activitiesModal" onclick="closeModal('activitiesModal', event)">
+        <div class="modal" style="max-width:700px;max-height:80vh;" onclick="event.stopPropagation()">
+            <div class="modal-header" style="background:linear-gradient(135deg,#FC4C02,#E34402);">
+                <h3 class="modal-title"><span class="material-icons" style="vertical-align:middle;margin-right:0.5rem;">directions_run</span>Atividades Strava</h3>
+                <button class="modal-close" onclick="closeModal('activitiesModal')"><span class="material-icons">close</span></button>
+            </div>
+            <div class="modal-body" style="max-height:60vh;overflow-y:auto;">
+                <div id="activitiesUserInfo" style="margin-bottom:1rem;padding:1rem;background:var(--card-bg);border-radius:12px;"></div>
+                <div id="activitiesList"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast">
         <span class="material-icons" id="toastIcon">check_circle</span>
         <span id="toastMessage">Sucesso!</span>
@@ -2333,6 +2347,7 @@
                     <td>${statusBadge(user.status)}</td>
                     <td>${user.createdAt || '-'}</td>
                     <td class="actions-cell">
+                        ${user.provider === 'strava' ? `<button class="btn btn-secondary btn-icon" onclick="viewUserActivities('${username}')" title="Ver Atividades Strava" style="background:#FC4C02;"><span class="material-icons">directions_run</span></button>` : ''}
                         ${user.status === 'pending' ? `<button class="btn btn-success btn-icon" onclick="approveUser('${username}')" title="Aprovar"><span class="material-icons">check</span></button>` : ''}
                         ${user.status === 'active' && user.role !== 'admin' ? `<button class="btn btn-secondary btn-icon" onclick="blockUser('${username}')" title="Bloquear"><span class="material-icons">block</span></button>` : ''}
                         ${user.status === 'blocked' ? `<button class="btn btn-secondary btn-icon" onclick="unblockUser('${username}')" title="Desbloquear"><span class="material-icons">check_circle</span></button>` : ''}
@@ -2374,6 +2389,124 @@
                 renderUsers();
                 showToast('Usuario excluido');
             }
+        }
+
+        // ========== VIEW STRAVA ACTIVITIES ==========
+        async function viewUserActivities(username) {
+            if (!isAdmin) return;
+            const user = USERS[username];
+            if (!user || user.provider !== 'strava' || !user.stravaToken) {
+                showToast('Usuario nao tem Strava conectado', true);
+                return;
+            }
+
+            // Mostrar modal com loading
+            document.getElementById('activitiesModal').classList.add('active');
+            document.getElementById('activitiesUserInfo').innerHTML = `
+                <div style="display:flex;align-items:center;gap:1rem;">
+                    ${user.picture ? `<img src="${user.picture}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;">` : ''}
+                    <div>
+                        <div style="font-weight:600;font-size:1.1rem;">${user.name}</div>
+                        <div style="color:var(--text-muted);font-size:0.9rem;">@${username}</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('activitiesList').innerHTML = `
+                <div style="text-align:center;padding:2rem;">
+                    <div class="loader" style="width:40px;height:40px;border:3px solid rgba(252,76,2,0.2);border-top-color:#FC4C02;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem;"></div>
+                    <p style="color:var(--text-muted);">Carregando atividades...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('https://www.strava.com/api/v3/athlete/activities?per_page=50', {
+                    headers: { 'Authorization': `Bearer ${user.stravaToken}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Token expirado ou invalido');
+                }
+
+                const activities = await response.json();
+                const runActivities = activities.filter(a => a.type === 'Run' || a.type === 'Trail Run' || a.type === 'VirtualRun');
+
+                if (runActivities.length === 0) {
+                    document.getElementById('activitiesList').innerHTML = `
+                        <div style="text-align:center;padding:2rem;color:var(--text-muted);">
+                            <span class="material-icons" style="font-size:3rem;opacity:0.5;">directions_run</span>
+                            <p>Nenhuma atividade de corrida encontrada</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                document.getElementById('activitiesList').innerHTML = `
+                    <div style="margin-bottom:1rem;color:var(--text-muted);font-size:0.9rem;">${runActivities.length} atividades de corrida</div>
+                    <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                        ${runActivities.map(a => {
+                            const date = new Date(a.start_date_local).toLocaleDateString('pt-BR');
+                            const distance = (a.distance / 1000).toFixed(2);
+                            const elevation = Math.round(a.total_elevation_gain);
+                            const pace = a.moving_time > 0 ? formatPace(a.moving_time / (a.distance / 1000)) : '-';
+                            const duration = formatDuration(a.moving_time);
+                            const matchedRoute = findMatchingRoute(a);
+
+                            return `
+                                <div style="background:var(--card-bg);border-radius:12px;padding:1rem;border-left:4px solid ${matchedRoute ? 'var(--success)' : '#FC4C02'};">
+                                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
+                                        <div style="font-weight:600;">${a.name}</div>
+                                        <div style="font-size:0.8rem;color:var(--text-muted);">${date}</div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;text-align:center;">
+                                        <div>
+                                            <div style="font-size:1.1rem;font-weight:600;color:#FC4C02;">${distance}</div>
+                                            <div style="font-size:0.7rem;color:var(--text-muted);">KM</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:1.1rem;font-weight:600;color:#FC4C02;">${elevation}</div>
+                                            <div style="font-size:0.7rem;color:var(--text-muted);">D+</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:1.1rem;font-weight:600;color:#FC4C02;">${pace}</div>
+                                            <div style="font-size:0.7rem;color:var(--text-muted);">PACE</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:1.1rem;font-weight:600;color:#FC4C02;">${duration}</div>
+                                            <div style="font-size:0.7rem;color:var(--text-muted);">TEMPO</div>
+                                        </div>
+                                    </div>
+                                    ${matchedRoute ? `<div style="margin-top:0.5rem;padding:0.5rem;background:rgba(16,185,129,0.1);border-radius:8px;font-size:0.85rem;color:var(--success);"><span class="material-icons" style="font-size:1rem;vertical-align:middle;">check_circle</span> Rota: ${matchedRoute.nome}</div>` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+
+            } catch (err) {
+                console.error('Erro ao buscar atividades:', err);
+                document.getElementById('activitiesList').innerHTML = `
+                    <div style="text-align:center;padding:2rem;color:#fca5a5;">
+                        <span class="material-icons" style="font-size:3rem;">error</span>
+                        <p>Erro ao carregar atividades</p>
+                        <p style="font-size:0.85rem;color:var(--text-muted);">Token pode ter expirado</p>
+                    </div>
+                `;
+            }
+        }
+
+        function formatPace(secondsPerKm) {
+            const mins = Math.floor(secondsPerKm / 60);
+            const secs = Math.round(secondsPerKm % 60);
+            return `${mins}'${secs.toString().padStart(2, '0')}"`;
+        }
+
+        function formatDuration(seconds) {
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            if (hrs > 0) {
+                return `${hrs}h${mins.toString().padStart(2, '0')}`;
+            }
+            return `${mins}min`;
         }
 
         // ========== EXPORT ==========
