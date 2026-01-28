@@ -178,6 +178,38 @@
         .stat-value { font-size: 2rem; font-weight: 800; color: var(--orange-primary); }
         .stat-label { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem; }
 
+        /* Gamification Rankings */
+        .rankings-section { margin-bottom: 2rem; }
+        .rankings-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .rankings-title .material-icons { color: #FFD700; }
+        .rankings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .ranking-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.25rem; position: relative; overflow: hidden; }
+        .ranking-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .ranking-card.gold::before { background: linear-gradient(90deg, #FFD700, #FFA500); }
+        .ranking-card.silver::before { background: linear-gradient(90deg, #C0C0C0, #A8A8A8); }
+        .ranking-card.bronze::before { background: linear-gradient(90deg, #CD7F32, #B87333); }
+        .ranking-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .ranking-medal { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; }
+        .ranking-medal.gold { background: linear-gradient(135deg, #FFD700, #FFA500); color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .ranking-medal.silver { background: linear-gradient(135deg, #C0C0C0, #A8A8A8); color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .ranking-medal.bronze { background: linear-gradient(135deg, #CD7F32, #B87333); color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .ranking-category { font-size: 0.85rem; color: var(--text-muted); }
+        .ranking-category-icon { font-size: 1.1rem; vertical-align: middle; margin-right: 0.25rem; }
+        .ranking-podium { display: flex; flex-direction: column; gap: 0.75rem; }
+        .podium-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(255,255,255,0.03); border-radius: 10px; transition: all 0.2s ease; }
+        .podium-item:hover { background: rgba(255,255,255,0.06); transform: translateX(4px); }
+        .podium-position { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+        .podium-position.p1 { background: linear-gradient(135deg, #FFD700, #FFA500); color: #fff; }
+        .podium-position.p2 { background: linear-gradient(135deg, #C0C0C0, #888); color: #fff; }
+        .podium-position.p3 { background: linear-gradient(135deg, #CD7F32, #8B4513); color: #fff; }
+        .podium-avatar { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; flex-shrink: 0; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-weight: 600; color: #fff; font-size: 1rem; }
+        .podium-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+        .podium-info { flex: 1; min-width: 0; }
+        .podium-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .podium-value { font-size: 1.1rem; font-weight: 700; color: var(--orange-primary); text-align: right; flex-shrink: 0; }
+        .podium-unit { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
+        .empty-ranking { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.9rem; }
+
         /* Buttons */
         .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem; font-family: inherit; }
         .btn-primary { background: var(--accent-gradient); color: white; }
@@ -593,6 +625,18 @@
                 <!-- DASHBOARD -->
                 <div class="page active" id="page-dashboard">
                     <div class="stats-grid" id="statsGrid"></div>
+
+                    <!-- Rankings Gamification -->
+                    <div class="rankings-section" id="rankingsSection">
+                        <div class="rankings-title">
+                            <span class="material-icons">emoji_events</span>
+                            Rankings do Mes
+                        </div>
+                        <div class="rankings-grid" id="rankingsGrid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
                     <div class="filters-bar">
                         <div class="filters-row">
                             <div class="filter-group" style="flex: 2;">
@@ -1697,6 +1741,7 @@
         // ========== RENDER ==========
         function renderAll() {
             renderStats();
+            renderRankings();
             populateCityFilter();
             renderRoutes();
             updateCounts();
@@ -1734,6 +1779,143 @@
                     <div class="stat-value">${pendingRoutes.length}</div>
                     <div class="stat-label">Aguardando Aprovacao</div>
                 </div>` : ''}
+            `;
+        }
+
+        async function renderRankings() {
+            const rankingsGrid = document.getElementById('rankingsGrid');
+            if (!rankingsGrid) return;
+
+            try {
+                // Buscar estatisticas de todos os usuarios do Firebase
+                const usersSnapshot = await db.collection('users').get();
+                const completedSnapshot = await db.collection('completed_routes').get();
+
+                // Mapear rotas completadas por usuario
+                const userStats = {};
+                completedSnapshot.forEach(doc => {
+                    const userId = doc.id;
+                    const routes = doc.data().routes || [];
+                    userStats[userId] = { completedRoutes: routes };
+                });
+
+                // Calcular estatisticas de cada usuario
+                const rankings = {
+                    completedCount: [],
+                    monthlyDistance: [],
+                    monthlyElevation: []
+                };
+
+                const currentMonth = new Date().getMonth();
+                const currentYear = new Date().getFullYear();
+
+                usersSnapshot.forEach(doc => {
+                    const userId = doc.id;
+                    const user = doc.data();
+
+                    // Pular usuarios sem dados ou admin
+                    if (!user.name || user.role === 'admin') return;
+
+                    const completedRoutes = userStats[userId]?.completedRoutes || [];
+                    const completedCount = completedRoutes.length;
+
+                    // Calcular distancia e elevacao das rotas completadas
+                    let totalDistance = 0;
+                    let totalElevation = 0;
+
+                    completedRoutes.forEach(routeName => {
+                        const route = routesData.find(r => r.nome === routeName);
+                        if (route) {
+                            totalDistance += route.distancia_km || 0;
+                            totalElevation += route.ganho_elevacao_m || 0;
+                        }
+                    });
+
+                    const userData = {
+                        id: userId,
+                        name: user.name,
+                        picture: user.picture || null,
+                        provider: user.provider
+                    };
+
+                    if (completedCount > 0) {
+                        rankings.completedCount.push({ ...userData, value: completedCount });
+                        rankings.monthlyDistance.push({ ...userData, value: totalDistance });
+                        rankings.monthlyElevation.push({ ...userData, value: totalElevation });
+                    }
+                });
+
+                // Ordenar rankings
+                rankings.completedCount.sort((a, b) => b.value - a.value);
+                rankings.monthlyDistance.sort((a, b) => b.value - a.value);
+                rankings.monthlyElevation.sort((a, b) => b.value - a.value);
+
+                // Renderizar
+                rankingsGrid.innerHTML = `
+                    ${renderRankingCard('Rotas Completadas', 'check_circle', rankings.completedCount.slice(0, 3), 'rotas')}
+                    ${renderRankingCard('Maior Distancia', 'straighten', rankings.monthlyDistance.slice(0, 3), 'km')}
+                    ${renderRankingCard('Maior Altimetria', 'trending_up', rankings.monthlyElevation.slice(0, 3), 'm D+')}
+                `;
+
+            } catch (err) {
+                console.error('Erro ao carregar rankings:', err);
+                rankingsGrid.innerHTML = `
+                    <div class="ranking-card">
+                        <div class="empty-ranking">
+                            <span class="material-icons" style="font-size:2rem;opacity:0.5;">emoji_events</span>
+                            <p>Conecte-se com Strava para aparecer nos rankings!</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderRankingCard(title, icon, items, unit) {
+            if (items.length === 0) {
+                return `
+                    <div class="ranking-card">
+                        <div class="ranking-header">
+                            <span class="material-icons ranking-category-icon" style="color:var(--orange-primary);">${icon}</span>
+                            <span class="ranking-category">${title}</span>
+                        </div>
+                        <div class="empty-ranking">
+                            <span class="material-icons" style="font-size:1.5rem;opacity:0.3;">hourglass_empty</span>
+                            <p>Sem dados ainda</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const positions = ['p1', 'p2', 'p3'];
+            const medals = ['gold', 'silver', 'bronze'];
+
+            return `
+                <div class="ranking-card ${medals[0]}">
+                    <div class="ranking-header">
+                        <span class="material-icons ranking-category-icon" style="color:var(--orange-primary);">${icon}</span>
+                        <span class="ranking-category">${title}</span>
+                    </div>
+                    <div class="ranking-podium">
+                        ${items.map((item, idx) => `
+                            <div class="podium-item">
+                                <div class="podium-position ${positions[idx]}">${idx + 1}</div>
+                                <div class="podium-avatar">
+                                    ${item.picture ?
+                                        `<img src="${item.picture}" alt="${item.name}" onerror="this.parentElement.textContent='${item.name.charAt(0).toUpperCase()}'">` :
+                                        item.name.charAt(0).toUpperCase()
+                                    }
+                                </div>
+                                <div class="podium-info">
+                                    <div class="podium-name">${item.name}</div>
+                                </div>
+                                <div class="podium-value">
+                                    ${typeof item.value === 'number' ? (unit === 'km' ? item.value.toFixed(1) : item.value) : item.value}
+                                    <span class="podium-unit">${unit}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
             `;
         }
 
