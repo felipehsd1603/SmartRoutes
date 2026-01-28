@@ -146,29 +146,30 @@
         }
 
         async function exchangeCodeForToken(code) {
-            // Opção 1: Proxy público (não recomendado para produção)
-            // Opção 2: Cloudflare Worker próprio
-            // Opção 3: Netlify Function
+            const WORKER_URL = 'https://purple-brook-7b47.felipehsd.workers.dev';
 
-            // Por enquanto, vamos tentar um approach direto
-            // NOTA: Isso não funcionará em produção sem um backend
-            // O Strava não permite CORS para o endpoint de token
+            try {
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
 
-            // Vamos salvar o código e o app principal fará a troca
-            // usando a técnica de "token exchange via opener"
+                if (!response.ok) {
+                    throw new Error('Erro na troca de token');
+                }
 
-            if (window.opener) {
-                // Se foi aberto como popup, enviar dados para janela pai
-                window.opener.postMessage({
-                    type: 'STRAVA_AUTH',
-                    code: code
-                }, '*');
-                window.close();
-                return null;
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                return data;
+            } catch (err) {
+                console.error('Erro ao trocar token:', err);
+                throw err;
             }
-
-            // Se não é popup, salvar para processamento posterior
-            return null;
         }
 
         function showError(msg) {
