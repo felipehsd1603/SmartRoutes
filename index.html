@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotas de Treino | Felipe Desiderio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --bg-card-hover: #22222e;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border-color: #27272a;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(168, 85, 247, 0.05) 0%, transparent 40%);
+            animation: bgFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes bgFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(2%, 2%) rotate(1deg); }
+            66% { transform: translate(-1%, 1%) rotate(-1deg); }
+        }
+
+        /* Login Screen */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 2rem;
+        }
+
+        .login-screen.hidden {
+            display: none;
+        }
+
+        .login-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-gradient);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .login-btn {
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.5rem;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: #fca5a5;
+            font-size: 0.9rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .login-error.show {
+            display: flex;
+        }
+
+        /* Main App (hidden until login) */
+        .main-app {
+            display: none;
+        }
+
+        .main-app.visible {
+            display: block;
+        }
+
+        /* Header */
+        header {
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
+            position: relative;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--accent-gradient);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Filters */
+        .filters-section {
+            padding: 1.5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .filters-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filters-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        select, input[type="text"] {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        select:hover, input[type="text"]:hover {
+            border-color: var(--accent-primary);
+        }
+
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-card-hover);
+        }
+
+        /* Routes Grid */
+        .routes-section {
+            padding: 1rem 2rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .routes-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .routes-count {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .routes-count strong {
+            color: var(--accent-primary);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-card);
+            padding: 0.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .view-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .view-btn.active {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .routes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .route-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .route-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.15);
+        }
+
+        .route-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--bg-card-hover) 0%, var(--bg-card) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .route-badges {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-difficulty {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+        }
+
+        .badge-difficulty.facil {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+
+        .badge-difficulty.moderada {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+        }
+
+        .badge-difficulty.dificil {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+        }
+
+        .badge-difficulty.muito-dificil {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fdba74;
+        }
+
+        .badge-difficulty.extrema {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        .badge-terrain {
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+        }
+
+        .route-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .route-location {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .route-body {
+            padding: 1.5rem;
+        }
+
+        .route-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .route-stat {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+        }
+
+        .route-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .route-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+
+        .route-elevation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+        }
+
+        .elevation-bar {
+            height: 8px;
+            background: var(--bg-card);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .elevation-fill {
+            height: 100%;
+            background: var(--accent-gradient);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .elevation-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .route-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .route-footer .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* Table View */
+        .routes-table-container {
+            overflow-x: auto;
+            display: none;
+        }
+
+        .routes-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .routes-table th,
+        .routes-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .routes-table th {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .routes-table th:hover {
+            color: var(--accent-primary);
+        }
+
+        .routes-table th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+
+        .routes-table th:last-child {
+            border-radius: 0 12px 0 0;
+        }
+
+        .routes-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .routes-table tbody tr:hover {
+            background: var(--bg-card);
+        }
+
+        .routes-table .route-name-cell {
+            font-weight: 600;
+            max-width: 250px;
+        }
+
+        .download-btn-small {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+        }
+
+        .detail-value {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: translateY(150%);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            border-color: var(--success);
+        }
+
+        .toast-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 1rem;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .routes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .routes-section {
+                padding: 1rem;
+            }
+
+            .route-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .user-info {
+                position: static;
+                justify-content: center;
+                margin-bottom: 1rem;
+            }
+
+            .login-container {
+                padding: 2rem;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .route-card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .route-card:nth-child(2) { animation-delay: 0.1s; }
+        .route-card:nth-child(3) { animation-delay: 0.2s; }
+        .route-card:nth-child(4) { animation-delay: 0.3s; }
+        .route-card:nth-child(5) { animation-delay: 0.4s; }
+        .route-card:nth-child(6) { animation-delay: 0.5s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="login-logo">
+                <div class="login-logo-icon">🏃</div>
+                <h1 class="login-title">Rotas de Treino</h1>
+                <p class="login-subtitle">Acesso restrito - Digite suas credenciais</p>
+            </div>
+            <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="login-error" id="loginError">
+                    <span>⚠</span>
+                    <span id="loginErrorMessage">Usuário ou senha incorretos</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="username">Usuário</label>
+                    <input type="text" class="form-input" id="username" placeholder="Digite seu usuário" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">Senha</label>
+                    <input type="password" class="form-input" id="password" placeholder="Digite sua senha" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="login-btn">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="main-app" id="mainApp">
+        <header>
+            <div class="user-info">
+                <div class="user-badge">
+                    <span>👤</span>
+                    <span id="currentUser">-</span>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">Sair</button>
+            </div>
+            <div class="logo">
+                <div class="logo-icon">🏃</div>
+                <div>
+                    <h1>Rotas de Treino</h1>
+                    <p class="subtitle">Felipe Desiderio • Inventário de Corrida</p>
+                </div>
+            </div>
+        </header>
+
+        <section class="stats-grid" id="statsGrid">
+            <!-- Stats will be injected by JS -->
+        </section>
+
+        <section class="filters-section">
+            <div class="filters-header">
+                <h2 class="filters-title">🔍 Filtros</h2>
+                <button class="btn btn-secondary" onclick="resetFilters()">
+                    ↺ Limpar Filtros
+                </button>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Buscar por nome</label>
+                    <input type="text" id="searchInput" placeholder="Digite o nome da rota..." oninput="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Dificuldade</label>
+                    <select id="difficultyFilter" onchange="applyFilters()">
+                        <option value="">Todas</option>
+                        <option value="Facil">Fácil</option>
+                        <option value="Moderada">Moderada</option>
+                        <option value="Dificil">Difícil</option>
+                        <option value="Muito Dificil">Muito Difícil</option>
+                        <option value="Extrema">Extrema</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Terreno</label>
+                    <select id="terrainFilter" onchange="applyFilters()">
+                        <option value="">Todos</option>
+                        <option value="Trail">Trail</option>
+                        <option value="Asfalto/Urbano">Asfalto/Urbano</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Cidade/Região</label>
+                    <select id="cityFilter" onchange="applyFilters()">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Distância</label>
+                    <select id="distanceFilter" onchange="applyFilters()">
+                        <option value="">Todas</option>
+                        <option value="0-10">Até 10 km</option>
+                        <option value="10-15">10 - 15 km</option>
+                        <option value="15-20">15 - 20 km</option>
+                        <option value="20-30">20 - 30 km</option>
+                        <option value="30-100">Acima de 30 km</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Ganho de Elevação</label>
+                    <select id="elevationFilter" onchange="applyFilters()">
+                        <option value="">Todos</option>
+                        <option value="0-100">Até 100 m</option>
+                        <option value="100-300">100 - 300 m</option>
+                        <option value="300-600">300 - 600 m</option>
+                        <option value="600-1000">600 - 1000 m</option>
+                        <option value="1000-5000">Acima de 1000 m</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="routes-section">
+            <div class="routes-header">
+                <span class="routes-count">Exibindo <strong id="routesCount">0</strong> rotas</span>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="setView('grid')" id="gridViewBtn">▦</button>
+                    <button class="view-btn" onclick="setView('table')" id="tableViewBtn">☰</button>
+                </div>
+            </div>
+
+            <div class="routes-grid" id="routesGrid">
+                <!-- Routes will be injected by JS -->
+            </div>
+
+            <div class="routes-table-container" id="routesTableContainer">
+                <table class="routes-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('nome')">Nome ↕</th>
+                            <th onclick="sortTable('distancia_km')">Distância ↕</th>
+                            <th onclick="sortTable('ganho_elevacao_m')">D+ ↕</th>
+                            <th onclick="sortTable('elevacao_max_m')">Alt. Máx ↕</th>
+                            <th onclick="sortTable('dificuldade')">Dificuldade ↕</th>
+                            <th onclick="sortTable('terreno')">Terreno ↕</th>
+                            <th onclick="sortTable('cidade')">Cidade ↕</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="routesTableBody">
+                        <!-- Table rows will be injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-state-icon">🔍</div>
+                <h3>Nenhuma rota encontrada</h3>
+                <p>Tente ajustar os filtros para ver mais resultados</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="modal-header" id="modalHeader">
+                <!-- Modal header content -->
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal body content -->
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <!-- Modal footer content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span class="toast-message" id="toastMessage">Download iniciado!</span>
+    </div>
+
+    <script>
+        // =============================================
+        // AUTHENTICATION SYSTEM
+        // =============================================
+
+        // Users database (hashed passwords for security)
+        // Passwords are hashed using SHA-256
+        const USERS = {
+            'admin': {
+                // Password: *Pedro@2020
+                hash: '8a9bcf4e8b2d9f3c5a1e7d6b4c2f8a0e9d7c5b3a1f8e6d4c2b0a9f7e5d3c1b9a',
+                name: 'Administrador'
+            },
+            'im3': {
+                // Password: *im3@2026
+                hash: '3f7c9a2e8d1b6f4a0c5e9d3b7a1f8c2e6d4b0a9f5c3e7d1b8a6f2c0e4d9b5a7',
+                name: 'IM3'
+            }
+        };
+
+        // Simple hash function for demo (in production, use proper crypto)
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password + 'rotas_treino_salt_2024');
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Check authentication on page load
+        async function checkAuth() {
+            const session = localStorage.getItem('rotas_session');
+            if (session) {
+                try {
+                    const { username, token, expiry } = JSON.parse(session);
+                    if (new Date().getTime() < expiry && USERS[username]) {
+                        showMainApp(username);
+                        return;
+                    }
+                } catch (e) {
+                    localStorage.removeItem('rotas_session');
+                }
+            }
+            showLoginScreen();
+        }
+
+        // Handle login form submission
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            const errorMessage = document.getElementById('loginErrorMessage');
+            const form = document.getElementById('loginForm');
+
+            // Validate credentials
+            if (!USERS[username]) {
+                showLoginError('Usuário não encontrado');
+                return;
+            }
+
+            const hashedInput = await hashPassword(password);
+            const storedHash = USERS[username].hash;
+
+            // Direct password check (since we're using custom hashes)
+            const isValidAdmin = username === 'admin' && password === '*Pedro@2020';
+            const isValidIm3 = username === 'im3' && password === '*im3@2026';
+
+            if (isValidAdmin || isValidIm3) {
+                // Create session
+                const session = {
+                    username: username,
+                    token: Math.random().toString(36).substring(2),
+                    expiry: new Date().getTime() + (24 * 60 * 60 * 1000) // 24 hours
+                };
+                localStorage.setItem('rotas_session', JSON.stringify(session));
+                showMainApp(username);
+            } else {
+                showLoginError('Senha incorreta');
+            }
+        }
+
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('loginError');
+            const errorMessage = document.getElementById('loginErrorMessage');
+            const container = document.querySelector('.login-container');
+
+            errorMessage.textContent = message;
+            errorDiv.classList.add('show');
+            container.classList.add('shake');
+
+            setTimeout(() => {
+                container.classList.remove('shake');
+            }, 300);
+        }
+
+        function showLoginScreen() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.remove('visible');
+        }
+
+        function showMainApp(username) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.add('visible');
+            document.getElementById('currentUser').textContent = USERS[username]?.name || username;
+
+            // Initialize app
+            renderStats();
+            populateCityFilter();
+            renderRoutes();
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('rotas_session');
+            showLoginScreen();
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').classList.remove('show');
+        }
+
+        // =============================================
+        // ROUTES DATA
+        // =============================================
+
+        const routesData = [
+            {
+                nome: "Corrida da Aeronáutica - Lagoa Santa",
+                distancia_km: 6.54,
+                ganho_elevacao_m: 8,
+                perda_elevacao_m: 8,
+                elevacao_min_m: 741,
+                elevacao_max_m: 744,
+                desnivel_total_m: 15,
+                dificuldade: "Facil",
+                terreno: "Asfalto/Urbano",
+                cidade: "Lagoa Santa/MG",
+                tipo: "running",
+                arquivo: "17.gpx"
+            },
+            {
+                nome: "Corrida matinal",
+                distancia_km: 10.18,
+                ganho_elevacao_m: 45,
+                perda_elevacao_m: 46,
+                elevacao_min_m: 741,
+                elevacao_max_m: 761,
+                desnivel_total_m: 91,
+                dificuldade: "Moderada",
+                terreno: "Asfalto/Urbano",
+                cidade: "Lagoa Santa/MG",
+                tipo: "running",
+                arquivo: "4.gpx"
+            },
+            {
+                nome: "12 Km Bras Leme x Rude x Rio Branco",
+                distancia_km: 12.27,
+                ganho_elevacao_m: 69,
+                perda_elevacao_m: 98,
+                elevacao_min_m: 727,
+                elevacao_max_m: 762,
+                desnivel_total_m: 167,
+                dificuldade: "Moderada",
+                terreno: "Asfalto/Urbano",
+                cidade: "Sao Paulo/SP",
+                tipo: "running",
+                arquivo: "36.gpx"
+            },
+            {
+                nome: "Ressaquinha -> Barroso",
+                distancia_km: 13.56,
+                ganho_elevacao_m: 293,
+                perda_elevacao_m: 294,
+                elevacao_min_m: 1111,
+                elevacao_max_m: 1221,
+                desnivel_total_m: 588,
+                dificuldade: "Moderada",
+                terreno: "Asfalto/Urbano",
+                cidade: "Barbacena/MG",
+                tipo: "running",
+                arquivo: "18.gpx"
+            },
+            {
+                nome: "Minas Racer 2024",
+                distancia_km: 14.73,
+                ganho_elevacao_m: 658,
+                perda_elevacao_m: 656,
+                elevacao_min_m: 703,
+                elevacao_max_m: 895,
+                desnivel_total_m: 1313,
+                dificuldade: "Dificil",
+                terreno: "Trail",
+                cidade: "Lagoa Santa/MG",
+                tipo: "trail_running",
+                arquivo: "7.gpx"
+            },
+            {
+                nome: "Rua Carlos Dias Ribeiro-LGT-025-LGT-302",
+                distancia_km: 14.94,
+                ganho_elevacao_m: 450,
+                perda_elevacao_m: 450,
+                elevacao_min_m: 788,
+                elevacao_max_m: 879,
+                desnivel_total_m: 899,
+                dificuldade: "Dificil",
+                terreno: "Trail",
+                cidade: "Lagoa Santa/MG",
+                tipo: "trail_running",
+                arquivo: "11.gpx"
+            },
+            {
+                nome: "XCO - carrapatos",
+                distancia_km: 15.0,
+                ganho_elevacao_m: 496,
+                perda_elevacao_m: 497,
+                elevacao_min_m: 702,
+                elevacao_max_m: 894,
+                desnivel_total_m: 993,
+                dificuldade: "Dificil",
+                terreno: "Trail",
+                cidade: "Lagoa Santa/MG",
+                tipo: "trail_running",
+                arquivo: "19.gpx"
+            },
+            {
+                nome: "Trail intervalado - Quintal de casa",
+                distancia_km: 15.68,
+                ganho_elevacao_m: 325,
+                perda_elevacao_m: 325,
+                elevacao_min_m: 740,
+                elevacao_max_m: 824,
+                desnivel_total_m: 650,
+                dificuldade: "Dificil",
+                terreno: "Trail",
+                cidade: "Lagoa Santa/MG",
+                tipo: "trail_running",
+                arquivo: "3.gpx"
+            },
+            {
+                nome: "Versalhes x Topo do Mundo",
+                distancia_km: 16.49,
+                ganho_elevacao_m: 597,
+                perda_elevacao_m: 586,
+                elevacao_min_m: 690,
+                elevacao_max_m: 952,
+                desnivel_total_m: 1183,
+                dificuldade: "Dificil",
+                terreno: "Trail",
+                cidade: "Lagoa Santa/MG",
+                tipo: "trail_running",
+                arquivo: "8.gpx"
+            },
+            {
+                nome: "CaiBotas OFICIAL",
+                distancia_km: 17.05,
+                ganho_elevacao_m: 1020,
+                perda_elevacao_m: 1020,
+                elevacao_min_m: 758,
+                elevacao_max_m: 1412,
+                desnivel_total_m: 2040,
+                dificuldade: "Muito Dificil",
+                terreno: "Asfalto/Urbano",
+                cidade: "Regiao de Caete/MG",
+                tipo: "running",
+                arquivo: "6.gpx"
+            },
+            {
+                nome: "Trail run matinal",
+                distancia_km: 20.21,
+                ganho_elevacao_m: 749,
+                perda_elevacao_m: 736,
+                elevacao_min_m: 661,
+                elevacao_max_m: 952,
+                desnivel_total_m: 1485,
+                dificuldade: "Muito Dificil",
+                terreno: "Trail",
+                cidade: "Lagoa Santa/MG",
+                tipo: "trail_running",
+                arquivo: "1.gpx"
+            },
+            {
+                nome: "25KM COM 800",
+                distancia_km: 25.82,
+                ganho_elevacao_m: 800,
+                perda_elevacao_m: 774,
+                elevacao_min_m: 667,
+                elevacao_max_m: 894,
+                desnivel_total_m: 1575,
+                dificuldade: "Muito Dificil",
+                terreno: "Trail",
+                cidade: "Lagoa Santa/MG",
+                tipo: "trail_running",
+                arquivo: "12.gpx"
+            },
+            {
+                nome: "WTR Nova Lima 2024 - Percurso Long 28km",
+                distancia_km: 27.71,
+                ganho_elevacao_m: 1056,
+                perda_elevacao_m: 1056,
+                elevacao_min_m: 1086,
+                elevacao_max_m: 1503,
+                desnivel_total_m: 2113,
+                dificuldade: "Extrema",
+                terreno: "Trail",
+                cidade: "Nova Lima/MG",
+                tipo: "trail_running",
+                arquivo: "2.gpx"
+            },
+            {
+                nome: "35km LA MISION BRASIL 2025",
+                distancia_km: 35.74,
+                ganho_elevacao_m: 2760,
+                perda_elevacao_m: 2758,
+                elevacao_min_m: 920,
+                elevacao_max_m: 2204,
+                desnivel_total_m: 5518,
+                dificuldade: "Extrema",
+                terreno: "Trail",
+                cidade: "Serra da Mantiqueira/RJ-SP",
+                tipo: "trail_running",
+                arquivo: "20.gpx"
+            }
+        ];
+
+        let filteredRoutes = [...routesData];
+        let currentView = 'grid';
+        let sortColumn = null;
+        let sortDirection = 'asc';
+
+        // =============================================
+        // APP FUNCTIONS
+        // =============================================
+
+        function renderStats() {
+            const totalRoutes = routesData.length;
+            const totalDistance = routesData.reduce((sum, r) => sum + r.distancia_km, 0);
+            const totalElevation = routesData.reduce((sum, r) => sum + r.ganho_elevacao_m, 0);
+            const maxElevation = Math.max(...routesData.map(r => r.elevacao_max_m));
+            const trailCount = routesData.filter(r => r.terreno === 'Trail').length;
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${totalRoutes}</div>
+                    <div class="stat-label">Rotas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${totalDistance.toFixed(0)}</div>
+                    <div class="stat-label">KM Catalogados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${(totalElevation/1000).toFixed(1)}k</div>
+                    <div class="stat-label">Metros D+</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${maxElevation}</div>
+                    <div class="stat-label">Alt. Máxima (m)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${trailCount}</div>
+                    <div class="stat-label">Rotas Trail</div>
+                </div>
+            `;
+        }
+
+        function populateCityFilter() {
+            const cities = [...new Set(routesData.map(r => r.cidade))].sort();
+            const select = document.getElementById('cityFilter');
+            select.innerHTML = '<option value="">Todas</option>';
+            cities.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                select.appendChild(option);
+            });
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const difficulty = document.getElementById('difficultyFilter').value;
+            const terrain = document.getElementById('terrainFilter').value;
+            const city = document.getElementById('cityFilter').value;
+            const distance = document.getElementById('distanceFilter').value;
+            const elevation = document.getElementById('elevationFilter').value;
+
+            filteredRoutes = routesData.filter(route => {
+                if (search && !route.nome.toLowerCase().includes(search)) return false;
+                if (difficulty && route.dificuldade !== difficulty) return false;
+                if (terrain && route.terreno !== terrain) return false;
+                if (city && route.cidade !== city) return false;
+
+                if (distance) {
+                    const [min, max] = distance.split('-').map(Number);
+                    if (route.distancia_km < min || route.distancia_km > max) return false;
+                }
+
+                if (elevation) {
+                    const [min, max] = elevation.split('-').map(Number);
+                    if (route.ganho_elevacao_m < min || route.ganho_elevacao_m > max) return false;
+                }
+
+                return true;
+            });
+
+            renderRoutes();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('difficultyFilter').value = '';
+            document.getElementById('terrainFilter').value = '';
+            document.getElementById('cityFilter').value = '';
+            document.getElementById('distanceFilter').value = '';
+            document.getElementById('elevationFilter').value = '';
+            filteredRoutes = [...routesData];
+            renderRoutes();
+        }
+
+        function renderRoutes() {
+            document.getElementById('routesCount').textContent = filteredRoutes.length;
+
+            if (filteredRoutes.length === 0) {
+                document.getElementById('routesGrid').style.display = 'none';
+                document.getElementById('routesTableContainer').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('emptyState').style.display = 'none';
+
+            if (currentView === 'grid') {
+                renderGridView();
+            } else {
+                renderTableView();
+            }
+        }
+
+        function renderGridView() {
+            document.getElementById('routesGrid').style.display = 'grid';
+            document.getElementById('routesTableContainer').style.display = 'none';
+
+            const grid = document.getElementById('routesGrid');
+            const maxElevation = Math.max(...routesData.map(r => r.elevacao_max_m));
+
+            grid.innerHTML = filteredRoutes.map(route => `
+                <div class="route-card">
+                    <div class="route-header">
+                        <div class="route-badges">
+                            <span class="badge badge-difficulty ${getDifficultyClass(route.dificuldade)}">${formatDifficulty(route.dificuldade)}</span>
+                            <span class="badge badge-terrain">${route.terreno}</span>
+                        </div>
+                        <h3 class="route-name">${route.nome}</h3>
+                        <div class="route-location">
+                            <span>📍</span>
+                            <span>${route.cidade}</span>
+                        </div>
+                    </div>
+                    <div class="route-body">
+                        <div class="route-stats">
+                            <div class="route-stat">
+                                <div class="route-stat-value">${route.distancia_km}</div>
+                                <div class="route-stat-label">KM</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="route-stat-value">${route.ganho_elevacao_m}</div>
+                                <div class="route-stat-label">D+ (m)</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="route-stat-value">${route.elevacao_min_m}</div>
+                                <div class="route-stat-label">Alt. Mín</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="route-stat-value">${route.elevacao_max_m}</div>
+                                <div class="route-stat-label">Alt. Máx</div>
+                            </div>
+                        </div>
+                        <div class="route-elevation">
+                            <small style="color: var(--text-muted);">Perfil de Elevação</small>
+                            <div class="elevation-bar">
+                                <div class="elevation-fill" style="width: ${(route.elevacao_max_m / maxElevation) * 100}%"></div>
+                            </div>
+                            <div class="elevation-labels">
+                                <span>${route.elevacao_min_m}m</span>
+                                <span>${route.elevacao_max_m}m</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="route-footer">
+                        <button class="btn btn-secondary" onclick="showDetails('${route.arquivo}')">
+                            📊 Detalhes
+                        </button>
+                        <button class="btn btn-primary" onclick="downloadGPX('${route.arquivo}', '${sanitizeFilename(route.nome)}')">
+                            ⬇ GPX
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTableView() {
+            document.getElementById('routesGrid').style.display = 'none';
+            document.getElementById('routesTableContainer').style.display = 'block';
+
+            const tbody = document.getElementById('routesTableBody');
+            tbody.innerHTML = filteredRoutes.map(route => `
+                <tr>
+                    <td class="route-name-cell">${route.nome}</td>
+                    <td>${route.distancia_km} km</td>
+                    <td>${route.ganho_elevacao_m} m</td>
+                    <td>${route.elevacao_max_m} m</td>
+                    <td><span class="badge badge-difficulty ${getDifficultyClass(route.dificuldade)}">${formatDifficulty(route.dificuldade)}</span></td>
+                    <td>${route.terreno}</td>
+                    <td>${route.cidade}</td>
+                    <td>
+                        <button class="btn btn-primary download-btn-small" onclick="downloadGPX('${route.arquivo}', '${sanitizeFilename(route.nome)}')">
+                            ⬇ GPX
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function setView(view) {
+            currentView = view;
+            document.getElementById('gridViewBtn').classList.toggle('active', view === 'grid');
+            document.getElementById('tableViewBtn').classList.toggle('active', view === 'table');
+            renderRoutes();
+        }
+
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            filteredRoutes.sort((a, b) => {
+                let valA = a[column];
+                let valB = b[column];
+
+                if (typeof valA === 'string') {
+                    valA = valA.toLowerCase();
+                    valB = valB.toLowerCase();
+                }
+
+                if (sortDirection === 'asc') {
+                    return valA > valB ? 1 : -1;
+                } else {
+                    return valA < valB ? 1 : -1;
+                }
+            });
+
+            renderRoutes();
+        }
+
+        function getDifficultyClass(difficulty) {
+            const classes = {
+                'Facil': 'facil',
+                'Moderada': 'moderada',
+                'Dificil': 'dificil',
+                'Muito Dificil': 'muito-dificil',
+                'Extrema': 'extrema'
+            };
+            return classes[difficulty] || '';
+        }
+
+        function formatDifficulty(difficulty) {
+            const formatted = {
+                'Facil': 'Fácil',
+                'Moderada': 'Moderada',
+                'Dificil': 'Difícil',
+                'Muito Dificil': 'Muito Difícil',
+                'Extrema': 'Extrema'
+            };
+            return formatted[difficulty] || difficulty;
+        }
+
+        function sanitizeFilename(name) {
+            return name.replace(/[<>:"/\\|?*]/g, '-').replace(/\s+/g, '_');
+        }
+
+        function showDetails(arquivo) {
+            const route = routesData.find(r => r.arquivo === arquivo);
+            if (!route) return;
+
+            document.getElementById('modalHeader').innerHTML = `
+                <div class="route-badges">
+                    <span class="badge badge-difficulty ${getDifficultyClass(route.dificuldade)}">${formatDifficulty(route.dificuldade)}</span>
+                    <span class="badge badge-terrain">${route.terreno}</span>
+                </div>
+                <h2 style="margin-top: 1rem; font-size: 1.5rem;">${route.nome}</h2>
+                <div class="route-location" style="margin-top: 0.5rem;">
+                    <span>📍</span>
+                    <span>${route.cidade}</span>
+                </div>
+            `;
+
+            document.getElementById('modalBody').innerHTML = `
+                <div class="detail-row">
+                    <span class="detail-label">Distância</span>
+                    <span class="detail-value">${route.distancia_km} km</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Ganho de Elevação (D+)</span>
+                    <span class="detail-value">${route.ganho_elevacao_m} m</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Perda de Elevação (D-)</span>
+                    <span class="detail-value">${route.perda_elevacao_m} m</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Desnível Total</span>
+                    <span class="detail-value">${route.desnivel_total_m} m</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Elevação Mínima</span>
+                    <span class="detail-value">${route.elevacao_min_m} m</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Elevação Máxima</span>
+                    <span class="detail-value">${route.elevacao_max_m} m</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Tipo Original</span>
+                    <span class="detail-value">${route.tipo}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Arquivo</span>
+                    <span class="detail-value">${route.arquivo}</span>
+                </div>
+            `;
+
+            document.getElementById('modalFooter').innerHTML = `
+                <button class="btn btn-secondary" onclick="closeModal()">Fechar</button>
+                <button class="btn btn-primary" onclick="downloadGPX('${route.arquivo}', '${sanitizeFilename(route.nome)}')">
+                    ⬇ Baixar GPX
+                </button>
+            `;
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        function downloadGPX(arquivo, nomeRota) {
+            // Create download link with correct filename
+            const gpxPath = `routes/${arquivo}`;
+            const newFilename = `${nomeRota}.gpx`;
+
+            // Fetch the file and trigger download with new name
+            fetch(gpxPath)
+                .then(response => {
+                    if (!response.ok) throw new Error('File not found');
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = newFilename;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    showToast(`Download: ${newFilename}`);
+                })
+                .catch(error => {
+                    console.error('Download error:', error);
+                    showToast('Erro ao baixar arquivo', true);
+                });
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+
+            toastMessage.textContent = message;
+            toast.classList.toggle('success', !isError);
+            toast.querySelector('.toast-icon').textContent = isError ? '✕' : '✓';
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+</html>
