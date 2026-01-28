@@ -4,22 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEPENDE ROUTE CLUB | Trail Running</title>
-
-    <!-- Google Fonts -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a2e26">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
-
-    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-    <!-- Leaflet Maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://alcdn.msauth.net/browser/2.30.0/js/msal-browser.min.js"></script>
     <style>
         :root {
-            /* Cores baseadas na logo DEPENDE */
             --green-dark: #2d4a3e;
             --green-medium: #3d5a4e;
             --green-light: #4a6b5c;
@@ -29,8 +26,6 @@
             --cream: #f5f0e6;
             --cream-dark: #e8e0d0;
             --white: #ffffff;
-
-            /* UI Colors */
             --bg-primary: #1a2e26;
             --bg-secondary: #223830;
             --bg-sidebar: #1e322a;
@@ -38,7 +33,6 @@
             --bg-card-hover: #345046;
             --bg-input: #243a32;
             --accent-primary: var(--orange-primary);
-            --accent-secondary: var(--orange-light);
             --accent-gradient: linear-gradient(135deg, var(--orange-primary) 0%, var(--orange-light) 100%);
             --green-gradient: linear-gradient(135deg, var(--green-dark) 0%, var(--green-medium) 100%);
             --text-primary: var(--cream);
@@ -54,604 +48,138 @@
             --info: #60a5fa;
             --info-bg: rgba(96, 165, 250, 0.1);
             --sidebar-width: 280px;
-            --header-height: 70px;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* ==================== LOGIN SCREEN ==================== */
-        .login-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--green-dark) 0%, var(--bg-primary) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            padding: 2rem;
-        }
-
+        /* Login */
+        .login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--green-dark) 0%, var(--bg-primary) 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 2rem; }
         .login-screen.hidden { display: none; }
-
-        .login-container {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 3rem;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
-        }
-
-        .login-logo {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .login-logo-img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin-bottom: 1rem;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .login-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--orange-primary);
-            letter-spacing: 1px;
-        }
-
-        .login-subtitle {
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-label {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        .form-input {
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
-            color: var(--text-primary);
-            font-size: 1rem;
-            font-family: inherit;
-            transition: all 0.2s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--orange-primary);
-            box-shadow: 0 0 0 3px rgba(193, 127, 74, 0.2);
-        }
-
-        .login-btn {
-            background: var(--accent-gradient);
-            border: none;
-            border-radius: 12px;
-            padding: 1rem;
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(193, 127, 74, 0.4);
-        }
-
-        .login-error {
-            background: var(--danger-bg);
-            border: 1px solid rgba(248, 113, 113, 0.3);
-            border-radius: 10px;
-            padding: 0.75rem 1rem;
-            color: #fca5a5;
-            font-size: 0.9rem;
-            display: none;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
+        .login-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; padding: 3rem; width: 100%; max-width: 420px; }
+        .login-logo { text-align: center; margin-bottom: 2rem; }
+        .login-logo-img { width: 120px; height: 120px; border-radius: 50%; margin-bottom: 1rem; }
+        .login-title { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--orange-primary); }
+        .login-subtitle { color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.9rem; }
+        .login-form { display: flex; flex-direction: column; gap: 1.5rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-label { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); }
+        .form-input { background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.25rem; color: var(--text-primary); font-size: 1rem; font-family: inherit; transition: all 0.2s ease; }
+        .form-input:focus { outline: none; border-color: var(--orange-primary); box-shadow: 0 0 0 3px rgba(193, 127, 74, 0.2); }
+        .login-btn { background: var(--accent-gradient); border: none; border-radius: 12px; padding: 1rem; color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(193, 127, 74, 0.4); }
+        .login-error { background: var(--danger-bg); border: 1px solid rgba(248, 113, 113, 0.3); border-radius: 10px; padding: 0.75rem 1rem; color: #fca5a5; font-size: 0.9rem; display: none; align-items: center; gap: 0.5rem; }
         .login-error.show { display: flex; }
 
-        /* ==================== MAIN APP LAYOUT ==================== */
-        .main-app {
-            display: none;
-            min-height: 100vh;
-        }
+        /* Social Login */
+        .login-divider { display: flex; align-items: center; margin: 1.5rem 0; color: var(--text-muted); font-size: 0.85rem; }
+        .login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+        .login-divider span { padding: 0 1rem; }
+        .social-buttons { display: flex; flex-direction: column; gap: 0.75rem; }
+        .social-btn { display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 0.875rem 1rem; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-input); color: var(--text-primary); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
+        .social-btn:hover { border-color: var(--orange-primary); background: var(--bg-card-hover); }
+        .social-btn svg { width: 20px; height: 20px; }
+        .social-btn.google:hover { border-color: #4285f4; }
+        .social-btn.microsoft:hover { border-color: #00a4ef; }
+        .login-footer { margin-top: 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
+        .login-footer a { color: var(--orange-primary); cursor: pointer; text-decoration: none; }
+        .login-footer a:hover { text-decoration: underline; }
+        .login-tabs { display: flex; margin-bottom: 1.5rem; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); }
+        .login-tab { flex: 1; padding: 0.75rem; text-align: center; cursor: pointer; background: var(--bg-input); color: var(--text-secondary); font-weight: 500; transition: all 0.2s ease; border: none; font-family: inherit; font-size: 0.9rem; }
+        .login-tab.active { background: var(--accent-gradient); color: white; }
+        .register-form { display: none; }
+        .register-form.active { display: flex; flex-direction: column; gap: 1rem; }
 
-        .main-app.visible {
-            display: flex;
-        }
+        /* Main Layout */
+        .main-app { display: none; min-height: 100vh; }
+        .main-app.visible { display: flex; }
 
-        /* ==================== SIDEBAR ==================== */
-        .sidebar {
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border-color);
-            position: fixed;
-            left: 0;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-            z-index: 100;
-            transition: transform 0.3s ease;
-        }
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); height: 100vh; background: var(--bg-sidebar); border-right: 1px solid var(--border-color); position: fixed; left: 0; top: 0; display: flex; flex-direction: column; z-index: 100; transition: transform 0.3s ease; }
+        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); background: var(--green-gradient); }
+        .sidebar-logo { display: flex; align-items: center; gap: 0.75rem; }
+        .sidebar-logo-img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--orange-primary); }
+        .sidebar-logo-text { font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 800; color: var(--cream); line-height: 1.2; }
+        .sidebar-logo-text span { color: var(--orange-primary); display: block; font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; }
+        .sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
+        .nav-section { padding: 0.5rem 1rem; margin-bottom: 0.5rem; }
+        .nav-section-title { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 0 0.75rem; margin-bottom: 0.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 12px; color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease; margin: 0.25rem 0; }
+        .nav-item:hover { background: var(--bg-card); color: var(--text-primary); }
+        .nav-item.active { background: var(--accent-gradient); color: white; }
+        .nav-item .material-icons { font-size: 1.3rem; }
+        .nav-item-text { font-size: 0.95rem; font-weight: 500; }
+        .nav-item-badge { margin-left: auto; background: var(--orange-primary); color: white; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 10px; font-weight: 600; }
+        .nav-item-badge.pending { background: var(--danger); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); }
+        .user-menu { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-radius: 12px; cursor: pointer; transition: background 0.2s ease; }
+        .user-menu:hover { background: var(--bg-card); }
+        .user-avatar { width: 40px; height: 40px; background: var(--accent-gradient); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 600; color: white; }
+        .user-info { flex: 1; }
+        .user-name { font-size: 0.9rem; font-weight: 600; }
+        .user-role { font-size: 0.75rem; color: var(--text-muted); }
+        .logout-icon { color: var(--text-muted); cursor: pointer; padding: 0.5rem; border-radius: 8px; transition: all 0.2s ease; }
+        .logout-icon:hover { background: var(--danger-bg); color: var(--danger); }
 
-        .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--green-gradient);
-        }
-
-        .sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .sidebar-logo-img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid var(--orange-primary);
-        }
-
-        .sidebar-logo-text {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--cream);
-            line-height: 1.2;
-        }
-
-        .sidebar-logo-text span {
-            color: var(--orange-primary);
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 1rem 0;
-            overflow-y: auto;
-        }
-
-        .nav-section {
-            padding: 0.5rem 1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .nav-section-title {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 0 0.75rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.85rem 1rem;
-            border-radius: 12px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin: 0.25rem 0;
-        }
-
-        .nav-item:hover {
-            background: var(--bg-card);
-            color: var(--text-primary);
-        }
-
-        .nav-item.active {
-            background: var(--accent-gradient);
-            color: white;
-        }
-
-        .nav-item .material-icons {
-            font-size: 1.3rem;
-        }
-
-        .nav-item-text {
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-
-        .nav-item-badge {
-            margin-left: auto;
-            background: var(--orange-primary);
-            color: white;
-            font-size: 0.75rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-
-        .sidebar-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .user-menu:hover {
-            background: var(--bg-card);
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--accent-gradient);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: white;
-        }
-
-        .user-info {
-            flex: 1;
-        }
-
-        .user-name {
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .user-role {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .logout-icon {
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .logout-icon:hover {
-            background: var(--danger-bg);
-            color: var(--danger);
-        }
-
-        /* ==================== MAIN CONTENT ==================== */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .content-header {
-            height: var(--header-height);
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--cream);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .content-body {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        /* ==================== PAGES ==================== */
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+        .content-header { height: 70px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 50; }
+        .page-title { font-size: 1.5rem; font-weight: 700; color: var(--cream); }
+        .header-actions { display: flex; align-items: center; gap: 1rem; }
+        .content-body { flex: 1; padding: 2rem; overflow-y: auto; }
         .page { display: none; }
         .page.active { display: block; }
 
-        /* ==================== STATS CARDS ==================== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--accent-gradient);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--orange-primary);
-            box-shadow: 0 12px 40px rgba(193, 127, 74, 0.15);
-        }
-
+        /* Stats Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent-gradient); opacity: 0; transition: opacity 0.3s ease; }
+        .stat-card:hover { transform: translateY(-4px); border-color: var(--orange-primary); }
         .stat-card:hover::before { opacity: 1; }
-
-        .stat-card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
+        .stat-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
         .stat-icon.orange { background: var(--warning-bg); color: var(--orange-primary); }
         .stat-icon.green { background: var(--success-bg); color: var(--success); }
         .stat-icon.blue { background: var(--info-bg); color: var(--info); }
+        .stat-icon.red { background: var(--danger-bg); color: var(--danger); }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--orange-primary); }
+        .stat-label { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem; }
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--orange-primary);
-        }
+        /* Buttons */
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem; font-family: inherit; }
+        .btn-primary { background: var(--accent-gradient); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(193, 127, 74, 0.4); }
+        .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { border-color: var(--orange-primary); background: var(--bg-card-hover); }
+        .btn-success { background: var(--success); color: var(--green-dark); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-icon { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 8px; }
+        .btn-icon .material-icons { font-size: 1.1rem; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 0.25rem;
-        }
+        /* Filters */
+        .filters-bar { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .filters-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+        .filter-group { flex: 1; min-width: 150px; }
+        .filter-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; display: block; }
+        .filter-select, .filter-input { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.75rem 1rem; color: var(--text-primary); font-size: 0.9rem; font-family: inherit; cursor: pointer; transition: all 0.2s ease; }
+        .filter-select:hover, .filter-input:hover { border-color: var(--orange-primary); }
+        .filter-select:focus, .filter-input:focus { outline: none; border-color: var(--orange-primary); }
 
-        /* ==================== BUTTONS ==================== */
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: inherit;
-        }
+        /* Table */
+        .routes-table-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; }
+        .routes-table { width: 100%; border-collapse: collapse; }
+        .routes-table th, .routes-table td { padding: 1rem 1.25rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .routes-table th { background: var(--green-dark); color: var(--cream); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: color 0.2s ease; }
+        .routes-table th:hover { color: var(--orange-primary); }
+        .routes-table tbody tr { transition: background 0.2s ease; }
+        .routes-table tbody tr:hover { background: var(--bg-card-hover); }
+        .routes-table tbody tr:last-child td { border-bottom: none; }
+        .route-name-cell { font-weight: 600; }
+        .actions-cell { display: flex; gap: 0.5rem; }
 
-        .btn-primary {
-            background: var(--accent-gradient);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(193, 127, 74, 0.4);
-        }
-
-        .btn-secondary {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--orange-primary);
-            background: var(--bg-card-hover);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: var(--green-dark);
-        }
-
-        .btn-success:hover {
-            background: #22c55e;
-        }
-
-        .btn-icon {
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            justify-content: center;
-            border-radius: 10px;
-        }
-
-        /* ==================== FILTERS BAR ==================== */
-        .filters-bar {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .filters-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: flex-end;
-        }
-
-        .filter-group {
-            flex: 1;
-            min-width: 180px;
-        }
-
-        .filter-label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .filter-select, .filter-input {
-            width: 100%;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 0.75rem 1rem;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .filter-select:hover, .filter-input:hover {
-            border-color: var(--orange-primary);
-        }
-
-        .filter-select:focus, .filter-input:focus {
-            outline: none;
-            border-color: var(--orange-primary);
-            box-shadow: 0 0 0 3px rgba(193, 127, 74, 0.2);
-        }
-
-        /* ==================== ROUTES TABLE ==================== */
-        .routes-table-wrapper {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            overflow: hidden;
-        }
-
-        .routes-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .routes-table th,
-        .routes-table td {
-            padding: 1rem 1.25rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .routes-table th {
-            background: var(--green-dark);
-            color: var(--cream);
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .routes-table th:hover {
-            color: var(--orange-primary);
-        }
-
-        .routes-table tbody tr {
-            transition: background 0.2s ease;
-        }
-
-        .routes-table tbody tr:hover {
-            background: var(--bg-card-hover);
-        }
-
-        .routes-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .route-name-cell {
-            font-weight: 600;
-        }
-
-        /* ==================== BADGES ==================== */
-        .badge {
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: inline-block;
-        }
-
+        /* Badges */
+        .badge { padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
         .badge-facil { background: rgba(74, 222, 128, 0.15); color: #86efac; }
         .badge-moderada { background: rgba(96, 165, 250, 0.15); color: #93c5fd; }
         .badge-dificil { background: rgba(193, 127, 74, 0.15); color: var(--orange-light); }
@@ -659,423 +187,156 @@
         .badge-extrema { background: rgba(248, 113, 113, 0.15); color: #fca5a5; }
         .badge-trail { background: rgba(45, 74, 62, 0.4); color: #86efac; }
         .badge-asfalto { background: rgba(193, 127, 74, 0.15); color: var(--orange-light); }
+        .badge-pending { background: rgba(251, 191, 36, 0.15); color: #fcd34d; }
+        .badge-approved { background: rgba(74, 222, 128, 0.15); color: #86efac; }
 
-        /* ==================== UPLOAD PAGE ==================== */
-        .upload-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        /* Tags */
+        .tags-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+        .tag { padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 500; background: var(--bg-input); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .tag.lama { background: rgba(139, 69, 19, 0.2); color: #d4a574; border-color: rgba(139, 69, 19, 0.3); }
+        .tag.pedras { background: rgba(156, 163, 175, 0.2); color: #d1d5db; border-color: rgba(156, 163, 175, 0.3); }
+        .tag.tecnico { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3); }
+        .tag.agua { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border-color: rgba(59, 130, 246, 0.3); }
+        .tag.sombra { background: rgba(74, 222, 128, 0.2); color: #86efac; border-color: rgba(74, 222, 128, 0.3); }
 
-        .upload-zone {
-            background: var(--bg-card);
-            border: 2px dashed var(--border-color);
-            border-radius: 20px;
-            padding: 3rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
+        /* Upload */
+        .upload-container { max-width: 900px; margin: 0 auto; }
+        .upload-zone { background: var(--bg-card); border: 2px dashed var(--border-color); border-radius: 20px; padding: 3rem; text-align: center; transition: all 0.3s ease; cursor: pointer; }
+        .upload-zone:hover, .upload-zone.dragover { border-color: var(--orange-primary); background: rgba(193, 127, 74, 0.05); }
+        .upload-icon { width: 80px; height: 80px; background: var(--accent-gradient); border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
+        .upload-icon .material-icons { font-size: 2.5rem; color: white; }
+        .upload-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cream); }
+        .upload-subtitle { color: var(--text-secondary); margin-bottom: 1.5rem; }
+        .upload-input { display: none; }
 
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: var(--orange-primary);
-            background: rgba(193, 127, 74, 0.05);
-        }
-
-        .upload-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--accent-gradient);
-            border-radius: 20px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .upload-icon .material-icons {
-            font-size: 2.5rem;
-            color: white;
-        }
-
-        .upload-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--cream);
-        }
-
-        .upload-subtitle {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-        }
-
-        .upload-input {
-            display: none;
-        }
-
-        /* ==================== GPX ANALYSIS CARD ==================== */
-        .analysis-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-top: 2rem;
-            display: none;
-        }
-
+        /* Analysis Card */
+        .analysis-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 2rem; margin-top: 2rem; display: none; }
         .analysis-card.visible { display: block; }
+        .analysis-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+        .analysis-icon { width: 50px; height: 50px; background: var(--success-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--success); }
+        .analysis-title { font-size: 1.2rem; font-weight: 600; color: var(--cream); }
+        .analysis-subtitle { font-size: 0.9rem; color: var(--text-secondary); }
+        .analysis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .analysis-stat { background: var(--bg-input); border-radius: 12px; padding: 1rem; text-align: center; }
+        .analysis-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--orange-primary); }
+        .analysis-stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .analysis-map-container { margin-bottom: 1.5rem; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
+        .analysis-map { height: 250px; width: 100%; background: var(--bg-input); }
+        .analysis-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        .analysis-form .full-width { grid-column: span 2; }
+        .analysis-actions { margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end; }
 
-        /* Mini Map */
-        .analysis-map-container {
-            margin-bottom: 1.5rem;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
+        /* Elevation Chart */
+        .elevation-container { margin: 1.5rem 0; background: var(--bg-input); border-radius: 12px; padding: 1rem; }
+        .elevation-chart { height: 150px; }
 
-        .analysis-map {
-            height: 250px;
-            width: 100%;
-            background: var(--bg-input);
-        }
+        /* Tags Selector */
+        .tags-selector { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .tag-option { padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-secondary); transition: all 0.2s ease; }
+        .tag-option:hover { border-color: var(--orange-primary); }
+        .tag-option.selected { background: var(--accent-gradient); color: white; border-color: transparent; }
 
-        .map-info {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.75rem 1rem;
-            background: var(--bg-input);
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
+        /* Pending Routes */
+        .pending-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; border-left: 4px solid #fbbf24; }
+        .pending-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .pending-title { font-weight: 600; font-size: 1.1rem; }
+        .pending-meta { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        .pending-stats { display: flex; gap: 2rem; margin: 1rem 0; }
+        .pending-stat { text-align: center; }
+        .pending-stat-value { font-size: 1.2rem; font-weight: 700; color: var(--orange-primary); }
+        .pending-stat-label { font-size: 0.75rem; color: var(--text-muted); }
+        .pending-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
 
-        .map-info-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        /* Compare Mode */
+        .compare-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; }
+        .compare-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; }
+        .compare-header { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); }
 
-        .map-info-item .material-icons {
-            font-size: 1rem;
-            color: var(--orange-primary);
-        }
-
-        .analysis-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .analysis-icon {
-            width: 50px;
-            height: 50px;
-            background: var(--success-bg);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--success);
-        }
-
-        .analysis-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--cream);
-        }
-
-        .analysis-subtitle {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .analysis-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .analysis-stat {
-            background: var(--bg-input);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .analysis-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--orange-primary);
-        }
-
-        .analysis-stat-label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-        }
-
-        .analysis-form {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-
-        .analysis-form .form-group {
-            margin-bottom: 0;
-        }
-
-        .analysis-form .form-group.full-width {
-            grid-column: span 2;
-        }
-
-        .analysis-actions {
-            margin-top: 1.5rem;
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-        }
-
-        /* ==================== MODAL ==================== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 2rem; }
         .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 24px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
+        .modal.modal-lg { max-width: 900px; }
+        .modal-header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; background: var(--green-gradient); }
+        .modal-title { font-size: 1.3rem; font-weight: 600; color: var(--cream); }
+        .modal-close { width: 36px; height: 36px; border: none; background: rgba(255,255,255,0.1); color: var(--cream); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+        .modal-close:hover { background: var(--danger); color: white; }
+        .modal-body { padding: 2rem; }
+        .modal-footer { padding: 1.5rem 2rem; border-top: 1px solid var(--border-color); display: flex; gap: 1rem; justify-content: flex-end; }
+        .modal-map-container { height: 350px; width: 100%; }
+        .modal-map-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1rem; padding: 1rem; background: var(--bg-input); }
+        .modal-map-stat { text-align: center; }
+        .modal-map-stat-value { font-size: 1.1rem; font-weight: 700; color: var(--orange-primary); }
+        .modal-map-stat-label { font-size: 0.7rem; color: var(--text-muted); }
 
-        .modal {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-header {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--green-gradient);
-        }
-
-        .modal-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--cream);
-        }
-
-        .modal-close {
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: rgba(255,255,255,0.1);
-            color: var(--cream);
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .modal-close:hover {
-            background: var(--danger);
-            color: white;
-        }
-
-        .modal-body {
-            padding: 2rem;
-        }
-
-        .modal-footer {
-            padding: 1.5rem 2rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-        }
-
-        /* ==================== TOAST ==================== */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            transform: translateY(150%);
-            transition: transform 0.3s ease;
-            z-index: 2000;
-        }
-
+        /* Toast */
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); transform: translateY(150%); transition: transform 0.3s ease; z-index: 2000; }
         .toast.show { transform: translateY(0); }
         .toast.success { border-color: var(--success); }
         .toast.error { border-color: var(--danger); }
 
-        /* ==================== EMPTY STATE ==================== */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-        }
+        /* Empty State */
+        .empty-state { text-align: center; padding: 4rem 2rem; }
+        .empty-state-icon { width: 100px; height: 100px; background: var(--bg-card); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
+        .empty-state-icon .material-icons { font-size: 3rem; color: var(--text-muted); }
+        .empty-state-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cream); }
+        .empty-state-text { color: var(--text-secondary); }
 
-        .empty-state-icon {
-            width: 100px;
-            height: 100px;
-            background: var(--bg-card);
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .empty-state-icon .material-icons {
-            font-size: 3rem;
-            color: var(--text-muted);
-        }
-
-        .empty-state-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--cream);
-        }
-
-        .empty-state-text {
-            color: var(--text-secondary);
-        }
-
-        /* ==================== MOBILE ==================== */
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
+        /* Mobile */
+        .mobile-menu-btn { display: none; background: none; border: none; color: var(--text-primary); cursor: pointer; padding: 0.5rem; }
         @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .mobile-menu-btn {
-                display: flex;
-            }
-
-            .analysis-form {
-                grid-template-columns: 1fr;
-            }
-
-            .analysis-form .form-group.full-width {
-                grid-column: span 1;
-            }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-menu-btn { display: flex; }
+            .analysis-form { grid-template-columns: 1fr; }
+            .analysis-form .full-width { grid-column: span 1; }
         }
-
         @media (max-width: 768px) {
-            .content-body {
-                padding: 1rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .filters-row {
-                flex-direction: column;
-            }
-
-            .filter-group {
-                width: 100%;
-            }
+            .content-body { padding: 1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .filters-row { flex-direction: column; }
+            .filter-group { width: 100%; }
         }
 
-        /* ==================== SCROLLBAR ==================== */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--orange-primary); }
 
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--orange-primary);
-        }
-
-        /* ==================== ANIMATIONS ==================== */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.3s ease forwards;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease forwards; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
         .shake { animation: shake 0.3s ease; }
     </style>
 </head>
 <body>
-    <!-- ==================== LOGIN SCREEN ==================== -->
+    <!-- LOGIN -->
     <div class="login-screen" id="loginScreen">
         <div class="login-container">
             <div class="login-logo">
                 <img src="logo.png" alt="DEPENDE ROUTE CLUB" class="login-logo-img">
                 <h1 class="login-title">DEPENDE ROUTE CLUB</h1>
-                <p class="login-subtitle">Trail Running • Rotas de Treino</p>
+                <p class="login-subtitle">Trail Running - Rotas de Treino</p>
             </div>
+
+            <div class="login-tabs">
+                <button class="login-tab active" onclick="showLoginTab('login')">Entrar</button>
+                <button class="login-tab" onclick="showLoginTab('register')">Criar Conta</button>
+            </div>
+
+            <div class="login-error" id="loginError">
+                <span class="material-icons">warning</span>
+                <span id="loginErrorMessage">Erro</span>
+            </div>
+
+            <!-- Login Form -->
             <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
-                <div class="login-error" id="loginError">
-                    <span class="material-icons">warning</span>
-                    <span id="loginErrorMessage">Usuário ou senha incorretos</span>
-                </div>
                 <div class="form-group">
-                    <label class="form-label">Usuário</label>
-                    <input type="text" class="form-input" id="username" placeholder="Digite seu usuário" required>
+                    <label class="form-label">Usuario ou Email</label>
+                    <input type="text" class="form-input" id="username" placeholder="Digite seu usuario ou email" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Senha</label>
@@ -1083,23 +344,56 @@
                 </div>
                 <button type="submit" class="login-btn">Entrar</button>
             </form>
+
+            <!-- Register Form -->
+            <form class="register-form" id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label class="form-label">Nome Completo</label>
+                    <input type="text" class="form-input" id="regName" placeholder="Seu nome" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="regEmail" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Senha</label>
+                    <input type="password" class="form-input" id="regPassword" placeholder="Crie uma senha (min. 6 caracteres)" minlength="6" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirmar Senha</label>
+                    <input type="password" class="form-input" id="regPasswordConfirm" placeholder="Confirme sua senha" required>
+                </div>
+                <button type="submit" class="login-btn">Criar Conta</button>
+            </form>
+
+            <div class="login-divider"><span>ou continue com</span></div>
+
+            <div class="social-buttons">
+                <button type="button" class="social-btn google" onclick="loginWithGoogle()">
+                    <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    Continuar com Google
+                </button>
+                <button type="button" class="social-btn microsoft" onclick="loginWithMicrosoft()">
+                    <svg viewBox="0 0 24 24"><path fill="#F25022" d="M1 1h10v10H1z"/><path fill="#00A4EF" d="M1 13h10v10H1z"/><path fill="#7FBA00" d="M13 1h10v10H13z"/><path fill="#FFB900" d="M13 13h10v10H13z"/></svg>
+                    Continuar com Microsoft
+                </button>
+            </div>
+
+            <div class="login-footer" id="loginFooter">
+                Primeiro acesso? <a onclick="showLoginTab('register')">Crie sua conta</a>
+            </div>
         </div>
     </div>
 
-    <!-- ==================== MAIN APPLICATION ==================== -->
+    <!-- MAIN APP -->
     <div class="main-app" id="mainApp">
-        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
                     <img src="logo.png" alt="Logo" class="sidebar-logo-img">
-                    <div class="sidebar-logo-text">
-                        DEPENDE
-                        <span>ROUTE CLUB</span>
-                    </div>
+                    <div class="sidebar-logo-text">DEPENDE<span>ROUTE CLUB</span></div>
                 </div>
             </div>
-
             <nav class="sidebar-nav">
                 <div class="nav-section">
                     <div class="nav-section-title">Menu Principal</div>
@@ -1112,14 +406,22 @@
                         <span class="nav-item-text">Rotas</span>
                         <span class="nav-item-badge" id="routesCount">0</span>
                     </div>
+                    <div class="nav-item" data-page="pending" onclick="navigateTo('pending')" id="pendingNav" style="display:none;">
+                        <span class="material-icons">pending_actions</span>
+                        <span class="nav-item-text">Pendentes</span>
+                        <span class="nav-item-badge pending" id="pendingCount">0</span>
+                    </div>
+                    <div class="nav-item" data-page="compare" onclick="navigateTo('compare')">
+                        <span class="material-icons">compare_arrows</span>
+                        <span class="nav-item-text">Comparar</span>
+                    </div>
                     <div class="nav-item" data-page="upload" onclick="navigateTo('upload')">
                         <span class="material-icons">cloud_upload</span>
                         <span class="nav-item-text">Upload GPX</span>
                     </div>
                 </div>
-
                 <div class="nav-section">
-                    <div class="nav-section-title">Filtros Rápidos</div>
+                    <div class="nav-section-title">Filtros Rapidos</div>
                     <div class="nav-item" onclick="filterByTerrain('Trail')">
                         <span class="material-icons">terrain</span>
                         <span class="nav-item-text">Trail</span>
@@ -1129,21 +431,35 @@
                         <span class="nav-item-text">Asfalto</span>
                     </div>
                 </div>
+                <div class="nav-section" id="adminSection" style="display:none;">
+                    <div class="nav-section-title">Admin</div>
+                    <div class="nav-item" data-page="users" onclick="navigateTo('users')">
+                        <span class="material-icons">people</span>
+                        <span class="nav-item-text">Usuarios</span>
+                        <span class="nav-item-badge" id="usersCount">0</span>
+                    </div>
+                    <div class="nav-item" onclick="exportInventory('csv')">
+                        <span class="material-icons">download</span>
+                        <span class="nav-item-text">Exportar CSV</span>
+                    </div>
+                    <div class="nav-item" onclick="exportInventory('json')">
+                        <span class="material-icons">code</span>
+                        <span class="nav-item-text">Exportar JSON</span>
+                    </div>
+                </div>
             </nav>
-
             <div class="sidebar-footer">
                 <div class="user-menu">
                     <div class="user-avatar" id="userAvatar">A</div>
                     <div class="user-info">
                         <div class="user-name" id="userName">Admin</div>
-                        <div class="user-role">Membro</div>
+                        <div class="user-role" id="userRole">Membro</div>
                     </div>
                     <span class="material-icons logout-icon" onclick="handleLogout()">logout</span>
                 </div>
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <header class="content-header">
                 <div style="display: flex; align-items: center; gap: 1rem;">
@@ -1154,17 +470,15 @@
                 </div>
                 <div class="header-actions">
                     <button class="btn btn-primary" onclick="navigateTo('upload')">
-                        <span class="material-icons">add</span>
-                        Nova Rota
+                        <span class="material-icons">add</span> Nova Rota
                     </button>
                 </div>
             </header>
 
             <div class="content-body">
-                <!-- Dashboard Page -->
+                <!-- DASHBOARD -->
                 <div class="page active" id="page-dashboard">
                     <div class="stats-grid" id="statsGrid"></div>
-
                     <div class="filters-bar">
                         <div class="filters-row">
                             <div class="filter-group" style="flex: 2;">
@@ -1175,10 +489,10 @@
                                 <label class="filter-label">Dificuldade</label>
                                 <select class="filter-select" id="difficultyFilter" onchange="applyFilters()">
                                     <option value="">Todas</option>
-                                    <option value="Facil">Fácil</option>
+                                    <option value="Facil">Facil</option>
                                     <option value="Moderada">Moderada</option>
-                                    <option value="Dificil">Difícil</option>
-                                    <option value="Muito Dificil">Muito Difícil</option>
+                                    <option value="Dificil">Dificil</option>
+                                    <option value="Muito Dificil">Muito Dificil</option>
                                     <option value="Extrema">Extrema</option>
                                 </select>
                             </div>
@@ -1199,19 +513,18 @@
                             </button>
                         </div>
                     </div>
-
                     <div class="routes-table-wrapper">
                         <table class="routes-table">
                             <thead>
                                 <tr>
                                     <th onclick="sortTable('nome')">Nome</th>
-                                    <th onclick="sortTable('distancia_km')">Distância</th>
+                                    <th onclick="sortTable('distancia_km')">Distancia</th>
                                     <th onclick="sortTable('ganho_elevacao_m')">D+</th>
-                                    <th onclick="sortTable('elevacao_max_m')">Alt. Máx</th>
+                                    <th onclick="sortTable('elevacao_max_m')">Alt. Max</th>
                                     <th onclick="sortTable('dificuldade')">Dificuldade</th>
                                     <th onclick="sortTable('terreno')">Terreno</th>
                                     <th onclick="sortTable('cidade')">Cidade</th>
-                                    <th>Ações</th>
+                                    <th>Acoes</th>
                                 </tr>
                             </thead>
                             <tbody id="routesTableBody"></tbody>
@@ -1219,50 +532,122 @@
                     </div>
                 </div>
 
-                <!-- Routes Page -->
-                <div class="page" id="page-routes"></div>
+                <!-- ROUTES (Cards) -->
+                <div class="page" id="page-routes">
+                    <div class="filters-bar">
+                        <div class="filters-row">
+                            <div class="filter-group" style="flex: 2;">
+                                <label class="filter-label">Buscar</label>
+                                <input type="text" class="filter-input" id="searchInputCards" placeholder="Nome da rota..." oninput="applyFiltersCards()">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Dificuldade</label>
+                                <select class="filter-select" id="difficultyFilterCards" onchange="applyFiltersCards()">
+                                    <option value="">Todas</option>
+                                    <option value="Facil">Facil</option>
+                                    <option value="Moderada">Moderada</option>
+                                    <option value="Dificil">Dificil</option>
+                                    <option value="Muito Dificil">Muito Dificil</option>
+                                    <option value="Extrema">Extrema</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Terreno</label>
+                                <select class="filter-select" id="terrainFilterCards" onchange="applyFiltersCards()">
+                                    <option value="">Todos</option>
+                                    <option value="Trail">Trail</option>
+                                    <option value="Asfalto/Urbano">Asfalto</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="routesCardsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;"></div>
+                </div>
 
-                <!-- Upload Page -->
+                <!-- PENDING -->
+                <div class="page" id="page-pending">
+                    <div id="pendingContainer"></div>
+                </div>
+
+                <!-- COMPARE -->
+                <div class="page" id="page-compare">
+                    <div class="filters-bar">
+                        <p style="margin-bottom: 1rem; color: var(--text-secondary);">Selecione 2 rotas para comparar:</p>
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label class="filter-label">Rota 1</label>
+                                <select class="filter-select" id="compareRoute1" onchange="updateComparison()"></select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Rota 2</label>
+                                <select class="filter-select" id="compareRoute2" onchange="updateComparison()"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="compare-container" id="compareContainer"></div>
+                </div>
+
+                <!-- USERS (Admin) -->
+                <div class="page" id="page-users">
+                    <div class="filters-bar">
+                        <div class="filters-row">
+                            <div class="filter-group" style="flex:2;">
+                                <label class="filter-label">Buscar Usuario</label>
+                                <input type="text" class="filter-input" id="searchUsers" placeholder="Nome ou email..." oninput="renderUsers()">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Status</label>
+                                <select class="filter-select" id="filterUserStatus" onchange="renderUsers()">
+                                    <option value="">Todos</option>
+                                    <option value="active">Ativos</option>
+                                    <option value="pending">Pendentes</option>
+                                    <option value="blocked">Bloqueados</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="routes-table-wrapper">
+                        <table class="routes-table">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Email</th>
+                                    <th>Tipo</th>
+                                    <th>Status</th>
+                                    <th>Criado em</th>
+                                    <th>Acoes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- UPLOAD -->
                 <div class="page" id="page-upload">
                     <div class="upload-container">
                         <div class="upload-zone" id="uploadZone" onclick="document.getElementById('gpxInput').click()">
-                            <div class="upload-icon">
-                                <span class="material-icons">cloud_upload</span>
-                            </div>
+                            <div class="upload-icon"><span class="material-icons">cloud_upload</span></div>
                             <h3 class="upload-title">Arraste seu arquivo GPX aqui</h3>
                             <p class="upload-subtitle">ou clique para selecionar</p>
-                            <button class="btn btn-primary">Selecionar Arquivo</button>
+                            <button class="btn btn-primary" type="button">Selecionar Arquivo</button>
                             <input type="file" class="upload-input" id="gpxInput" accept=".gpx" onchange="handleFileSelect(event)">
                         </div>
-
                         <div class="analysis-card" id="analysisCard">
                             <div class="analysis-header">
-                                <div class="analysis-icon">
-                                    <span class="material-icons">check_circle</span>
-                                </div>
+                                <div class="analysis-icon"><span class="material-icons">check_circle</span></div>
                                 <div>
                                     <h3 class="analysis-title" id="analysisFileName">Arquivo analisado</h3>
-                                    <p class="analysis-subtitle">Dados extraídos automaticamente do GPX</p>
+                                    <p class="analysis-subtitle">Dados extraidos automaticamente do GPX</p>
                                 </div>
                             </div>
-
                             <div class="analysis-grid" id="analysisStats"></div>
-
-                            <!-- Mini Mapa -->
                             <div class="analysis-map-container">
                                 <div id="analysisMap" class="analysis-map"></div>
-                                <div class="map-info">
-                                    <div class="map-info-item">
-                                        <span class="material-icons">place</span>
-                                        <span id="mapLocation">Carregando localização...</span>
-                                    </div>
-                                    <div class="map-info-item">
-                                        <span class="material-icons">straighten</span>
-                                        <span id="mapDistance">0 km</span>
-                                    </div>
-                                </div>
                             </div>
-
+                            <div class="elevation-container">
+                                <canvas id="elevationChart" class="elevation-chart"></canvas>
+                            </div>
                             <form id="routeForm" onsubmit="saveRoute(event)">
                                 <div class="analysis-form">
                                     <div class="form-group full-width">
@@ -1277,29 +662,39 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Cidade/Região *</label>
+                                        <label class="form-label">Cidade/Regiao *</label>
                                         <input type="text" class="form-input" id="routeCity" required>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Dificuldade</label>
                                         <select class="form-input" id="routeDifficulty">
-                                            <option value="Facil">Fácil</option>
+                                            <option value="Facil">Facil</option>
                                             <option value="Moderada">Moderada</option>
-                                            <option value="Dificil">Difícil</option>
-                                            <option value="Muito Dificil">Muito Difícil</option>
+                                            <option value="Dificil">Dificil</option>
+                                            <option value="Muito Dificil">Muito Dificil</option>
                                             <option value="Extrema">Extrema</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Contribuidor</label>
-                                        <input type="text" class="form-input" id="routeContributor" placeholder="Seu nome">
+                                        <label class="form-label">Pace Medio (min/km)</label>
+                                        <input type="number" step="0.1" class="form-input" id="routePace" placeholder="ex: 6.5" value="6">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label class="form-label">Condicoes do Terreno</label>
+                                        <div class="tags-selector" id="tagsSelector">
+                                            <span class="tag-option" data-tag="lama" onclick="toggleTag(this)">Lama</span>
+                                            <span class="tag-option" data-tag="pedras" onclick="toggleTag(this)">Pedras</span>
+                                            <span class="tag-option" data-tag="tecnico" onclick="toggleTag(this)">Tecnico</span>
+                                            <span class="tag-option" data-tag="agua" onclick="toggleTag(this)">Ponto d'agua</span>
+                                            <span class="tag-option" data-tag="sombra" onclick="toggleTag(this)">Sombra</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="analysis-actions">
                                     <button type="button" class="btn btn-secondary" onclick="cancelUpload()">Cancelar</button>
                                     <button type="submit" class="btn btn-success">
-                                        <span class="material-icons">save</span>
-                                        Adicionar ao Inventário
+                                        <span class="material-icons">send</span>
+                                        <span id="submitBtnText">Enviar para Aprovacao</span>
                                     </button>
                                 </div>
                             </form>
@@ -1310,75 +705,368 @@
         </main>
     </div>
 
-    <!-- Modal -->
-    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <!-- MODALS -->
+    <div class="modal-overlay" id="detailsModal" onclick="closeModal('detailsModal', event)">
         <div class="modal" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Detalhes da Rota</h3>
-                <button class="modal-close" onclick="closeModal()">
-                    <span class="material-icons">close</span>
-                </button>
+                <h3 class="modal-title" id="detailsModalTitle">Detalhes</h3>
+                <button class="modal-close" onclick="closeModal('detailsModal')"><span class="material-icons">close</span></button>
             </div>
-            <div class="modal-body" id="modalBody"></div>
-            <div class="modal-footer" id="modalFooter"></div>
+            <div class="modal-body" id="detailsModalBody"></div>
+            <div class="modal-footer" id="detailsModalFooter"></div>
         </div>
     </div>
 
-    <!-- Toast -->
+    <div class="modal-overlay" id="mapModal" onclick="closeModal('mapModal', event)">
+        <div class="modal modal-lg" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title" id="mapModalTitle">Mapa da Rota</h3>
+                <button class="modal-close" onclick="closeModal('mapModal')"><span class="material-icons">close</span></button>
+            </div>
+            <div id="routeMapContainer" class="modal-map-container"></div>
+            <div class="modal-map-info" id="mapModalInfo"></div>
+            <div class="elevation-container" style="margin: 0; border-radius: 0;">
+                <canvas id="modalElevationChart" style="height: 120px;"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('mapModal')">Fechar</button>
+                <button class="btn btn-primary" id="mapDownloadBtn"><span class="material-icons">download</span> Download GPX</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal" onclick="closeModal('editModal', event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title">Editar Rota</h3>
+                <button class="modal-close" onclick="closeModal('editModal')"><span class="material-icons">close</span></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" onsubmit="saveEdit(event)">
+                    <input type="hidden" id="editIndex">
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label class="form-label">Nome</label>
+                        <input type="text" class="form-input" id="editName" required>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Distancia (km)</label>
+                            <input type="number" step="0.01" class="form-input" id="editDistance" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">D+ (m)</label>
+                            <input type="number" class="form-input" id="editGain" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Dificuldade</label>
+                            <select class="form-input" id="editDifficulty">
+                                <option value="Facil">Facil</option>
+                                <option value="Moderada">Moderada</option>
+                                <option value="Dificil">Dificil</option>
+                                <option value="Muito Dificil">Muito Dificil</option>
+                                <option value="Extrema">Extrema</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Terreno</label>
+                            <select class="form-input" id="editTerrain">
+                                <option value="Trail">Trail</option>
+                                <option value="Asfalto/Urbano">Asfalto/Urbano</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column:span 2;">
+                            <label class="form-label">Cidade</label>
+                            <input type="text" class="form-input" id="editCity" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('editModal')">Cancelar</button>
+                <button class="btn btn-primary" type="submit" form="editForm"><span class="material-icons">save</span> Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="deleteModal" onclick="closeModal('deleteModal', event)">
+        <div class="modal" style="max-width:400px;" onclick="event.stopPropagation()">
+            <div class="modal-header" style="background:linear-gradient(135deg,#dc2626,#b91c1c);">
+                <h3 class="modal-title">Confirmar Exclusao</h3>
+                <button class="modal-close" onclick="closeModal('deleteModal')"><span class="material-icons">close</span></button>
+            </div>
+            <div class="modal-body" style="text-align:center;">
+                <div style="width:60px;height:60px;background:rgba(239,68,68,0.1);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1rem;">
+                    <span class="material-icons" style="font-size:2rem;color:#ef4444;">delete_forever</span>
+                </div>
+                <p>Deseja excluir a rota:</p>
+                <p style="font-weight:600;color:var(--orange-primary);margin:0.5rem 0;" id="deleteRouteName"></p>
+                <input type="hidden" id="deleteIndex">
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancelar</button>
+                <button class="btn btn-danger" onclick="confirmDelete()"><span class="material-icons">delete</span> Excluir</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast">
         <span class="material-icons" id="toastIcon">check_circle</span>
-        <span id="toastMessage">Operação realizada com sucesso!</span>
+        <span id="toastMessage">Sucesso!</span>
     </div>
 
     <script>
-        // ==================== AUTH ====================
-        const USERS = {
-            'admin': { password: '*Pedro@2020', name: 'Administrador', role: 'admin' },
-            'im3': { password: '*im3@2026', name: 'IM3', role: 'user' }
+        // ========== CONFIG ==========
+        const CONFIG = {
+            GOOGLE_CLIENT_ID: 'SEU_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+            MICROSOFT_CLIENT_ID: 'SEU_MICROSOFT_CLIENT_ID',
+            MICROSOFT_TENANT: 'common'
         };
 
+        // ========== AUTH ==========
+        const DEFAULT_USERS = {
+            'admin': { password: '*Pedro@2020', name: 'Administrador', role: 'admin', email: 'admin@depende.club', status: 'active', createdAt: '2024-01-01', provider: 'local' },
+            'im3': { password: '*im3@2026', name: 'IM3', role: 'user', email: 'im3@depende.club', status: 'active', createdAt: '2024-01-01', provider: 'local' }
+        };
+
+        let USERS = {};
+        let currentUser = null;
+        let isAdmin = false;
+
+        function loadUsers() {
+            const stored = localStorage.getItem('depende_users');
+            USERS = stored ? JSON.parse(stored) : { ...DEFAULT_USERS };
+        }
+
+        function saveUsers() {
+            localStorage.setItem('depende_users', JSON.stringify(USERS));
+        }
+
+        // ========== LOGIN TABS ==========
+        function showLoginTab(tab) {
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.login-tab:${tab === 'login' ? 'first-child' : 'last-child'}`).classList.add('active');
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'flex' : 'none';
+            document.getElementById('registerForm').classList.toggle('active', tab === 'register');
+            document.getElementById('loginFooter').innerHTML = tab === 'login'
+                ? 'Primeiro acesso? <a onclick="showLoginTab(\'register\')">Crie sua conta</a>'
+                : 'Ja tem conta? <a onclick="showLoginTab(\'login\')">Faca login</a>';
+            document.getElementById('loginError').classList.remove('show');
+        }
+
+        // ========== REGISTER ==========
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+
+            if (password !== passwordConfirm) {
+                showLoginError('As senhas nao coincidem');
+                return;
+            }
+
+            if (Object.values(USERS).some(u => u.email === email)) {
+                showLoginError('Este email ja esta cadastrado');
+                return;
+            }
+
+            const username = email.split('@')[0].replace(/[^a-z0-9]/g, '') + '_' + Date.now().toString(36);
+            USERS[username] = {
+                password,
+                name,
+                email,
+                role: 'user',
+                status: 'pending',
+                createdAt: new Date().toISOString().split('T')[0],
+                provider: 'local'
+            };
+            saveUsers();
+
+            showLoginError('Conta criada! Aguarde aprovacao do admin.');
+            document.getElementById('loginError').style.borderColor = 'var(--success)';
+            document.getElementById('loginError').style.background = 'var(--success-bg)';
+            document.getElementById('loginError').style.color = '#86efac';
+            document.getElementById('loginError').querySelector('.material-icons').textContent = 'check_circle';
+
+            setTimeout(() => {
+                showLoginTab('login');
+                document.getElementById('loginError').style.borderColor = '';
+                document.getElementById('loginError').style.background = '';
+                document.getElementById('loginError').style.color = '';
+                document.getElementById('loginError').querySelector('.material-icons').textContent = 'warning';
+            }, 3000);
+        }
+
+        // ========== GOOGLE LOGIN ==========
+        function loginWithGoogle() {
+            if (typeof google === 'undefined' || !google.accounts) {
+                showLoginError('Google SDK nao carregado. Verifique sua conexao.');
+                return;
+            }
+            google.accounts.id.initialize({
+                client_id: CONFIG.GOOGLE_CLIENT_ID,
+                callback: handleGoogleResponse
+            });
+            google.accounts.id.prompt();
+        }
+
+        function handleGoogleResponse(response) {
+            try {
+                const payload = JSON.parse(atob(response.credential.split('.')[1]));
+                handleSocialLogin({
+                    email: payload.email,
+                    name: payload.name,
+                    picture: payload.picture,
+                    provider: 'google'
+                });
+            } catch (e) {
+                showLoginError('Erro ao processar login Google');
+            }
+        }
+
+        // ========== MICROSOFT LOGIN ==========
+        let msalInstance = null;
+
+        function initMsal() {
+            if (typeof msal === 'undefined') return;
+            msalInstance = new msal.PublicClientApplication({
+                auth: {
+                    clientId: CONFIG.MICROSOFT_CLIENT_ID,
+                    authority: `https://login.microsoftonline.com/${CONFIG.MICROSOFT_TENANT}`,
+                    redirectUri: window.location.origin
+                }
+            });
+        }
+
+        function loginWithMicrosoft() {
+            if (!msalInstance) {
+                initMsal();
+                if (!msalInstance) {
+                    showLoginError('Microsoft SDK nao carregado. Verifique sua conexao.');
+                    return;
+                }
+            }
+            msalInstance.loginPopup({ scopes: ['user.read'] })
+                .then(response => {
+                    msalInstance.acquireTokenSilent({ scopes: ['user.read'], account: response.account })
+                        .then(tokenResponse => {
+                            fetch('https://graph.microsoft.com/v1.0/me', {
+                                headers: { 'Authorization': `Bearer ${tokenResponse.accessToken}` }
+                            })
+                            .then(r => r.json())
+                            .then(profile => {
+                                handleSocialLogin({
+                                    email: profile.mail || profile.userPrincipalName,
+                                    name: profile.displayName,
+                                    provider: 'microsoft'
+                                });
+                            });
+                        });
+                })
+                .catch(e => showLoginError('Erro no login Microsoft'));
+        }
+
+        // ========== SOCIAL LOGIN HANDLER ==========
+        function handleSocialLogin(data) {
+            const email = data.email.toLowerCase();
+            let existingUser = Object.entries(USERS).find(([k, u]) => u.email === email);
+
+            if (existingUser) {
+                const [username, user] = existingUser;
+                if (user.status === 'blocked') {
+                    showLoginError('Sua conta esta bloqueada');
+                    return;
+                }
+                if (user.status === 'pending') {
+                    showLoginError('Sua conta aguarda aprovacao do admin');
+                    return;
+                }
+                loginUser(username);
+            } else {
+                const username = email.split('@')[0].replace(/[^a-z0-9]/g, '') + '_' + Date.now().toString(36);
+                USERS[username] = {
+                    password: null,
+                    name: data.name,
+                    email: email,
+                    role: 'user',
+                    status: 'pending',
+                    createdAt: new Date().toISOString().split('T')[0],
+                    provider: data.provider,
+                    picture: data.picture || null
+                };
+                saveUsers();
+                showLoginError('Conta criada! Aguarde aprovacao do admin.');
+                document.getElementById('loginError').style.borderColor = 'var(--success)';
+                document.getElementById('loginError').style.background = 'var(--success-bg)';
+                document.getElementById('loginError').style.color = '#86efac';
+                document.getElementById('loginError').querySelector('.material-icons').textContent = 'check_circle';
+            }
+        }
+
+        function loginUser(username) {
+            const user = USERS[username];
+            localStorage.setItem('depende_session', JSON.stringify({ username, expiry: Date.now() + 86400000 }));
+            showMainApp(username);
+        }
+
         function checkAuth() {
+            loadUsers();
             const session = localStorage.getItem('depende_session');
             if (session) {
                 try {
                     const { username, expiry } = JSON.parse(session);
                     if (new Date().getTime() < expiry && USERS[username]) {
-                        showMainApp(username);
-                        return;
+                        if (USERS[username].status === 'active') {
+                            showMainApp(username);
+                            return;
+                        }
                     }
-                } catch (e) {
-                    localStorage.removeItem('depende_session');
-                }
+                } catch (e) { localStorage.removeItem('depende_session'); }
             }
             showLoginScreen();
         }
 
-        function handleLogin(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value.trim().toLowerCase();
+        function handleLogin(e) {
+            e.preventDefault();
+            const input = document.getElementById('username').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
 
-            if (!USERS[username]) {
-                showLoginError('Usuário não encontrado');
+            // Buscar por username ou email
+            let foundUser = USERS[input] ? [input, USERS[input]] : Object.entries(USERS).find(([k, u]) => u.email === input);
+
+            if (!foundUser) {
+                showLoginError('Usuario ou email nao encontrado');
                 return;
             }
 
-            if (USERS[username].password === password) {
-                const session = {
-                    username,
-                    expiry: new Date().getTime() + (24 * 60 * 60 * 1000)
-                };
-                localStorage.setItem('depende_session', JSON.stringify(session));
-                showMainApp(username);
+            const [username, user] = foundUser;
+
+            if (user.status === 'blocked') {
+                showLoginError('Sua conta esta bloqueada');
+                return;
+            }
+
+            if (user.status === 'pending') {
+                showLoginError('Sua conta aguarda aprovacao do admin');
+                return;
+            }
+
+            if (user.provider !== 'local' && !user.password) {
+                showLoginError(`Use o botao "${user.provider === 'google' ? 'Google' : 'Microsoft'}" para entrar`);
+                return;
+            }
+
+            if (user.password === password) {
+                loginUser(username);
             } else {
                 showLoginError('Senha incorreta');
             }
         }
 
-        function showLoginError(message) {
-            const errorDiv = document.getElementById('loginError');
-            document.getElementById('loginErrorMessage').textContent = message;
-            errorDiv.classList.add('show');
+        function showLoginError(msg) {
+            document.getElementById('loginErrorMessage').textContent = msg;
+            document.getElementById('loginError').classList.add('show');
             document.querySelector('.login-container').classList.add('shake');
             setTimeout(() => document.querySelector('.login-container').classList.remove('shake'), 300);
         }
@@ -1389,181 +1077,278 @@
         }
 
         function showMainApp(username) {
+            currentUser = username;
+            isAdmin = USERS[username].role === 'admin';
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.add('visible');
             document.getElementById('userName').textContent = USERS[username].name;
-            document.getElementById('userAvatar').textContent = USERS[username].name.charAt(0).toUpperCase();
-
-            loadRoutes();
-            renderStats();
-            populateCityFilter();
-            renderRoutes();
+            document.getElementById('userAvatar').textContent = USERS[username].name.charAt(0);
+            document.getElementById('userRole').textContent = isAdmin ? 'Administrador' : 'Membro';
+            document.getElementById('adminSection').style.display = isAdmin ? 'block' : 'none';
+            document.getElementById('pendingNav').style.display = isAdmin ? 'flex' : 'none';
+            document.getElementById('submitBtnText').textContent = isAdmin ? 'Adicionar Diretamente' : 'Enviar para Aprovacao';
+            loadData();
+            renderAll();
+            if (isAdmin) {
+                const pendingUsers = Object.values(USERS).filter(u => u.status === 'pending').length;
+                const usersCountEl = document.getElementById('usersCount');
+                if (usersCountEl) {
+                    usersCountEl.textContent = pendingUsers > 0 ? pendingUsers : Object.keys(USERS).length;
+                    if (pendingUsers > 0) usersCountEl.classList.add('pending');
+                }
+            }
         }
 
         function handleLogout() {
             localStorage.removeItem('depende_session');
+            currentUser = null;
+            isAdmin = false;
             showLoginScreen();
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('loginError').classList.remove('show');
         }
 
-        // ==================== ROUTES DATA ====================
+        // ========== DATA ==========
         const defaultRoutes = [
-            { nome: "Corrida da Aeronáutica - Lagoa Santa", distancia_km: 6.54, ganho_elevacao_m: 8, perda_elevacao_m: 8, elevacao_min_m: 741, elevacao_max_m: 744, dificuldade: "Facil", terreno: "Asfalto/Urbano", cidade: "Lagoa Santa/MG", tipo: "running", arquivo: "17.gpx" },
-            { nome: "Corrida matinal", distancia_km: 10.18, ganho_elevacao_m: 45, perda_elevacao_m: 46, elevacao_min_m: 741, elevacao_max_m: 761, dificuldade: "Moderada", terreno: "Asfalto/Urbano", cidade: "Lagoa Santa/MG", tipo: "running", arquivo: "4.gpx" },
-            { nome: "12 Km Bras Leme x Rude x Rio Branco", distancia_km: 12.27, ganho_elevacao_m: 69, perda_elevacao_m: 98, elevacao_min_m: 727, elevacao_max_m: 762, dificuldade: "Moderada", terreno: "Asfalto/Urbano", cidade: "Sao Paulo/SP", tipo: "running", arquivo: "36.gpx" },
-            { nome: "Ressaquinha -> Barroso", distancia_km: 13.56, ganho_elevacao_m: 293, perda_elevacao_m: 294, elevacao_min_m: 1111, elevacao_max_m: 1221, dificuldade: "Moderada", terreno: "Asfalto/Urbano", cidade: "Barbacena/MG", tipo: "running", arquivo: "18.gpx" },
-            { nome: "Minas Racer 2024", distancia_km: 14.73, ganho_elevacao_m: 658, perda_elevacao_m: 656, elevacao_min_m: 703, elevacao_max_m: 895, dificuldade: "Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "7.gpx" },
-            { nome: "Rua Carlos Dias Ribeiro-LGT-025-LGT-302", distancia_km: 14.94, ganho_elevacao_m: 450, perda_elevacao_m: 450, elevacao_min_m: 788, elevacao_max_m: 879, dificuldade: "Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "11.gpx" },
-            { nome: "XCO - carrapatos", distancia_km: 15.0, ganho_elevacao_m: 496, perda_elevacao_m: 497, elevacao_min_m: 702, elevacao_max_m: 894, dificuldade: "Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "19.gpx" },
-            { nome: "Trail intervalado - Quintal de casa", distancia_km: 15.68, ganho_elevacao_m: 325, perda_elevacao_m: 325, elevacao_min_m: 740, elevacao_max_m: 824, dificuldade: "Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "3.gpx" },
-            { nome: "Versalhes x Topo do Mundo", distancia_km: 16.49, ganho_elevacao_m: 597, perda_elevacao_m: 586, elevacao_min_m: 690, elevacao_max_m: 952, dificuldade: "Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "8.gpx" },
-            { nome: "CaiBotas OFICIAL", distancia_km: 17.05, ganho_elevacao_m: 1020, perda_elevacao_m: 1020, elevacao_min_m: 758, elevacao_max_m: 1412, dificuldade: "Muito Dificil", terreno: "Asfalto/Urbano", cidade: "Regiao de Caete/MG", tipo: "running", arquivo: "6.gpx" },
-            { nome: "Trail run matinal", distancia_km: 20.21, ganho_elevacao_m: 749, perda_elevacao_m: 736, elevacao_min_m: 661, elevacao_max_m: 952, dificuldade: "Muito Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "1.gpx" },
-            { nome: "25KM COM 800", distancia_km: 25.82, ganho_elevacao_m: 800, perda_elevacao_m: 774, elevacao_min_m: 667, elevacao_max_m: 894, dificuldade: "Muito Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "12.gpx" },
-            { nome: "WTR Nova Lima 2024 - Percurso Long 28km", distancia_km: 27.71, ganho_elevacao_m: 1056, perda_elevacao_m: 1056, elevacao_min_m: 1086, elevacao_max_m: 1503, dificuldade: "Extrema", terreno: "Trail", cidade: "Nova Lima/MG", tipo: "trail_running", arquivo: "2.gpx" },
-            { nome: "35km LA MISION BRASIL 2025", distancia_km: 35.74, ganho_elevacao_m: 2760, perda_elevacao_m: 2758, elevacao_min_m: 920, elevacao_max_m: 2204, dificuldade: "Extrema", terreno: "Trail", cidade: "Serra da Mantiqueira/RJ-SP", tipo: "trail_running", arquivo: "20.gpx" }
+            { nome: "Corrida da Aeronautica - Lagoa Santa", distancia_km: 6.54, ganho_elevacao_m: 8, perda_elevacao_m: 8, elevacao_min_m: 741, elevacao_max_m: 744, dificuldade: "Facil", terreno: "Asfalto/Urbano", cidade: "Lagoa Santa/MG", tipo: "running", arquivo: "17.gpx", tags: [], contribuidor: "Admin" },
+            { nome: "Corrida matinal", distancia_km: 10.18, ganho_elevacao_m: 45, perda_elevacao_m: 46, elevacao_min_m: 741, elevacao_max_m: 761, dificuldade: "Moderada", terreno: "Asfalto/Urbano", cidade: "Lagoa Santa/MG", tipo: "running", arquivo: "4.gpx", tags: [], contribuidor: "Admin" },
+            { nome: "12 Km Bras Leme x Rude x Rio Branco", distancia_km: 12.27, ganho_elevacao_m: 69, perda_elevacao_m: 98, elevacao_min_m: 727, elevacao_max_m: 762, dificuldade: "Moderada", terreno: "Asfalto/Urbano", cidade: "Sao Paulo/SP", tipo: "running", arquivo: "36.gpx", tags: [], contribuidor: "Admin" },
+            { nome: "Ressaquinha -> Barroso", distancia_km: 13.56, ganho_elevacao_m: 293, perda_elevacao_m: 294, elevacao_min_m: 1111, elevacao_max_m: 1221, dificuldade: "Moderada", terreno: "Asfalto/Urbano", cidade: "Barbacena/MG", tipo: "running", arquivo: "18.gpx", tags: [], contribuidor: "Admin" },
+            { nome: "Minas Racer 2024", distancia_km: 14.73, ganho_elevacao_m: 658, perda_elevacao_m: 656, elevacao_min_m: 703, elevacao_max_m: 895, dificuldade: "Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "7.gpx", tags: ["pedras", "tecnico"], contribuidor: "Admin" },
+            { nome: "Rua Carlos Dias Ribeiro-LGT-025-LGT-302", distancia_km: 14.94, ganho_elevacao_m: 450, perda_elevacao_m: 450, elevacao_min_m: 788, elevacao_max_m: 879, dificuldade: "Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "11.gpx", tags: ["sombra"], contribuidor: "Admin" },
+            { nome: "XCO - carrapatos", distancia_km: 15.0, ganho_elevacao_m: 496, perda_elevacao_m: 497, elevacao_min_m: 702, elevacao_max_m: 894, dificuldade: "Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "19.gpx", tags: ["tecnico"], contribuidor: "Admin" },
+            { nome: "Trail intervalado - Quintal de casa", distancia_km: 15.68, ganho_elevacao_m: 325, perda_elevacao_m: 325, elevacao_min_m: 740, elevacao_max_m: 824, dificuldade: "Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "3.gpx", tags: ["sombra"], contribuidor: "Admin" },
+            { nome: "Versalhes x Topo do Mundo", distancia_km: 16.49, ganho_elevacao_m: 597, perda_elevacao_m: 586, elevacao_min_m: 690, elevacao_max_m: 952, dificuldade: "Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "8.gpx", tags: ["pedras", "agua"], contribuidor: "Admin" },
+            { nome: "CaiBotas OFICIAL", distancia_km: 17.05, ganho_elevacao_m: 1020, perda_elevacao_m: 1020, elevacao_min_m: 758, elevacao_max_m: 1412, dificuldade: "Muito Dificil", terreno: "Trail", cidade: "Regiao de Caete/MG", tipo: "trail_running", arquivo: "6.gpx", tags: ["pedras", "tecnico"], contribuidor: "Admin" },
+            { nome: "Trail run matinal", distancia_km: 20.21, ganho_elevacao_m: 749, perda_elevacao_m: 736, elevacao_min_m: 661, elevacao_max_m: 952, dificuldade: "Muito Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "1.gpx", tags: ["sombra", "agua"], contribuidor: "Admin" },
+            { nome: "25KM COM 800", distancia_km: 25.82, ganho_elevacao_m: 800, perda_elevacao_m: 774, elevacao_min_m: 667, elevacao_max_m: 894, dificuldade: "Muito Dificil", terreno: "Trail", cidade: "Lagoa Santa/MG", tipo: "trail_running", arquivo: "12.gpx", tags: ["tecnico"], contribuidor: "Admin" },
+            { nome: "WTR Nova Lima 2024 - Percurso Long 28km", distancia_km: 27.71, ganho_elevacao_m: 1056, perda_elevacao_m: 1056, elevacao_min_m: 1086, elevacao_max_m: 1503, dificuldade: "Extrema", terreno: "Trail", cidade: "Nova Lima/MG", tipo: "trail_running", arquivo: "2.gpx", tags: ["pedras", "tecnico", "agua"], contribuidor: "Admin" },
+            { nome: "35km LA MISION BRASIL 2025", distancia_km: 35.74, ganho_elevacao_m: 2760, perda_elevacao_m: 2758, elevacao_min_m: 920, elevacao_max_m: 2204, dificuldade: "Extrema", terreno: "Trail", cidade: "Serra da Mantiqueira/RJ-SP", tipo: "trail_running", arquivo: "20.gpx", tags: ["pedras", "tecnico", "lama"], contribuidor: "Admin" }
         ];
 
         let routesData = [];
+        let pendingRoutes = [];
         let filteredRoutes = [];
-        let sortColumn = null;
+        let sortColumn = 'nome';
         let sortDirection = 'asc';
         let currentGpxData = null;
+        let analysisMap = null;
+        let routeMap = null;
+        let elevationChart = null;
+        let modalElevationChart = null;
+        let selectedTags = [];
 
-        function loadRoutes() {
-            const stored = localStorage.getItem('depende_routes');
-            if (stored) {
-                routesData = JSON.parse(stored);
-            } else {
-                routesData = [...defaultRoutes];
-                localStorage.setItem('depende_routes', JSON.stringify(routesData));
-            }
+        function loadData() {
+            routesData = JSON.parse(localStorage.getItem('depende_routes') || 'null') || [...defaultRoutes];
+            pendingRoutes = JSON.parse(localStorage.getItem('depende_pending') || '[]');
             filteredRoutes = [...routesData];
-            document.getElementById('routesCount').textContent = routesData.length;
         }
 
-        function saveRoutesToStorage() {
+        function saveData() {
             localStorage.setItem('depende_routes', JSON.stringify(routesData));
+            localStorage.setItem('depende_pending', JSON.stringify(pendingRoutes));
         }
 
-        // ==================== NAVIGATION ====================
+        // ========== NAVIGATION ==========
         function navigateTo(page) {
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
-
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(`page-${page}`).classList.add('active');
-
-            const titles = { dashboard: 'Dashboard', routes: 'Rotas', upload: 'Upload GPX' };
+            const titles = { dashboard: 'Dashboard', routes: 'Rotas', pending: 'Pendentes', compare: 'Comparar Rotas', upload: 'Upload GPX', users: 'Gerenciar Usuarios' };
             document.getElementById('pageTitle').textContent = titles[page] || page;
-
-            if (page === 'routes') {
-                document.getElementById('page-routes').innerHTML = document.getElementById('page-dashboard').innerHTML;
-            }
-
             document.getElementById('sidebar').classList.remove('open');
+            if (page === 'routes') renderCards();
+            if (page === 'pending') renderPending();
+            if (page === 'compare') populateCompareSelects();
+            if (page === 'users') renderUsers();
         }
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+        // ========== RENDER ==========
+        function renderAll() {
+            renderStats();
+            populateCityFilter();
+            renderRoutes();
+            updateCounts();
         }
 
-        // ==================== RENDER ====================
         function renderStats() {
             const total = routesData.length;
             const totalDist = routesData.reduce((s, r) => s + r.distancia_km, 0);
             const totalEle = routesData.reduce((s, r) => s + r.ganho_elevacao_m, 0);
             const trailCount = routesData.filter(r => r.terreno === 'Trail').length;
-
             document.getElementById('statsGrid').innerHTML = `
                 <div class="stat-card fade-in">
-                    <div class="stat-card-header">
-                        <div class="stat-icon orange"><span class="material-icons">route</span></div>
-                    </div>
+                    <div class="stat-card-header"><div class="stat-icon orange"><span class="material-icons">route</span></div></div>
                     <div class="stat-value">${total}</div>
                     <div class="stat-label">Total de Rotas</div>
                 </div>
-                <div class="stat-card fade-in" style="animation-delay: 0.1s">
-                    <div class="stat-card-header">
-                        <div class="stat-icon green"><span class="material-icons">straighten</span></div>
-                    </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-card-header"><div class="stat-icon green"><span class="material-icons">straighten</span></div></div>
                     <div class="stat-value">${totalDist.toFixed(0)}</div>
                     <div class="stat-label">KM Catalogados</div>
                 </div>
-                <div class="stat-card fade-in" style="animation-delay: 0.2s">
-                    <div class="stat-card-header">
-                        <div class="stat-icon orange"><span class="material-icons">trending_up</span></div>
-                    </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-card-header"><div class="stat-icon orange"><span class="material-icons">trending_up</span></div></div>
                     <div class="stat-value">${(totalEle/1000).toFixed(1)}k</div>
                     <div class="stat-label">Metros D+</div>
                 </div>
-                <div class="stat-card fade-in" style="animation-delay: 0.3s">
-                    <div class="stat-card-header">
-                        <div class="stat-icon green"><span class="material-icons">terrain</span></div>
-                    </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-card-header"><div class="stat-icon green"><span class="material-icons">terrain</span></div></div>
                     <div class="stat-value">${trailCount}</div>
                     <div class="stat-label">Rotas Trail</div>
                 </div>
+                ${isAdmin && pendingRoutes.length > 0 ? `
+                <div class="stat-card fade-in" onclick="navigateTo('pending')" style="cursor:pointer;">
+                    <div class="stat-card-header"><div class="stat-icon red"><span class="material-icons">pending_actions</span></div></div>
+                    <div class="stat-value">${pendingRoutes.length}</div>
+                    <div class="stat-label">Aguardando Aprovacao</div>
+                </div>` : ''}
             `;
+        }
+
+        function updateCounts() {
+            document.getElementById('routesCount').textContent = routesData.length;
+            document.getElementById('pendingCount').textContent = pendingRoutes.length;
+            document.getElementById('pendingNav').style.display = isAdmin && pendingRoutes.length > 0 ? 'flex' : 'none';
         }
 
         function populateCityFilter() {
             const cities = [...new Set(routesData.map(r => r.cidade))].sort();
-            const select = document.getElementById('cityFilter');
-            select.innerHTML = '<option value="">Todas</option>' + cities.map(c => `<option value="${c}">${c}</option>`).join('');
-        }
-
-        function renderRoutes() {
-            const tbody = document.getElementById('routesTableBody');
-            if (filteredRoutes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon"><span class="material-icons">search_off</span></div><h3 class="empty-state-title">Nenhuma rota encontrada</h3><p class="empty-state-text">Tente ajustar os filtros</p></div></td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = filteredRoutes.map((r, i) => `
-                <tr class="fade-in" style="animation-delay: ${i * 0.03}s">
-                    <td class="route-name-cell">${r.nome}</td>
-                    <td>${r.distancia_km} km</td>
-                    <td>${r.ganho_elevacao_m} m</td>
-                    <td>${r.elevacao_max_m} m</td>
-                    <td><span class="badge badge-${getDifficultyClass(r.dificuldade)}">${formatDifficulty(r.dificuldade)}</span></td>
-                    <td><span class="badge badge-${r.terreno === 'Trail' ? 'trail' : 'asfalto'}">${r.terreno}</span></td>
-                    <td>${r.cidade}</td>
-                    <td>
-                        <button class="btn btn-secondary btn-icon" onclick="showDetails(${routesData.indexOf(r)})" title="Detalhes">
-                            <span class="material-icons">visibility</span>
-                        </button>
-                        ${r.arquivo ? `<button class="btn btn-primary btn-icon" onclick="downloadGPX('${r.arquivo}', '${sanitize(r.nome)}')" title="Download"><span class="material-icons">download</span></button>` : ''}
-                    </td>
-                </tr>
-            `).join('');
+            document.getElementById('cityFilter').innerHTML = '<option value="">Todas</option>' + cities.map(c => `<option value="${c}">${c}</option>`).join('');
         }
 
         function getDifficultyClass(d) {
             return { 'Facil': 'facil', 'Moderada': 'moderada', 'Dificil': 'dificil', 'Muito Dificil': 'muito-dificil', 'Extrema': 'extrema' }[d] || '';
         }
 
-        function formatDifficulty(d) {
-            return { 'Facil': 'Fácil', 'Moderada': 'Moderada', 'Dificil': 'Difícil', 'Muito Dificil': 'Muito Difícil', 'Extrema': 'Extrema' }[d] || d;
+        function sanitize(name) { return name.replace(/[<>:"/\\|?*]/g, '-').replace(/\s+/g, '_'); }
+
+        function calcEstimatedTime(dist, gain, pace = 6) {
+            const baseMins = dist * pace;
+            const climbMins = gain / 100 * 10;
+            const totalMins = baseMins + climbMins;
+            const h = Math.floor(totalMins / 60);
+            const m = Math.round(totalMins % 60);
+            return h > 0 ? `${h}h ${m}min` : `${m}min`;
         }
 
-        function sanitize(name) {
-            return name.replace(/[<>:"/\\|?*]/g, '-').replace(/\s+/g, '_');
+        function renderRoutes() {
+            const tbody = document.getElementById('routesTableBody');
+            if (filteredRoutes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon"><span class="material-icons">search_off</span></div><h3 class="empty-state-title">Nenhuma rota encontrada</h3></div></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = filteredRoutes.map((r, i) => {
+                const idx = routesData.indexOf(r);
+                const tagsHtml = (r.tags || []).map(t => `<span class="tag ${t}">${t}</span>`).join('');
+                return `
+                <tr class="fade-in">
+                    <td class="route-name-cell">
+                        ${r.nome}
+                        ${r.contribuidor && r.contribuidor !== 'Admin' ? `<br><small style="color:var(--text-muted);">#${r.contribuidor}</small>` : ''}
+                        ${tagsHtml ? `<div class="tags-container">${tagsHtml}</div>` : ''}
+                    </td>
+                    <td>${r.distancia_km} km</td>
+                    <td>${r.ganho_elevacao_m} m</td>
+                    <td>${r.elevacao_max_m} m</td>
+                    <td><span class="badge badge-${getDifficultyClass(r.dificuldade)}">${r.dificuldade}</span></td>
+                    <td><span class="badge badge-${r.terreno === 'Trail' ? 'trail' : 'asfalto'}">${r.terreno}</span></td>
+                    <td>${r.cidade}</td>
+                    <td class="actions-cell">
+                        <button class="btn btn-secondary btn-icon" onclick="showDetails(${idx})" title="Detalhes"><span class="material-icons">visibility</span></button>
+                        ${r.arquivo ? `<button class="btn btn-secondary btn-icon" onclick="showMap(${idx})" title="Mapa"><span class="material-icons">map</span></button>` : ''}
+                        ${r.arquivo ? `<button class="btn btn-primary btn-icon" onclick="downloadGPX('${r.arquivo}','${sanitize(r.nome)}')" title="Download"><span class="material-icons">download</span></button>` : ''}
+                        ${isAdmin ? `<button class="btn btn-secondary btn-icon" onclick="openEdit(${idx})" title="Editar"><span class="material-icons">edit</span></button>` : ''}
+                        ${isAdmin ? `<button class="btn btn-danger btn-icon" onclick="openDelete(${idx})" title="Excluir"><span class="material-icons">delete</span></button>` : ''}
+                    </td>
+                </tr>`;
+            }).join('');
         }
 
-        // ==================== FILTERS ====================
+        function renderCards() {
+            const container = document.getElementById('routesCardsContainer');
+            const search = document.getElementById('searchInputCards')?.value.toLowerCase() || '';
+            const diff = document.getElementById('difficultyFilterCards')?.value || '';
+            const terr = document.getElementById('terrainFilterCards')?.value || '';
+            let filtered = routesData.filter(r => {
+                if (search && !r.nome.toLowerCase().includes(search)) return false;
+                if (diff && r.dificuldade !== diff) return false;
+                if (terr && r.terreno !== terr) return false;
+                return true;
+            });
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon"><span class="material-icons">search_off</span></div><h3 class="empty-state-title">Nenhuma rota</h3></div>`;
+                return;
+            }
+            container.innerHTML = filtered.map((r, i) => {
+                const idx = routesData.indexOf(r);
+                const time = calcEstimatedTime(r.distancia_km, r.ganho_elevacao_m);
+                const tagsHtml = (r.tags || []).map(t => `<span class="tag ${t}">${t}</span>`).join('');
+                return `
+                <div class="stat-card fade-in" style="cursor:pointer;" onclick="showDetails(${idx})">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
+                        <span class="badge badge-${getDifficultyClass(r.dificuldade)}">${r.dificuldade}</span>
+                        <span class="badge badge-${r.terreno === 'Trail' ? 'trail' : 'asfalto'}">${r.terreno}</span>
+                    </div>
+                    <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;">${r.nome}</h3>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">${r.cidade}</p>
+                    ${r.contribuidor && r.contribuidor !== 'Admin' ? `<p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.5rem;">#${r.contribuidor}</p>` : ''}
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;text-align:center;margin-bottom:1rem;">
+                        <div><div style="font-size:1.2rem;font-weight:700;color:var(--orange-primary);">${r.distancia_km}</div><div style="font-size:0.7rem;color:var(--text-muted);">KM</div></div>
+                        <div><div style="font-size:1.2rem;font-weight:700;color:var(--orange-primary);">${r.ganho_elevacao_m}</div><div style="font-size:0.7rem;color:var(--text-muted);">D+</div></div>
+                        <div><div style="font-size:1.2rem;font-weight:700;color:var(--orange-primary);">${time}</div><div style="font-size:0.7rem;color:var(--text-muted);">TEMPO</div></div>
+                    </div>
+                    ${tagsHtml ? `<div class="tags-container">${tagsHtml}</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function applyFiltersCards() { renderCards(); }
+
+        function renderPending() {
+            const container = document.getElementById('pendingContainer');
+            if (pendingRoutes.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-state-icon"><span class="material-icons">check_circle</span></div><h3 class="empty-state-title">Nenhuma rota pendente</h3><p class="empty-state-text">Todas as rotas foram aprovadas!</p></div>`;
+                return;
+            }
+            container.innerHTML = pendingRoutes.map((r, i) => {
+                const tagsHtml = (r.tags || []).map(t => `<span class="tag ${t}">${t}</span>`).join('');
+                return `
+                <div class="pending-card fade-in">
+                    <div class="pending-header">
+                        <div>
+                            <div class="pending-title">${r.nome}</div>
+                            <div class="pending-meta">Enviado por: <strong>#${r.contribuidor}</strong> | ${r.cidade}</div>
+                        </div>
+                        <span class="badge badge-pending">Pendente</span>
+                    </div>
+                    <div class="pending-stats">
+                        <div class="pending-stat"><div class="pending-stat-value">${r.distancia_km} km</div><div class="pending-stat-label">Distancia</div></div>
+                        <div class="pending-stat"><div class="pending-stat-value">${r.ganho_elevacao_m} m</div><div class="pending-stat-label">D+</div></div>
+                        <div class="pending-stat"><div class="pending-stat-value">${r.dificuldade}</div><div class="pending-stat-label">Dificuldade</div></div>
+                        <div class="pending-stat"><div class="pending-stat-value">${r.terreno}</div><div class="pending-stat-label">Terreno</div></div>
+                    </div>
+                    ${tagsHtml ? `<div class="tags-container" style="margin-bottom:1rem;">${tagsHtml}</div>` : ''}
+                    <div class="pending-actions">
+                        <button class="btn btn-success" onclick="approveRoute(${i})"><span class="material-icons">check</span> Aprovar</button>
+                        <button class="btn btn-secondary" onclick="editPending(${i})"><span class="material-icons">edit</span> Editar</button>
+                        <button class="btn btn-danger" onclick="rejectRoute(${i})"><span class="material-icons">close</span> Rejeitar</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ========== FILTERS ==========
         function applyFilters() {
             const search = document.getElementById('searchInput').value.toLowerCase();
-            const difficulty = document.getElementById('difficultyFilter').value;
-            const terrain = document.getElementById('terrainFilter').value;
+            const diff = document.getElementById('difficultyFilter').value;
+            const terr = document.getElementById('terrainFilter').value;
             const city = document.getElementById('cityFilter').value;
-
             filteredRoutes = routesData.filter(r => {
                 if (search && !r.nome.toLowerCase().includes(search)) return false;
-                if (difficulty && r.dificuldade !== difficulty) return false;
-                if (terrain && r.terreno !== terrain) return false;
+                if (diff && r.dificuldade !== diff) return false;
+                if (terr && r.terreno !== terr) return false;
                 if (city && r.cidade !== city) return false;
                 return true;
             });
@@ -1579,90 +1364,248 @@
             renderRoutes();
         }
 
-        function filterByTerrain(terrain) {
-            document.getElementById('terrainFilter').value = terrain;
+        function filterByTerrain(t) {
+            document.getElementById('terrainFilter').value = t;
             applyFilters();
             navigateTo('dashboard');
         }
 
-        function sortTable(column) {
-            if (sortColumn === column) {
-                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortColumn = column;
-                sortDirection = 'asc';
-            }
+        function sortTable(col) {
+            if (sortColumn === col) sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            else { sortColumn = col; sortDirection = 'asc'; }
             filteredRoutes.sort((a, b) => {
-                let va = a[column], vb = b[column];
+                let va = a[col], vb = b[col];
                 if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
                 return sortDirection === 'asc' ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
             });
             renderRoutes();
         }
 
-        // ==================== CIDADES DATABASE ====================
-        const CIDADES_DB = [
-            { nome: "Lagoa Santa", estado: "MG", lat: -19.63, lon: -43.89, raio: 0.15 },
-            { nome: "Nova Lima", estado: "MG", lat: -20.00, lon: -43.85, raio: 0.20 },
-            { nome: "Belo Horizonte", estado: "MG", lat: -19.92, lon: -43.94, raio: 0.15 },
-            { nome: "Sabará", estado: "MG", lat: -19.88, lon: -43.81, raio: 0.10 },
-            { nome: "Santa Luzia", estado: "MG", lat: -19.77, lon: -43.85, raio: 0.10 },
-            { nome: "Confins", estado: "MG", lat: -19.63, lon: -43.97, raio: 0.08 },
-            { nome: "Pedro Leopoldo", estado: "MG", lat: -19.62, lon: -44.04, raio: 0.10 },
-            { nome: "Vespasiano", estado: "MG", lat: -19.69, lon: -43.92, raio: 0.08 },
-            { nome: "Contagem", estado: "MG", lat: -19.93, lon: -44.05, raio: 0.12 },
-            { nome: "Betim", estado: "MG", lat: -19.97, lon: -44.20, raio: 0.12 },
-            { nome: "Ouro Preto", estado: "MG", lat: -20.38, lon: -43.50, raio: 0.20 },
-            { nome: "Mariana", estado: "MG", lat: -20.38, lon: -43.42, raio: 0.15 },
-            { nome: "Itabirito", estado: "MG", lat: -20.25, lon: -43.80, raio: 0.15 },
-            { nome: "Brumadinho", estado: "MG", lat: -20.15, lon: -44.20, raio: 0.15 },
-            { nome: "São João Del Rei", estado: "MG", lat: -21.13, lon: -44.25, raio: 0.20 },
-            { nome: "Tiradentes", estado: "MG", lat: -21.11, lon: -44.17, raio: 0.10 },
-            { nome: "Barbacena", estado: "MG", lat: -21.22, lon: -43.77, raio: 0.15 },
-            { nome: "Juiz de Fora", estado: "MG", lat: -21.76, lon: -43.35, raio: 0.20 },
-            { nome: "Visconde de Mauá", estado: "RJ", lat: -22.33, lon: -44.55, raio: 0.15 },
-            { nome: "Penedo", estado: "RJ", lat: -22.42, lon: -44.53, raio: 0.10 },
-            { nome: "Resende", estado: "RJ", lat: -22.47, lon: -44.45, raio: 0.15 },
-            { nome: "Itatiaia", estado: "RJ", lat: -22.49, lon: -44.56, raio: 0.15 },
-            { nome: "São Paulo", estado: "SP", lat: -23.55, lon: -46.63, raio: 0.30 },
-            { nome: "Barroso", estado: "MG", lat: -21.19, lon: -43.97, raio: 0.10 },
-            { nome: "Ressaquinha", estado: "MG", lat: -21.06, lon: -43.76, raio: 0.10 },
-            { nome: "Caeté", estado: "MG", lat: -19.88, lon: -43.67, raio: 0.15 },
-            { nome: "Serra do Cipó", estado: "MG", lat: -19.35, lon: -43.60, raio: 0.20 },
-            { nome: "Jaboticatubas", estado: "MG", lat: -19.52, lon: -43.74, raio: 0.12 },
-            { nome: "Raposos", estado: "MG", lat: -19.97, lon: -43.80, raio: 0.08 },
-            { nome: "Rio Acima", estado: "MG", lat: -20.08, lon: -43.79, raio: 0.10 },
-            { nome: "Topo do Mundo", estado: "MG", lat: -20.07, lon: -43.96, raio: 0.08 },
-            { nome: "Serra da Mantiqueira", estado: "MG/RJ/SP", lat: -22.40, lon: -44.60, raio: 0.30 }
-        ];
-
-        function identificarCidade(lat, lon) {
-            for (const cidade of CIDADES_DB) {
-                const dist = Math.sqrt(Math.pow(lat - cidade.lat, 2) + Math.pow(lon - cidade.lon, 2));
-                if (dist < cidade.raio) {
-                    return `${cidade.nome}/${cidade.estado}`;
-                }
-            }
-            // Regiões genéricas
-            if (lat > -20.5 && lat < -19.0 && lon > -44.5 && lon < -43.0) return "Região Metropolitana BH/MG";
-            if (lat < -22.0 && lon < -44.0 && lon > -45.0) return "Serra da Mantiqueira/RJ-SP";
-            if (lat < -21.0 && lat > -22.0 && lon > -44.5 && lon < -43.5) return "Sul de Minas/MG";
-            return `Lat:${lat.toFixed(2)} Lon:${lon.toFixed(2)}`;
+        // ========== COMPARE ==========
+        function populateCompareSelects() {
+            const opts = '<option value="">Selecione...</option>' + routesData.map((r, i) => `<option value="${i}">${r.nome}</option>`).join('');
+            document.getElementById('compareRoute1').innerHTML = opts;
+            document.getElementById('compareRoute2').innerHTML = opts;
         }
 
-        function classificarTerreno(type, ganhoElevacao, distancia) {
-            // Se o tipo já indica trail
-            if (type && (type.includes('trail') || type.includes('hike') || type.includes('mountain'))) {
-                return 'Trail';
-            }
-            // Se tem muito ganho de elevação por km, provavelmente é trail
-            const elevacaoPorKm = distancia > 0 ? ganhoElevacao / distancia : 0;
-            if (elevacaoPorKm > 40) return 'Trail'; // Mais de 40m de ganho por km
-            return 'Asfalto/Urbano';
+        function updateComparison() {
+            const i1 = document.getElementById('compareRoute1').value;
+            const i2 = document.getElementById('compareRoute2').value;
+            const container = document.getElementById('compareContainer');
+            if (i1 === '' && i2 === '') { container.innerHTML = ''; return; }
+            const renderCard = (r) => r ? `
+                <div class="compare-card">
+                    <div class="compare-header">${r.nome}</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                        <div><strong>Distancia:</strong> ${r.distancia_km} km</div>
+                        <div><strong>D+:</strong> ${r.ganho_elevacao_m} m</div>
+                        <div><strong>D-:</strong> ${r.perda_elevacao_m} m</div>
+                        <div><strong>Alt. Max:</strong> ${r.elevacao_max_m} m</div>
+                        <div><strong>Dificuldade:</strong> <span class="badge badge-${getDifficultyClass(r.dificuldade)}">${r.dificuldade}</span></div>
+                        <div><strong>Terreno:</strong> <span class="badge badge-${r.terreno === 'Trail' ? 'trail' : 'asfalto'}">${r.terreno}</span></div>
+                        <div style="grid-column:span 2;"><strong>Cidade:</strong> ${r.cidade}</div>
+                        <div style="grid-column:span 2;"><strong>Tempo Est.:</strong> ${calcEstimatedTime(r.distancia_km, r.ganho_elevacao_m)}</div>
+                    </div>
+                </div>` : '';
+            container.innerHTML = renderCard(routesData[i1]) + renderCard(routesData[i2]);
         }
 
-        // ==================== GPX PARSER ====================
-        let analysisMap = null;
+        // ========== DETAILS ==========
+        function showDetails(idx) {
+            const r = routesData[idx];
+            document.getElementById('detailsModalTitle').textContent = r.nome;
+            const time = calcEstimatedTime(r.distancia_km, r.ganho_elevacao_m);
+            const tagsHtml = (r.tags || []).map(t => `<span class="tag ${t}">${t}</span>`).join('');
+            document.getElementById('detailsModalBody').innerHTML = `
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                    <span class="badge badge-${getDifficultyClass(r.dificuldade)}">${r.dificuldade}</span>
+                    <span class="badge badge-${r.terreno === 'Trail' ? 'trail' : 'asfalto'}">${r.terreno}</span>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                    <div><strong>Distancia:</strong> ${r.distancia_km} km</div>
+                    <div><strong>Cidade:</strong> ${r.cidade}</div>
+                    <div><strong>D+:</strong> ${r.ganho_elevacao_m} m</div>
+                    <div><strong>D-:</strong> ${r.perda_elevacao_m} m</div>
+                    <div><strong>Alt. Min:</strong> ${r.elevacao_min_m} m</div>
+                    <div><strong>Alt. Max:</strong> ${r.elevacao_max_m} m</div>
+                    <div style="grid-column:span 2;"><strong>Tempo Estimado (pace 6min/km):</strong> ${time}</div>
+                </div>
+                ${r.contribuidor ? `<p style="margin-top:1rem;color:var(--text-muted);">Contribuidor: <strong>#${r.contribuidor}</strong></p>` : ''}
+                ${tagsHtml ? `<div style="margin-top:1rem;"><strong>Condicoes:</strong><div class="tags-container" style="margin-top:0.5rem;">${tagsHtml}</div></div>` : ''}
+            `;
+            document.getElementById('detailsModalFooter').innerHTML = `
+                <button class="btn btn-secondary" onclick="closeModal('detailsModal')">Fechar</button>
+                ${r.arquivo ? `<button class="btn btn-secondary" onclick="closeModal('detailsModal');showMap(${idx})"><span class="material-icons">map</span> Ver Mapa</button>` : ''}
+                ${r.arquivo ? `<button class="btn btn-primary" onclick="downloadGPX('${r.arquivo}','${sanitize(r.nome)}')"><span class="material-icons">download</span> Download</button>` : ''}
+            `;
+            openModal('detailsModal');
+        }
+
+        // ========== MAP ==========
+        async function showMap(idx) {
+            const r = routesData[idx];
+            if (!r.arquivo) return;
+            document.getElementById('mapModalTitle').textContent = r.nome;
+            document.getElementById('mapModalInfo').innerHTML = `
+                <div class="modal-map-stat"><div class="modal-map-stat-value">${r.distancia_km} km</div><div class="modal-map-stat-label">Distancia</div></div>
+                <div class="modal-map-stat"><div class="modal-map-stat-value">${r.ganho_elevacao_m} m</div><div class="modal-map-stat-label">D+</div></div>
+                <div class="modal-map-stat"><div class="modal-map-stat-value">${r.elevacao_max_m} m</div><div class="modal-map-stat-label">Alt. Max</div></div>
+                <div class="modal-map-stat"><div class="modal-map-stat-value">${calcEstimatedTime(r.distancia_km, r.ganho_elevacao_m)}</div><div class="modal-map-stat-label">Tempo Est.</div></div>
+            `;
+            document.getElementById('mapDownloadBtn').onclick = () => downloadGPX(r.arquivo, sanitize(r.nome));
+            openModal('mapModal');
+            try {
+                const res = await fetch(`routes/${r.arquivo}`);
+                const gpxContent = await res.text();
+                const data = parseGPX(gpxContent);
+                setTimeout(() => {
+                    if (routeMap) { routeMap.remove(); routeMap = null; }
+                    routeMap = L.map('routeMapContainer').fitBounds(data.bounds, { padding: [30, 30] });
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(routeMap);
+                    L.polyline(data.coords, { color: '#c17f4a', weight: 4 }).addTo(routeMap);
+                    const startIcon = L.divIcon({ className: '', html: '<div style="background:#22c55e;width:14px;height:14px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>', iconSize: [14, 14] });
+                    const endIcon = L.divIcon({ className: '', html: '<div style="background:#ef4444;width:14px;height:14px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>', iconSize: [14, 14] });
+                    L.marker(data.coords[0], { icon: startIcon }).addTo(routeMap).bindPopup('Inicio');
+                    L.marker(data.coords[data.coords.length - 1], { icon: endIcon }).addTo(routeMap).bindPopup('Fim');
+                    renderModalElevationChart(data.elevations, data.distances);
+                }, 100);
+            } catch (e) { showToast('Erro ao carregar GPX', true); }
+        }
+
+        function renderModalElevationChart(elevations, distances) {
+            const ctx = document.getElementById('modalElevationChart');
+            if (modalElevationChart) modalElevationChart.destroy();
+            modalElevationChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: distances.map(d => d.toFixed(1)),
+                    datasets: [{ label: 'Elevacao (m)', data: elevations, borderColor: '#c17f4a', backgroundColor: 'rgba(193,127,74,0.2)', fill: true, tension: 0.3, pointRadius: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: true, title: { display: true, text: 'Distancia (km)', color: '#a8b8b0' }, ticks: { color: '#7a8a82' }, grid: { color: 'rgba(58,80,72,0.3)' } }, y: { display: true, title: { display: true, text: 'Elevacao (m)', color: '#a8b8b0' }, ticks: { color: '#7a8a82' }, grid: { color: 'rgba(58,80,72,0.3)' } } } }
+            });
+        }
+
+        // ========== EDIT/DELETE ==========
+        function openEdit(idx) {
+            if (!isAdmin) return;
+            const r = routesData[idx];
+            document.getElementById('editIndex').value = idx;
+            document.getElementById('editName').value = r.nome;
+            document.getElementById('editDistance').value = r.distancia_km;
+            document.getElementById('editGain').value = r.ganho_elevacao_m;
+            document.getElementById('editDifficulty').value = r.dificuldade;
+            document.getElementById('editTerrain').value = r.terreno;
+            document.getElementById('editCity').value = r.cidade;
+            openModal('editModal');
+        }
+
+        function saveEdit(e) {
+            e.preventDefault();
+            const idx = parseInt(document.getElementById('editIndex').value);
+            routesData[idx].nome = document.getElementById('editName').value;
+            routesData[idx].distancia_km = parseFloat(document.getElementById('editDistance').value);
+            routesData[idx].ganho_elevacao_m = parseInt(document.getElementById('editGain').value);
+            routesData[idx].dificuldade = document.getElementById('editDifficulty').value;
+            routesData[idx].terreno = document.getElementById('editTerrain').value;
+            routesData[idx].cidade = document.getElementById('editCity').value;
+            saveData();
+            filteredRoutes = [...routesData];
+            renderAll();
+            closeModal('editModal');
+            showToast('Rota atualizada!');
+        }
+
+        function openDelete(idx) {
+            if (!isAdmin) return;
+            document.getElementById('deleteIndex').value = idx;
+            document.getElementById('deleteRouteName').textContent = routesData[idx].nome;
+            openModal('deleteModal');
+        }
+
+        function confirmDelete() {
+            const idx = parseInt(document.getElementById('deleteIndex').value);
+            routesData.splice(idx, 1);
+            saveData();
+            filteredRoutes = [...routesData];
+            renderAll();
+            closeModal('deleteModal');
+            showToast('Rota excluida!');
+        }
+
+        // ========== PENDING APPROVAL ==========
+        function approveRoute(idx) {
+            const route = pendingRoutes[idx];
+            routesData.push(route);
+            pendingRoutes.splice(idx, 1);
+            saveData();
+            filteredRoutes = [...routesData];
+            renderAll();
+            renderPending();
+            showToast(`Rota "${route.nome}" aprovada!`);
+        }
+
+        function rejectRoute(idx) {
+            const route = pendingRoutes[idx];
+            pendingRoutes.splice(idx, 1);
+            saveData();
+            renderPending();
+            updateCounts();
+            showToast(`Rota "${route.nome}" rejeitada.`);
+        }
+
+        function editPending(idx) {
+            const r = pendingRoutes[idx];
+            document.getElementById('editIndex').value = 'pending_' + idx;
+            document.getElementById('editName').value = r.nome;
+            document.getElementById('editDistance').value = r.distancia_km;
+            document.getElementById('editGain').value = r.ganho_elevacao_m;
+            document.getElementById('editDifficulty').value = r.dificuldade;
+            document.getElementById('editTerrain').value = r.terreno;
+            document.getElementById('editCity').value = r.cidade;
+            openModal('editModal');
+        }
+
+        // Override saveEdit for pending
+        const originalSaveEdit = saveEdit;
+        saveEdit = function(e) {
+            e.preventDefault();
+            const idxVal = document.getElementById('editIndex').value;
+            if (idxVal.startsWith('pending_')) {
+                const idx = parseInt(idxVal.replace('pending_', ''));
+                pendingRoutes[idx].nome = document.getElementById('editName').value;
+                pendingRoutes[idx].distancia_km = parseFloat(document.getElementById('editDistance').value);
+                pendingRoutes[idx].ganho_elevacao_m = parseInt(document.getElementById('editGain').value);
+                pendingRoutes[idx].dificuldade = document.getElementById('editDifficulty').value;
+                pendingRoutes[idx].terreno = document.getElementById('editTerrain').value;
+                pendingRoutes[idx].cidade = document.getElementById('editCity').value;
+                saveData();
+                renderPending();
+                closeModal('editModal');
+                showToast('Rota pendente atualizada!');
+            } else {
+                originalSaveEdit.call(this, e);
+            }
+        };
+
+        // ========== UPLOAD ==========
+        const uploadZone = document.getElementById('uploadZone');
+        uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+        uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('dragover'); const f = e.dataTransfer.files[0]; if (f && f.name.endsWith('.gpx')) processGPXFile(f); else showToast('Selecione um arquivo .gpx', true); });
+
+        function handleFileSelect(e) { const f = e.target.files[0]; if (f) processGPXFile(f); }
+
+        function processGPXFile(file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    currentGpxData = parseGPX(e.target.result);
+                    currentGpxData.rawContent = e.target.result;
+                    showAnalysis(file.name, currentGpxData);
+                } catch (err) { showToast('Erro: ' + err.message, true); }
+            };
+            reader.readAsText(file);
+        }
 
         function parseGPX(content) {
             const parser = new DOMParser();
@@ -1670,191 +1613,295 @@
             const name = xml.querySelector('name')?.textContent || 'Rota sem nome';
             const type = xml.querySelector('type')?.textContent || 'running';
             const points = xml.querySelectorAll('trkpt');
-            if (points.length === 0) throw new Error('Nenhum ponto encontrado no GPX');
-
-            let lats = [], lons = [], elevations = [], coords = [];
-            points.forEach(pt => {
+            if (points.length === 0) throw new Error('Nenhum ponto no GPX');
+            let lats = [], lons = [], elevations = [], coords = [], distances = [0];
+            let totalDist = 0;
+            points.forEach((pt, i) => {
                 const lat = parseFloat(pt.getAttribute('lat'));
                 const lon = parseFloat(pt.getAttribute('lon'));
-                lats.push(lat);
-                lons.push(lon);
-                coords.push([lat, lon]);
+                lats.push(lat); lons.push(lon); coords.push([lat, lon]);
                 const ele = pt.querySelector('ele');
                 if (ele) elevations.push(parseFloat(ele.textContent));
+                if (i > 0) {
+                    totalDist += haversine(lats[i-1], lons[i-1], lat, lon);
+                    distances.push(totalDist);
+                }
             });
-
-            let distance = 0;
-            for (let i = 1; i < lats.length; i++) distance += haversine(lats[i-1], lons[i-1], lats[i], lons[i]);
-
             let gain = 0, loss = 0;
             for (let i = 1; i < elevations.length; i++) {
                 const diff = elevations[i] - elevations[i-1];
                 if (diff > 0) gain += diff; else loss += Math.abs(diff);
             }
-
-            // Calcular centro e bounds
-            const latCentral = lats.reduce((a, b) => a + b, 0) / lats.length;
-            const lonCentral = lons.reduce((a, b) => a + b, 0) / lons.length;
-            const bounds = [[Math.min(...lats), Math.min(...lons)], [Math.max(...lats), Math.max(...lons)]];
-
+            const latC = lats.reduce((a, b) => a + b, 0) / lats.length;
+            const lonC = lons.reduce((a, b) => a + b, 0) / lons.length;
             return {
-                name,
-                type,
-                distancia_km: Math.round(distance * 100) / 100,
+                name, type,
+                distancia_km: Math.round(totalDist * 100) / 100,
                 ganho_elevacao_m: Math.round(gain),
                 perda_elevacao_m: Math.round(loss),
                 elevacao_min_m: Math.round(Math.min(...elevations)),
                 elevacao_max_m: Math.round(Math.max(...elevations)),
-                coords,
-                latCentral,
-                lonCentral,
-                bounds
+                coords, elevations, distances,
+                latCentral: latC, lonCentral: lonC,
+                bounds: [[Math.min(...lats), Math.min(...lons)], [Math.max(...lats), Math.max(...lons)]]
             };
         }
 
         function haversine(lat1, lon1, lat2, lon2) {
             const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
         function classifyDifficulty(dist, gain) {
-            const ptDist = dist < 5 ? 1 : dist < 10 ? 2 : dist < 15 ? 3 : dist < 25 ? 4 : 5;
-            const ptEle = gain < 100 ? 1 : gain < 300 ? 2 : gain < 600 ? 3 : gain < 1000 ? 4 : 5;
-            const avg = (ptDist + ptEle) / 2;
+            const ptD = dist < 5 ? 1 : dist < 10 ? 2 : dist < 15 ? 3 : dist < 25 ? 4 : 5;
+            const ptE = gain < 100 ? 1 : gain < 300 ? 2 : gain < 600 ? 3 : gain < 1000 ? 4 : 5;
+            const avg = (ptD + ptE) / 2;
             if (avg <= 1.5) return 'Facil'; if (avg <= 2.5) return 'Moderada'; if (avg <= 3.5) return 'Dificil'; if (avg <= 4.5) return 'Muito Dificil'; return 'Extrema';
         }
 
-        // ==================== UPLOAD ====================
-        const uploadZone = document.getElementById('uploadZone');
-        uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-        uploadZone.addEventListener('drop', (e) => { e.preventDefault(); uploadZone.classList.remove('dragover'); const file = e.dataTransfer.files[0]; if (file && file.name.endsWith('.gpx')) processGPXFile(file); else showToast('Por favor, selecione um arquivo .gpx', true); });
-
-        function handleFileSelect(event) { const file = event.target.files[0]; if (file) processGPXFile(file); }
-
-        function processGPXFile(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => { try { currentGpxData = parseGPX(e.target.result); showAnalysisCard(file.name, currentGpxData); } catch (err) { showToast('Erro ao processar GPX: ' + err.message, true); } };
-            reader.readAsText(file);
+        function identificarCidade(lat, lon) {
+            const cidades = [
+                { nome: "Lagoa Santa", estado: "MG", lat: -19.63, lon: -43.89, raio: 0.15 },
+                { nome: "Nova Lima", estado: "MG", lat: -20.00, lon: -43.85, raio: 0.20 },
+                { nome: "Belo Horizonte", estado: "MG", lat: -19.92, lon: -43.94, raio: 0.15 },
+                { nome: "Sao Paulo", estado: "SP", lat: -23.55, lon: -46.63, raio: 0.30 },
+                { nome: "Serra da Mantiqueira", estado: "RJ-SP", lat: -22.40, lon: -44.60, raio: 0.30 }
+            ];
+            for (const c of cidades) if (Math.sqrt((lat-c.lat)**2 + (lon-c.lon)**2) < c.raio) return `${c.nome}/${c.estado}`;
+            return `Lat:${lat.toFixed(2)} Lon:${lon.toFixed(2)}`;
         }
 
-        function showAnalysisCard(filename, data) {
+        function showAnalysis(filename, data) {
             document.getElementById('analysisFileName').textContent = filename;
             document.getElementById('analysisStats').innerHTML = `
                 <div class="analysis-stat"><div class="analysis-stat-value">${data.distancia_km}</div><div class="analysis-stat-label">KM</div></div>
                 <div class="analysis-stat"><div class="analysis-stat-value">${data.ganho_elevacao_m}</div><div class="analysis-stat-label">D+ (m)</div></div>
                 <div class="analysis-stat"><div class="analysis-stat-value">${data.perda_elevacao_m}</div><div class="analysis-stat-label">D- (m)</div></div>
-                <div class="analysis-stat"><div class="analysis-stat-value">${data.elevacao_min_m}</div><div class="analysis-stat-label">Alt. Mín</div></div>
-                <div class="analysis-stat"><div class="analysis-stat-value">${data.elevacao_max_m}</div><div class="analysis-stat-label">Alt. Máx</div></div>
+                <div class="analysis-stat"><div class="analysis-stat-value">${data.elevacao_min_m}</div><div class="analysis-stat-label">Alt. Min</div></div>
+                <div class="analysis-stat"><div class="analysis-stat-value">${data.elevacao_max_m}</div><div class="analysis-stat-label">Alt. Max</div></div>
             `;
-
-            // Auto-preencher campos com sugestões inteligentes
             document.getElementById('routeName').value = data.name;
-
-            // Sugestão de terreno baseado no tipo e características
-            const terrenoSugerido = classificarTerreno(data.type, data.ganho_elevacao_m, data.distancia_km);
-            document.getElementById('routeTerrain').value = terrenoSugerido;
-
-            // Sugestão de dificuldade
+            document.getElementById('routeTerrain').value = data.ganho_elevacao_m / data.distancia_km > 40 ? 'Trail' : 'Asfalto/Urbano';
             document.getElementById('routeDifficulty').value = classifyDifficulty(data.distancia_km, data.ganho_elevacao_m);
-
-            // Identificar cidade automaticamente
-            const cidadeSugerida = identificarCidade(data.latCentral, data.lonCentral);
-            document.getElementById('routeCity').value = cidadeSugerida;
-
-            const session = JSON.parse(localStorage.getItem('depende_session') || '{}');
-            document.getElementById('routeContributor').value = USERS[session.username]?.name || '';
-
+            document.getElementById('routeCity').value = identificarCidade(data.latCentral, data.lonCentral);
+            selectedTags = [];
+            document.querySelectorAll('.tag-option').forEach(t => t.classList.remove('selected'));
             document.getElementById('analysisCard').classList.add('visible');
-
-            // Atualizar info do mapa
-            document.getElementById('mapLocation').textContent = cidadeSugerida;
-            document.getElementById('mapDistance').textContent = data.distancia_km + ' km';
-
-            // Renderizar mapa após o card ficar visível
-            setTimeout(() => renderAnalysisMap(data), 100);
+            setTimeout(() => {
+                if (analysisMap) { analysisMap.remove(); analysisMap = null; }
+                analysisMap = L.map('analysisMap').fitBounds(data.bounds, { padding: [20, 20] });
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(analysisMap);
+                L.polyline(data.coords, { color: '#c17f4a', weight: 4 }).addTo(analysisMap);
+                const startIcon = L.divIcon({ className: '', html: '<div style="background:#22c55e;width:12px;height:12px;border-radius:50%;border:2px solid white;"></div>', iconSize: [12, 12] });
+                const endIcon = L.divIcon({ className: '', html: '<div style="background:#ef4444;width:12px;height:12px;border-radius:50%;border:2px solid white;"></div>', iconSize: [12, 12] });
+                L.marker(data.coords[0], { icon: startIcon }).addTo(analysisMap);
+                L.marker(data.coords[data.coords.length - 1], { icon: endIcon }).addTo(analysisMap);
+                renderElevationChart(data.elevations, data.distances);
+            }, 100);
         }
 
-        function renderAnalysisMap(data) {
-            // Destruir mapa anterior se existir
-            if (analysisMap) {
-                analysisMap.remove();
-                analysisMap = null;
-            }
-
-            // Criar novo mapa
-            analysisMap = L.map('analysisMap').fitBounds(data.bounds, { padding: [20, 20] });
-
-            // Adicionar tiles (OpenStreetMap)
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(analysisMap);
-
-            // Desenhar a rota
-            const polyline = L.polyline(data.coords, {
-                color: '#c17f4a',
-                weight: 4,
-                opacity: 0.9
-            }).addTo(analysisMap);
-
-            // Marcadores de início e fim
-            const startIcon = L.divIcon({
-                className: 'custom-marker',
-                html: '<div style="background:#22c55e;width:12px;height:12px;border-radius:50%;border:2px solid white;"></div>',
-                iconSize: [12, 12]
+        function renderElevationChart(elevations, distances) {
+            const ctx = document.getElementById('elevationChart');
+            if (elevationChart) elevationChart.destroy();
+            elevationChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: distances.map(d => d.toFixed(1)),
+                    datasets: [{ label: 'Elevacao (m)', data: elevations, borderColor: '#c17f4a', backgroundColor: 'rgba(193,127,74,0.2)', fill: true, tension: 0.3, pointRadius: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: true, ticks: { color: '#7a8a82' }, grid: { color: 'rgba(58,80,72,0.3)' } } } }
             });
+        }
 
-            const endIcon = L.divIcon({
-                className: 'custom-marker',
-                html: '<div style="background:#ef4444;width:12px;height:12px;border-radius:50%;border:2px solid white;"></div>',
-                iconSize: [12, 12]
-            });
-
-            L.marker(data.coords[0], { icon: startIcon }).addTo(analysisMap).bindPopup('Início');
-            L.marker(data.coords[data.coords.length - 1], { icon: endIcon }).addTo(analysisMap).bindPopup('Fim');
+        function toggleTag(el) {
+            const tag = el.dataset.tag;
+            el.classList.toggle('selected');
+            if (el.classList.contains('selected')) selectedTags.push(tag);
+            else selectedTags = selectedTags.filter(t => t !== tag);
         }
 
         function cancelUpload() {
             document.getElementById('analysisCard').classList.remove('visible');
             document.getElementById('gpxInput').value = '';
             currentGpxData = null;
+            selectedTags = [];
             if (analysisMap) { analysisMap.remove(); analysisMap = null; }
         }
 
-        function saveRoute(event) {
-            event.preventDefault();
+        function saveRoute(e) {
+            e.preventDefault();
             if (!currentGpxData) return;
-            const newRoute = { nome: document.getElementById('routeName').value, distancia_km: currentGpxData.distancia_km, ganho_elevacao_m: currentGpxData.ganho_elevacao_m, perda_elevacao_m: currentGpxData.perda_elevacao_m, elevacao_min_m: currentGpxData.elevacao_min_m, elevacao_max_m: currentGpxData.elevacao_max_m, dificuldade: document.getElementById('routeDifficulty').value, terreno: document.getElementById('routeTerrain').value, cidade: document.getElementById('routeCity').value, tipo: currentGpxData.type, contribuidor: document.getElementById('routeContributor').value, arquivo: null };
-            routesData.push(newRoute); filteredRoutes = [...routesData]; saveRoutesToStorage();
-            renderStats(); populateCityFilter(); renderRoutes(); document.getElementById('routesCount').textContent = routesData.length;
-            cancelUpload(); showToast('Rota adicionada com sucesso!'); navigateTo('dashboard');
+            const newRoute = {
+                nome: document.getElementById('routeName').value,
+                distancia_km: currentGpxData.distancia_km,
+                ganho_elevacao_m: currentGpxData.ganho_elevacao_m,
+                perda_elevacao_m: currentGpxData.perda_elevacao_m,
+                elevacao_min_m: currentGpxData.elevacao_min_m,
+                elevacao_max_m: currentGpxData.elevacao_max_m,
+                dificuldade: document.getElementById('routeDifficulty').value,
+                terreno: document.getElementById('routeTerrain').value,
+                cidade: document.getElementById('routeCity').value,
+                tipo: currentGpxData.type,
+                arquivo: null,
+                tags: [...selectedTags],
+                contribuidor: USERS[currentUser].name
+            };
+            if (isAdmin) {
+                routesData.push(newRoute);
+                saveData();
+                filteredRoutes = [...routesData];
+                renderAll();
+                showToast('Rota adicionada!');
+            } else {
+                pendingRoutes.push(newRoute);
+                saveData();
+                updateCounts();
+                showToast('Rota enviada para aprovacao!');
+            }
+            cancelUpload();
+            navigateTo('dashboard');
         }
 
-        // ==================== MODAL ====================
-        function showDetails(index) {
-            const r = routesData[index];
-            document.getElementById('modalTitle').textContent = r.nome;
-            document.getElementById('modalBody').innerHTML = `
-                <div style="display: grid; gap: 1rem;">
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;"><span class="badge badge-${getDifficultyClass(r.dificuldade)}">${formatDifficulty(r.dificuldade)}</span><span class="badge badge-${r.terreno === 'Trail' ? 'trail' : 'asfalto'}">${r.terreno}</span></div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;"><div><strong>Distância:</strong> ${r.distancia_km} km</div><div><strong>Cidade:</strong> ${r.cidade}</div><div><strong>D+:</strong> ${r.ganho_elevacao_m} m</div><div><strong>D-:</strong> ${r.perda_elevacao_m} m</div><div><strong>Alt. Mín:</strong> ${r.elevacao_min_m} m</div><div><strong>Alt. Máx:</strong> ${r.elevacao_max_m} m</div></div>
-                    ${r.contribuidor ? `<div><strong>Contribuidor:</strong> ${r.contribuidor}</div>` : ''}
-                </div>
-            `;
-            document.getElementById('modalFooter').innerHTML = `<button class="btn btn-secondary" onclick="closeModal()">Fechar</button>${r.arquivo ? `<button class="btn btn-primary" onclick="downloadGPX('${r.arquivo}', '${sanitize(r.nome)}')"><span class="material-icons">download</span> Download GPX</button>` : ''}`;
-            document.getElementById('modalOverlay').classList.add('active');
+        // ========== USERS MANAGEMENT ==========
+        function renderUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            if (!tbody) return;
+            const search = (document.getElementById('searchUsers')?.value || '').toLowerCase();
+            const statusFilter = document.getElementById('filterUserStatus')?.value || '';
+
+            const usersList = Object.entries(USERS).filter(([username, user]) => {
+                if (search && !user.name.toLowerCase().includes(search) && !user.email.toLowerCase().includes(search)) return false;
+                if (statusFilter && user.status !== statusFilter) return false;
+                return true;
+            });
+
+            document.getElementById('usersCount').textContent = Object.keys(USERS).length;
+
+            if (usersList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon"><span class="material-icons">person_off</span></div><h3 class="empty-state-title">Nenhum usuario encontrado</h3></div></td></tr>';
+                return;
+            }
+
+            const statusBadge = (s) => ({
+                'active': '<span class="badge badge-approved">Ativo</span>',
+                'pending': '<span class="badge badge-pending">Pendente</span>',
+                'blocked': '<span class="badge" style="background:rgba(239,68,68,0.15);color:#fca5a5;">Bloqueado</span>'
+            }[s] || s);
+
+            const providerIcon = (p) => ({
+                'google': '<span style="color:#4285f4;" title="Google">G</span>',
+                'microsoft': '<span style="color:#00a4ef;" title="Microsoft">M</span>',
+                'local': '<span style="color:var(--text-muted);" title="Local">@</span>'
+            }[p] || '');
+
+            tbody.innerHTML = usersList.map(([username, user]) => `
+                <tr class="fade-in">
+                    <td>
+                        <div style="display:flex;align-items:center;gap:0.75rem;">
+                            <div style="width:36px;height:36px;background:var(--accent-gradient);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:600;color:white;">${user.name.charAt(0).toUpperCase()}</div>
+                            <div>
+                                <div style="font-weight:600;">${user.name}</div>
+                                <div style="font-size:0.8rem;color:var(--text-muted);">@${username}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.email}</td>
+                    <td>
+                        ${providerIcon(user.provider)}
+                        <span class="badge ${user.role === 'admin' ? 'badge-extrema' : 'badge-trail'}">${user.role === 'admin' ? 'Admin' : 'Membro'}</span>
+                    </td>
+                    <td>${statusBadge(user.status)}</td>
+                    <td>${user.createdAt || '-'}</td>
+                    <td class="actions-cell">
+                        ${user.status === 'pending' ? `<button class="btn btn-success btn-icon" onclick="approveUser('${username}')" title="Aprovar"><span class="material-icons">check</span></button>` : ''}
+                        ${user.status === 'active' && user.role !== 'admin' ? `<button class="btn btn-secondary btn-icon" onclick="blockUser('${username}')" title="Bloquear"><span class="material-icons">block</span></button>` : ''}
+                        ${user.status === 'blocked' ? `<button class="btn btn-secondary btn-icon" onclick="unblockUser('${username}')" title="Desbloquear"><span class="material-icons">check_circle</span></button>` : ''}
+                        ${username !== 'admin' && username !== currentUser ? `<button class="btn btn-danger btn-icon" onclick="deleteUser('${username}')" title="Excluir"><span class="material-icons">delete</span></button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
         }
 
-        function closeModal(e) { if (e && e.target !== e.currentTarget) return; document.getElementById('modalOverlay').classList.remove('active'); }
+        function approveUser(username) {
+            if (!isAdmin) return;
+            USERS[username].status = 'active';
+            saveUsers();
+            renderUsers();
+            showToast(`Usuario ${USERS[username].name} aprovado!`);
+        }
+
+        function blockUser(username) {
+            if (!isAdmin || username === 'admin') return;
+            USERS[username].status = 'blocked';
+            saveUsers();
+            renderUsers();
+            showToast(`Usuario ${USERS[username].name} bloqueado`);
+        }
+
+        function unblockUser(username) {
+            if (!isAdmin) return;
+            USERS[username].status = 'active';
+            saveUsers();
+            renderUsers();
+            showToast(`Usuario ${USERS[username].name} desbloqueado`);
+        }
+
+        function deleteUser(username) {
+            if (!isAdmin || username === 'admin' || username === currentUser) return;
+            if (confirm(`Excluir usuario ${USERS[username].name}?`)) {
+                delete USERS[username];
+                saveUsers();
+                renderUsers();
+                showToast('Usuario excluido');
+            }
+        }
+
+        // ========== EXPORT ==========
+        function exportInventory(format) {
+            if (!isAdmin) return;
+            if (format === 'csv') {
+                const headers = ['nome', 'distancia_km', 'ganho_elevacao_m', 'perda_elevacao_m', 'elevacao_min_m', 'elevacao_max_m', 'dificuldade', 'terreno', 'cidade', 'contribuidor', 'tags'];
+                const csv = [headers.join(';'), ...routesData.map(r => headers.map(h => h === 'tags' ? (r.tags || []).join(',') : (r[h] || '')).join(';'))].join('\n');
+                download('inventario_rotas.csv', csv, 'text/csv');
+            } else {
+                download('inventario_rotas.json', JSON.stringify(routesData, null, 2), 'application/json');
+            }
+        }
+
+        function download(filename, content, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = filename; a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Exportado: ${filename}`);
+        }
 
         function downloadGPX(arquivo, nome) {
-            fetch(`routes/${arquivo}`).then(r => { if (!r.ok) throw new Error(); return r.blob(); }).then(blob => { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `${nome}.gpx`; a.click(); URL.revokeObjectURL(url); showToast(`Download: ${nome}.gpx`); }).catch(() => showToast('Erro ao baixar arquivo', true));
+            fetch(`routes/${arquivo}`).then(r => { if (!r.ok) throw new Error(); return r.blob(); }).then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = `${nome}.gpx`; a.click();
+                URL.revokeObjectURL(url);
+                showToast(`Download: ${nome}.gpx`);
+            }).catch(() => showToast('Erro ao baixar', true));
         }
 
-        function showToast(message, isError = false) { const toast = document.getElementById('toast'); document.getElementById('toastMessage').textContent = message; document.getElementById('toastIcon').textContent = isError ? 'error' : 'check_circle'; toast.className = `toast show ${isError ? 'error' : 'success'}`; setTimeout(() => toast.classList.remove('show'), 3000); }
+        // ========== MODALS ==========
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id, e) { if (e && e.target !== e.currentTarget) return; document.getElementById(id).classList.remove('active'); }
 
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+        // ========== TOAST ==========
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = msg;
+            document.getElementById('toastIcon').textContent = isError ? 'error' : 'check_circle';
+            toast.className = `toast show ${isError ? 'error' : 'success'}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ========== INIT ==========
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active')); });
         document.addEventListener('DOMContentLoaded', checkAuth);
     </script>
 </body>

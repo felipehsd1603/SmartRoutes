@@ -1,0 +1,55 @@
+# Dados pessoais do Strava - NAO publicar
+activities/
+activities.csv
+media/
+media.csv
+profile.jpg
+profile.csv
+
+# Arquivos de configuracao pessoal Strava
+applications.csv
+bikes.csv
+blocks.csv
+clubs.csv
+comments.csv
+components.csv
+connected_apps.csv
+contacts.csv
+email_preferences.csv
+events.csv
+flags.csv
+followers.csv
+following.csv
+general_preferences.csv
+global_challenges.csv
+goals.csv
+group_challenges.csv
+local_legend_segments.csv
+logins.csv
+memberships.csv
+mobile_device_identifiers.csv
+monthly_recap_achievements.csv
+orders.csv
+partner_opt_outs.csv
+posts.csv
+privacy_zones.csv
+reactions.csv
+segments.csv
+shoes.csv
+social_settings.csv
+starred_routes.csv
+starred_segments.csv
+support_tickets.csv
+visibility_settings.csv
+routes.csv
+
+# Arquivos temporarios
+nul
+*.pyc
+__pycache__/
+.DS_Store
+Thumbs.db
+
+# Arquivos locais
+iniciar_servidor.bat
+inventario_rotas_corrida.txt
