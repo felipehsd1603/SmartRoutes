@@ -13,6 +13,10 @@
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+    <!-- Leaflet Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         :root {
             /* Cores baseadas na logo DEPENDE */
@@ -721,6 +725,40 @@
 
         .analysis-card.visible { display: block; }
 
+        /* Mini Map */
+        .analysis-map-container {
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .analysis-map {
+            height: 250px;
+            width: 100%;
+            background: var(--bg-input);
+        }
+
+        .map-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .map-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .map-info-item .material-icons {
+            font-size: 1rem;
+            color: var(--orange-primary);
+        }
+
         .analysis-header {
             display: flex;
             align-items: center;
@@ -1210,6 +1248,21 @@
 
                             <div class="analysis-grid" id="analysisStats"></div>
 
+                            <!-- Mini Mapa -->
+                            <div class="analysis-map-container">
+                                <div id="analysisMap" class="analysis-map"></div>
+                                <div class="map-info">
+                                    <div class="map-info-item">
+                                        <span class="material-icons">place</span>
+                                        <span id="mapLocation">Carregando localização...</span>
+                                    </div>
+                                    <div class="map-info-item">
+                                        <span class="material-icons">straighten</span>
+                                        <span id="mapDistance">0 km</span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <form id="routeForm" onsubmit="saveRoute(event)">
                                 <div class="analysis-form">
                                     <div class="form-group full-width">
@@ -1547,7 +1600,70 @@
             renderRoutes();
         }
 
+        // ==================== CIDADES DATABASE ====================
+        const CIDADES_DB = [
+            { nome: "Lagoa Santa", estado: "MG", lat: -19.63, lon: -43.89, raio: 0.15 },
+            { nome: "Nova Lima", estado: "MG", lat: -20.00, lon: -43.85, raio: 0.20 },
+            { nome: "Belo Horizonte", estado: "MG", lat: -19.92, lon: -43.94, raio: 0.15 },
+            { nome: "Sabará", estado: "MG", lat: -19.88, lon: -43.81, raio: 0.10 },
+            { nome: "Santa Luzia", estado: "MG", lat: -19.77, lon: -43.85, raio: 0.10 },
+            { nome: "Confins", estado: "MG", lat: -19.63, lon: -43.97, raio: 0.08 },
+            { nome: "Pedro Leopoldo", estado: "MG", lat: -19.62, lon: -44.04, raio: 0.10 },
+            { nome: "Vespasiano", estado: "MG", lat: -19.69, lon: -43.92, raio: 0.08 },
+            { nome: "Contagem", estado: "MG", lat: -19.93, lon: -44.05, raio: 0.12 },
+            { nome: "Betim", estado: "MG", lat: -19.97, lon: -44.20, raio: 0.12 },
+            { nome: "Ouro Preto", estado: "MG", lat: -20.38, lon: -43.50, raio: 0.20 },
+            { nome: "Mariana", estado: "MG", lat: -20.38, lon: -43.42, raio: 0.15 },
+            { nome: "Itabirito", estado: "MG", lat: -20.25, lon: -43.80, raio: 0.15 },
+            { nome: "Brumadinho", estado: "MG", lat: -20.15, lon: -44.20, raio: 0.15 },
+            { nome: "São João Del Rei", estado: "MG", lat: -21.13, lon: -44.25, raio: 0.20 },
+            { nome: "Tiradentes", estado: "MG", lat: -21.11, lon: -44.17, raio: 0.10 },
+            { nome: "Barbacena", estado: "MG", lat: -21.22, lon: -43.77, raio: 0.15 },
+            { nome: "Juiz de Fora", estado: "MG", lat: -21.76, lon: -43.35, raio: 0.20 },
+            { nome: "Visconde de Mauá", estado: "RJ", lat: -22.33, lon: -44.55, raio: 0.15 },
+            { nome: "Penedo", estado: "RJ", lat: -22.42, lon: -44.53, raio: 0.10 },
+            { nome: "Resende", estado: "RJ", lat: -22.47, lon: -44.45, raio: 0.15 },
+            { nome: "Itatiaia", estado: "RJ", lat: -22.49, lon: -44.56, raio: 0.15 },
+            { nome: "São Paulo", estado: "SP", lat: -23.55, lon: -46.63, raio: 0.30 },
+            { nome: "Barroso", estado: "MG", lat: -21.19, lon: -43.97, raio: 0.10 },
+            { nome: "Ressaquinha", estado: "MG", lat: -21.06, lon: -43.76, raio: 0.10 },
+            { nome: "Caeté", estado: "MG", lat: -19.88, lon: -43.67, raio: 0.15 },
+            { nome: "Serra do Cipó", estado: "MG", lat: -19.35, lon: -43.60, raio: 0.20 },
+            { nome: "Jaboticatubas", estado: "MG", lat: -19.52, lon: -43.74, raio: 0.12 },
+            { nome: "Raposos", estado: "MG", lat: -19.97, lon: -43.80, raio: 0.08 },
+            { nome: "Rio Acima", estado: "MG", lat: -20.08, lon: -43.79, raio: 0.10 },
+            { nome: "Topo do Mundo", estado: "MG", lat: -20.07, lon: -43.96, raio: 0.08 },
+            { nome: "Serra da Mantiqueira", estado: "MG/RJ/SP", lat: -22.40, lon: -44.60, raio: 0.30 }
+        ];
+
+        function identificarCidade(lat, lon) {
+            for (const cidade of CIDADES_DB) {
+                const dist = Math.sqrt(Math.pow(lat - cidade.lat, 2) + Math.pow(lon - cidade.lon, 2));
+                if (dist < cidade.raio) {
+                    return `${cidade.nome}/${cidade.estado}`;
+                }
+            }
+            // Regiões genéricas
+            if (lat > -20.5 && lat < -19.0 && lon > -44.5 && lon < -43.0) return "Região Metropolitana BH/MG";
+            if (lat < -22.0 && lon < -44.0 && lon > -45.0) return "Serra da Mantiqueira/RJ-SP";
+            if (lat < -21.0 && lat > -22.0 && lon > -44.5 && lon < -43.5) return "Sul de Minas/MG";
+            return `Lat:${lat.toFixed(2)} Lon:${lon.toFixed(2)}`;
+        }
+
+        function classificarTerreno(type, ganhoElevacao, distancia) {
+            // Se o tipo já indica trail
+            if (type && (type.includes('trail') || type.includes('hike') || type.includes('mountain'))) {
+                return 'Trail';
+            }
+            // Se tem muito ganho de elevação por km, provavelmente é trail
+            const elevacaoPorKm = distancia > 0 ? ganhoElevacao / distancia : 0;
+            if (elevacaoPorKm > 40) return 'Trail'; // Mais de 40m de ganho por km
+            return 'Asfalto/Urbano';
+        }
+
         // ==================== GPX PARSER ====================
+        let analysisMap = null;
+
         function parseGPX(content) {
             const parser = new DOMParser();
             const xml = parser.parseFromString(content, 'text/xml');
@@ -1555,21 +1671,45 @@
             const type = xml.querySelector('type')?.textContent || 'running';
             const points = xml.querySelectorAll('trkpt');
             if (points.length === 0) throw new Error('Nenhum ponto encontrado no GPX');
-            let lats = [], lons = [], elevations = [];
+
+            let lats = [], lons = [], elevations = [], coords = [];
             points.forEach(pt => {
-                lats.push(parseFloat(pt.getAttribute('lat')));
-                lons.push(parseFloat(pt.getAttribute('lon')));
+                const lat = parseFloat(pt.getAttribute('lat'));
+                const lon = parseFloat(pt.getAttribute('lon'));
+                lats.push(lat);
+                lons.push(lon);
+                coords.push([lat, lon]);
                 const ele = pt.querySelector('ele');
                 if (ele) elevations.push(parseFloat(ele.textContent));
             });
+
             let distance = 0;
             for (let i = 1; i < lats.length; i++) distance += haversine(lats[i-1], lons[i-1], lats[i], lons[i]);
+
             let gain = 0, loss = 0;
             for (let i = 1; i < elevations.length; i++) {
                 const diff = elevations[i] - elevations[i-1];
                 if (diff > 0) gain += diff; else loss += Math.abs(diff);
             }
-            return { name, type, distancia_km: Math.round(distance * 100) / 100, ganho_elevacao_m: Math.round(gain), perda_elevacao_m: Math.round(loss), elevacao_min_m: Math.round(Math.min(...elevations)), elevacao_max_m: Math.round(Math.max(...elevations)) };
+
+            // Calcular centro e bounds
+            const latCentral = lats.reduce((a, b) => a + b, 0) / lats.length;
+            const lonCentral = lons.reduce((a, b) => a + b, 0) / lons.length;
+            const bounds = [[Math.min(...lats), Math.min(...lons)], [Math.max(...lats), Math.max(...lons)]];
+
+            return {
+                name,
+                type,
+                distancia_km: Math.round(distance * 100) / 100,
+                ganho_elevacao_m: Math.round(gain),
+                perda_elevacao_m: Math.round(loss),
+                elevacao_min_m: Math.round(Math.min(...elevations)),
+                elevacao_max_m: Math.round(Math.max(...elevations)),
+                coords,
+                latCentral,
+                lonCentral,
+                bounds
+            };
         }
 
         function haversine(lat1, lon1, lat2, lon2) {
@@ -1608,16 +1748,79 @@
                 <div class="analysis-stat"><div class="analysis-stat-value">${data.elevacao_min_m}</div><div class="analysis-stat-label">Alt. Mín</div></div>
                 <div class="analysis-stat"><div class="analysis-stat-value">${data.elevacao_max_m}</div><div class="analysis-stat-label">Alt. Máx</div></div>
             `;
+
+            // Auto-preencher campos com sugestões inteligentes
             document.getElementById('routeName').value = data.name;
-            document.getElementById('routeTerrain').value = data.type.includes('trail') ? 'Trail' : 'Asfalto/Urbano';
+
+            // Sugestão de terreno baseado no tipo e características
+            const terrenoSugerido = classificarTerreno(data.type, data.ganho_elevacao_m, data.distancia_km);
+            document.getElementById('routeTerrain').value = terrenoSugerido;
+
+            // Sugestão de dificuldade
             document.getElementById('routeDifficulty').value = classifyDifficulty(data.distancia_km, data.ganho_elevacao_m);
-            document.getElementById('routeCity').value = '';
+
+            // Identificar cidade automaticamente
+            const cidadeSugerida = identificarCidade(data.latCentral, data.lonCentral);
+            document.getElementById('routeCity').value = cidadeSugerida;
+
             const session = JSON.parse(localStorage.getItem('depende_session') || '{}');
             document.getElementById('routeContributor').value = USERS[session.username]?.name || '';
+
             document.getElementById('analysisCard').classList.add('visible');
+
+            // Atualizar info do mapa
+            document.getElementById('mapLocation').textContent = cidadeSugerida;
+            document.getElementById('mapDistance').textContent = data.distancia_km + ' km';
+
+            // Renderizar mapa após o card ficar visível
+            setTimeout(() => renderAnalysisMap(data), 100);
         }
 
-        function cancelUpload() { document.getElementById('analysisCard').classList.remove('visible'); document.getElementById('gpxInput').value = ''; currentGpxData = null; }
+        function renderAnalysisMap(data) {
+            // Destruir mapa anterior se existir
+            if (analysisMap) {
+                analysisMap.remove();
+                analysisMap = null;
+            }
+
+            // Criar novo mapa
+            analysisMap = L.map('analysisMap').fitBounds(data.bounds, { padding: [20, 20] });
+
+            // Adicionar tiles (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(analysisMap);
+
+            // Desenhar a rota
+            const polyline = L.polyline(data.coords, {
+                color: '#c17f4a',
+                weight: 4,
+                opacity: 0.9
+            }).addTo(analysisMap);
+
+            // Marcadores de início e fim
+            const startIcon = L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="background:#22c55e;width:12px;height:12px;border-radius:50%;border:2px solid white;"></div>',
+                iconSize: [12, 12]
+            });
+
+            const endIcon = L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="background:#ef4444;width:12px;height:12px;border-radius:50%;border:2px solid white;"></div>',
+                iconSize: [12, 12]
+            });
+
+            L.marker(data.coords[0], { icon: startIcon }).addTo(analysisMap).bindPopup('Início');
+            L.marker(data.coords[data.coords.length - 1], { icon: endIcon }).addTo(analysisMap).bindPopup('Fim');
+        }
+
+        function cancelUpload() {
+            document.getElementById('analysisCard').classList.remove('visible');
+            document.getElementById('gpxInput').value = '';
+            currentGpxData = null;
+            if (analysisMap) { analysisMap.remove(); analysisMap = null; }
+        }
 
         function saveRoute(event) {
             event.preventDefault();
