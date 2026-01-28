@@ -2391,6 +2391,131 @@
             if (avg <= 1.5) return 'Facil'; if (avg <= 2.5) return 'Moderada'; if (avg <= 3.5) return 'Dificil'; if (avg <= 4.5) return 'Muito Dificil'; return 'Extrema';
         }
 
+        // ========== DUPLICATE DETECTION ==========
+        function checkDuplicateRoute(newRoute, gpxData = null) {
+            const toleranceDist = 0.05; // 5% tolerancia na distancia
+            const toleranceElev = 0.15; // 15% tolerancia na elevacao
+            const toleranceCoord = 0.005; // ~500m tolerancia nas coordenadas
+
+            const duplicates = [];
+
+            for (const route of routesData) {
+                let score = 0;
+                let reasons = [];
+
+                // Comparar distancia (peso 30)
+                const distDiff = Math.abs(newRoute.distancia_km - route.distancia_km) / Math.max(route.distancia_km, 1);
+                if (distDiff < toleranceDist) {
+                    score += 30;
+                    reasons.push(`Distancia similar (${route.distancia_km}km vs ${newRoute.distancia_km}km)`);
+                } else if (distDiff < toleranceDist * 2) {
+                    score += 15;
+                }
+
+                // Comparar elevacao (peso 25)
+                const elevDiff = Math.abs(newRoute.ganho_elevacao_m - route.ganho_elevacao_m) / Math.max(route.ganho_elevacao_m, 1);
+                if (elevDiff < toleranceElev) {
+                    score += 25;
+                    reasons.push(`Elevacao similar (${route.ganho_elevacao_m}m vs ${newRoute.ganho_elevacao_m}m)`);
+                } else if (elevDiff < toleranceElev * 2) {
+                    score += 12;
+                }
+
+                // Comparar nome (peso 20)
+                const nameSimilarity = calculateNameSimilarity(newRoute.nome, route.nome);
+                if (nameSimilarity > 0.7) {
+                    score += 20;
+                    reasons.push(`Nome similar: "${route.nome}"`);
+                } else if (nameSimilarity > 0.4) {
+                    score += 10;
+                }
+
+                // Comparar cidade (peso 15)
+                if (newRoute.cidade && route.cidade) {
+                    const cityMatch = newRoute.cidade.toLowerCase().includes(route.cidade.toLowerCase().split('/')[0]) ||
+                                      route.cidade.toLowerCase().includes(newRoute.cidade.toLowerCase().split('/')[0]);
+                    if (cityMatch) {
+                        score += 15;
+                        reasons.push(`Mesma regiao: ${route.cidade}`);
+                    }
+                }
+
+                // Comparar coordenadas centrais se disponiveis (peso 10)
+                if (gpxData && gpxData.latCentral && route.latCentral) {
+                    const coordDist = Math.sqrt(
+                        Math.pow(gpxData.latCentral - route.latCentral, 2) +
+                        Math.pow(gpxData.lonCentral - route.lonCentral, 2)
+                    );
+                    if (coordDist < toleranceCoord) {
+                        score += 10;
+                        reasons.push('Localizacao geografica proxima');
+                    }
+                }
+
+                // Se score >= 70, considerar duplicata provavel
+                if (score >= 70) {
+                    duplicates.push({
+                        route: route,
+                        score: score,
+                        confidence: score >= 85 ? 'alta' : 'media',
+                        reasons: reasons
+                    });
+                }
+            }
+
+            // Ordenar por score decrescente
+            duplicates.sort((a, b) => b.score - a.score);
+
+            return duplicates;
+        }
+
+        function calculateNameSimilarity(str1, str2) {
+            const s1 = str1.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const s2 = str2.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+            if (s1 === s2) return 1;
+            if (s1.length === 0 || s2.length === 0) return 0;
+
+            // Verificar se um contem o outro
+            if (s1.includes(s2) || s2.includes(s1)) return 0.8;
+
+            // Calcular distancia de Levenshtein simplificada
+            const longer = s1.length > s2.length ? s1 : s2;
+            const shorter = s1.length > s2.length ? s2 : s1;
+
+            const longerLength = longer.length;
+            if (longerLength === 0) return 1.0;
+
+            // Contar caracteres em comum
+            let matches = 0;
+            for (let i = 0; i < shorter.length; i++) {
+                if (longer.includes(shorter[i])) matches++;
+            }
+
+            return matches / longerLength;
+        }
+
+        function showDuplicateWarning(duplicates, onConfirm, onCancel) {
+            const dup = duplicates[0];
+            const message = `
+                <div style="text-align:left;">
+                    <p style="margin-bottom:1rem;"><strong>Possivel rota duplicada encontrada!</strong></p>
+                    <p style="margin-bottom:0.5rem;color:var(--text-muted);">Confianca: <span style="color:${dup.confidence === 'alta' ? 'var(--danger)' : 'var(--warning)'};">${dup.confidence.toUpperCase()}</span></p>
+                    <p style="margin-bottom:0.5rem;"><strong>Rota similar:</strong> ${dup.route.nome}</p>
+                    <ul style="margin:0.5rem 0;padding-left:1.5rem;color:var(--text-secondary);font-size:0.9rem;">
+                        ${dup.reasons.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
+                    <p style="margin-top:1rem;font-size:0.9rem;">Deseja adicionar mesmo assim?</p>
+                </div>
+            `;
+
+            if (confirm(`POSSIVEL DUPLICATA DETECTADA!\n\nRota similar: "${dup.route.nome}"\n\nMotivos:\n- ${dup.reasons.join('\n- ')}\n\nConfianca: ${dup.confidence.toUpperCase()}\n\nDeseja adicionar mesmo assim?`)) {
+                onConfirm();
+            } else {
+                onCancel();
+            }
+        }
+
         function identificarCidade(lat, lon) {
             const cidades = [
                 { nome: "Lagoa Santa", estado: "MG", lat: -19.63, lon: -43.89, raio: 0.15 },
@@ -2463,6 +2588,7 @@
         function saveRoute(e) {
             e.preventDefault();
             if (!currentGpxData) return;
+
             const newRoute = {
                 nome: document.getElementById('routeName').value,
                 distancia_km: currentGpxData.distancia_km,
@@ -2476,8 +2602,25 @@
                 tipo: currentGpxData.type,
                 arquivo: null,
                 tags: [...selectedTags],
-                contribuidor: USERS[currentUser].name
+                contribuidor: USERS[currentUser].name,
+                latCentral: currentGpxData.latCentral,
+                lonCentral: currentGpxData.lonCentral
             };
+
+            // Verificar duplicatas
+            const duplicates = checkDuplicateRoute(newRoute, currentGpxData);
+
+            if (duplicates.length > 0) {
+                showDuplicateWarning(duplicates,
+                    () => addRouteToSystem(newRoute), // Confirmar adicao
+                    () => showToast('Adicao cancelada - rota possivelmente duplicada', true) // Cancelar
+                );
+            } else {
+                addRouteToSystem(newRoute);
+            }
+        }
+
+        function addRouteToSystem(newRoute) {
             if (isAdmin) {
                 routesData.push(newRoute);
                 saveData();
@@ -2758,8 +2901,23 @@
                 tags: isTrail ? ['trail'] : [],
                 contribuidor: 'Strava Import',
                 stravaActivityId: activity.id,
-                stravaActivityName: activity.name
+                stravaActivityName: activity.name,
+                latCentral: activity.start_latlng ? activity.start_latlng[0] : null,
+                lonCentral: activity.start_latlng ? activity.start_latlng[1] : null
             };
+
+            // Verificar duplicatas
+            const duplicates = checkDuplicateRoute(novaRota);
+
+            const btnElement = event.target.closest('button');
+
+            if (duplicates.length > 0) {
+                const dup = duplicates[0];
+                if (!confirm(`POSSIVEL DUPLICATA DETECTADA!\n\nRota similar: "${dup.route.nome}"\n\nMotivos:\n- ${dup.reasons.join('\n- ')}\n\nConfianca: ${dup.confidence.toUpperCase()}\n\nDeseja importar mesmo assim?`)) {
+                    showToast('Importacao cancelada - rota possivelmente duplicada', true);
+                    return;
+                }
+            }
 
             routesData.push(novaRota);
             filteredRoutes = [...routesData];
@@ -2769,9 +2927,8 @@
             showToast(`Rota "${nomeSugestivo}" importada!`);
 
             // Atualizar a lista para mostrar como "já importada"
-            const btn = event.target.closest('button');
-            if (btn) {
-                btn.outerHTML = `<span style="font-size:0.8rem;color:var(--success);"><span class="material-icons" style="font-size:1rem;vertical-align:middle;">check</span> Ja importada</span>`;
+            if (btnElement) {
+                btnElement.outerHTML = `<span style="font-size:0.8rem;color:var(--success);"><span class="material-icons" style="font-size:1rem;vertical-align:middle;">check</span> Ja importada</span>`;
             }
         }
 
