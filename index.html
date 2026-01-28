@@ -1673,9 +1673,11 @@
             tbody.innerHTML = filteredRoutes.map((r, i) => {
                 const idx = routesData.indexOf(r);
                 const tagsHtml = (r.tags || []).map(t => `<span class="tag ${t}">${t}</span>`).join('');
+                const completed = isRouteCompleted(r.nome);
                 return `
-                <tr class="fade-in">
+                <tr class="fade-in" ${completed ? 'style="background: rgba(16, 185, 129, 0.1);"' : ''}>
                     <td class="route-name-cell">
+                        ${completed ? '<span class="material-icons" style="color:var(--success);font-size:1rem;vertical-align:middle;margin-right:0.5rem;" title="Completada via Strava">check_circle</span>' : ''}
                         ${r.nome}
                         ${r.contribuidor && r.contribuidor !== 'Admin' ? `<br><small style="color:var(--text-muted);">#${r.contribuidor}</small>` : ''}
                         ${tagsHtml ? `<div class="tags-container">${tagsHtml}</div>` : ''}
@@ -1716,11 +1718,15 @@
                 const idx = routesData.indexOf(r);
                 const time = calcEstimatedTime(r.distancia_km, r.ganho_elevacao_m);
                 const tagsHtml = (r.tags || []).map(t => `<span class="tag ${t}">${t}</span>`).join('');
+                const completed = isRouteCompleted(r.nome);
                 return `
-                <div class="stat-card fade-in" style="cursor:pointer;" onclick="showDetails(${idx})">
+                <div class="stat-card fade-in" style="cursor:pointer;${completed ? 'border: 2px solid var(--success);' : ''}" onclick="showDetails(${idx})">
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
                         <span class="badge badge-${getDifficultyClass(r.dificuldade)}">${r.dificuldade}</span>
-                        <span class="badge badge-${r.terreno === 'Trail' ? 'trail' : 'asfalto'}">${r.terreno}</span>
+                        <div style="display:flex;gap:0.5rem;align-items:center;">
+                            ${completed ? '<span class="material-icons" style="color:var(--success);font-size:1.2rem;" title="Completada via Strava">check_circle</span>' : ''}
+                            <span class="badge badge-${r.terreno === 'Trail' ? 'trail' : 'asfalto'}">${r.terreno}</span>
+                        </div>
                     </div>
                     <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;">${r.nome}</h3>
                     <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">${r.cidade}</p>

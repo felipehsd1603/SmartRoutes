@@ -50,8 +50,8 @@ export default {
 
             const response = await fetch('https://www.strava.com/oauth/token', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(tokenRequest),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(tokenRequest).toString(),
             });
 
             const data = await response.json();
