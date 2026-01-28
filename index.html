@@ -543,6 +543,10 @@
                         <span class="material-icons">location_city</span>
                         <span class="nav-item-text">Asfalto</span>
                     </div>
+                    <div class="nav-item" id="completedFilterNav" onclick="filterByCompleted()" style="display:none;">
+                        <span class="material-icons" style="color:var(--success);">check_circle</span>
+                        <span class="nav-item-text">Completadas</span>
+                    </div>
                 </div>
                 <div class="nav-section" id="adminSection" style="display:none;">
                     <div class="nav-section-title">Admin</div>
@@ -1601,6 +1605,9 @@
             // Mostrar botao sincronizar Strava se usuario logou com Strava
             document.getElementById('syncStravaNav').style.display = isStravaUser ? 'flex' : 'none';
 
+            // Mostrar filtro de rotas completadas para usuarios logados
+            document.getElementById('completedFilterNav').style.display = 'flex';
+
             // Carregar rotas completadas do Firestore
             await getCompletedRoutes();
 
@@ -1897,6 +1904,19 @@
             document.getElementById('terrainFilter').value = t;
             applyFilters();
             navigateTo('dashboard');
+        }
+
+        function filterByCompleted() {
+            // Filtrar apenas rotas que o usuario completou
+            const completed = completedRoutesCache;
+            if (completed.length === 0) {
+                showToast('Nenhuma rota completada ainda. Sincronize com o Strava!', true);
+                return;
+            }
+            filteredRoutes = routesData.filter(r => completed.includes(r.nome));
+            renderRoutes();
+            navigateTo('dashboard');
+            showToast(`${filteredRoutes.length} rota(s) completada(s)`);
         }
 
         function sortTable(col) {
@@ -2437,16 +2457,20 @@
                     return;
                 }
 
+                // Salvar atividades para importação
+                window.tempStravaActivities = runActivities;
+
                 document.getElementById('activitiesList').innerHTML = `
                     <div style="margin-bottom:1rem;color:var(--text-muted);font-size:0.9rem;">${runActivities.length} atividades de corrida</div>
                     <div style="display:flex;flex-direction:column;gap:0.75rem;">
-                        ${runActivities.map(a => {
+                        ${runActivities.map((a, idx) => {
                             const date = new Date(a.start_date_local).toLocaleDateString('pt-BR');
                             const distance = (a.distance / 1000).toFixed(2);
                             const elevation = Math.round(a.total_elevation_gain);
                             const pace = a.moving_time > 0 ? formatPace(a.moving_time / (a.distance / 1000)) : '-';
                             const duration = formatDuration(a.moving_time);
                             const matchedRoute = findMatchingRoute(a);
+                            const alreadyImported = routesData.some(r => r.stravaActivityId === a.id);
 
                             return `
                                 <div style="background:var(--card-bg);border-radius:12px;padding:1rem;border-left:4px solid ${matchedRoute ? 'var(--success)' : '#FC4C02'};">
@@ -2473,6 +2497,12 @@
                                         </div>
                                     </div>
                                     ${matchedRoute ? `<div style="margin-top:0.5rem;padding:0.5rem;background:rgba(16,185,129,0.1);border-radius:8px;font-size:0.85rem;color:var(--success);"><span class="material-icons" style="font-size:1rem;vertical-align:middle;">check_circle</span> Rota: ${matchedRoute.nome}</div>` : ''}
+                                    <div style="margin-top:0.75rem;display:flex;gap:0.5rem;">
+                                        ${alreadyImported ?
+                                            `<span style="font-size:0.8rem;color:var(--success);"><span class="material-icons" style="font-size:1rem;vertical-align:middle;">check</span> Ja importada</span>` :
+                                            `<button class="btn btn-primary btn-sm" onclick="importStravaActivity(${idx})" style="font-size:0.8rem;padding:0.4rem 0.8rem;"><span class="material-icons" style="font-size:1rem;vertical-align:middle;margin-right:0.25rem;">add</span>Importar como Rota</button>`
+                                        }
+                                    </div>
                                 </div>
                             `;
                         }).join('')}
@@ -2504,6 +2534,63 @@
                 return `${hrs}h${mins.toString().padStart(2, '0')}`;
             }
             return `${mins}min`;
+        }
+
+        function importStravaActivity(idx) {
+            if (!isAdmin || !window.tempStravaActivities) return;
+
+            const activity = window.tempStravaActivities[idx];
+            if (!activity) return;
+
+            const distance = (activity.distance / 1000).toFixed(2);
+            const elevation = Math.round(activity.total_elevation_gain);
+            const date = new Date(activity.start_date_local);
+            const dateStr = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.');
+
+            // Determinar tipo baseado na atividade
+            const isTrail = activity.type === 'Trail Run' || elevation > 100;
+            const tipo = isTrail ? 'Trail' : 'Asfalto/Urbano';
+
+            // Determinar dificuldade baseada em distância e elevação
+            let dificuldade = 'Facil';
+            if (distance > 20 || elevation > 500) dificuldade = 'Dificil';
+            else if (distance > 15 || elevation > 300) dificuldade = 'Moderada-Dificil';
+            else if (distance > 10 || elevation > 150) dificuldade = 'Moderada';
+
+            // Gerar nome sugestivo: Distância + Tipo + D+ + Data
+            const nomeSugestivo = `${distance}km ${isTrail ? 'Trail' : 'Run'} D+${elevation}m - ${dateStr}`;
+
+            // Criar a rota
+            const novaRota = {
+                nome: nomeSugestivo,
+                distancia_km: parseFloat(distance),
+                ganho_elevacao_m: elevation,
+                perda_elevacao_m: elevation,
+                elevacao_min_m: Math.round(activity.elev_low || 0),
+                elevacao_max_m: Math.round(activity.elev_high || elevation),
+                dificuldade: dificuldade,
+                terreno: tipo,
+                cidade: activity.location_city || activity.timezone?.split('/')[1]?.replace('_', ' ') || 'Nao informada',
+                tipo: 'running',
+                arquivo: null,
+                tags: isTrail ? ['trail'] : [],
+                contribuidor: 'Strava Import',
+                stravaActivityId: activity.id,
+                stravaActivityName: activity.name
+            };
+
+            routesData.push(novaRota);
+            filteredRoutes = [...routesData];
+            saveData();
+            renderAll();
+
+            showToast(`Rota "${nomeSugestivo}" importada!`);
+
+            // Atualizar a lista para mostrar como "já importada"
+            const btn = event.target.closest('button');
+            if (btn) {
+                btn.outerHTML = `<span style="font-size:0.8rem;color:var(--success);"><span class="material-icons" style="font-size:1rem;vertical-align:middle;">check</span> Ja importada</span>`;
+            }
         }
 
         // ========== EXPORT ==========
