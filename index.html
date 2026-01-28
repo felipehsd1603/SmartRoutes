@@ -162,7 +162,7 @@
         .nav-item-badge { margin-left: auto; background: var(--orange-primary); color: white; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 10px; font-weight: 600; }
         .nav-item-badge.pending { background: var(--danger); animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-        .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); }
+        .sidebar-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); margin-top: auto; flex-shrink: 0; padding-bottom: max(1rem, calc(env(safe-area-inset-bottom, 0px) + 1rem)); }
         .user-menu { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-radius: 12px; cursor: pointer; transition: background 0.2s ease; }
         .user-menu:hover { background: var(--bg-card); }
         .user-avatar { width: 40px; height: 40px; background: var(--accent-gradient); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 600; color: white; }
@@ -405,7 +405,14 @@
         /* Mobile */
         .mobile-menu-btn { display: none; background: none; border: none; color: var(--text-primary); cursor: pointer; padding: 0.5rem; }
         @media (max-width: 1024px) {
-            .sidebar { transform: translateX(-100%); }
+            .sidebar { transform: translateX(-100%); height: 100%; max-height: 100dvh; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-nav { flex: 1; overflow-y: auto; padding-bottom: 1rem; }
+            .sidebar-footer { padding: 0.75rem 1rem; padding-bottom: max(0.75rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem)); }
+            .user-menu { padding: 0.5rem; gap: 0.5rem; }
+            .user-avatar { width: 36px; height: 36px; font-size: 0.9rem; }
+            .user-name { font-size: 0.9rem; }
+            .user-role { font-size: 0.7rem; }
             .sidebar.open { transform: translateX(0); }
             .main-content { margin-left: 0; }
             .mobile-menu-btn { display: flex; }
@@ -560,17 +567,11 @@
                 </div>
             </div>
 
-            <div class="login-divider"><span>ou acesse como admin</span></div>
+            <!-- Admin Login (hidden - only visible with /admin or ?admin in URL) -->
+            <div id="adminLoginSection" style="display:none;">
+                <div class="login-divider"><span>Acesso Administrativo</span></div>
 
-            <!-- Admin Login (hidden by default) -->
-            <div class="admin-login-toggle">
-                <button type="button" class="btn btn-secondary" onclick="toggleAdminLogin()" style="width:100%;">
-                    <span class="material-icons">admin_panel_settings</span>
-                    Acesso Administrativo
-                </button>
-            </div>
-
-            <form class="login-form admin-form" id="loginForm" onsubmit="handleLogin(event)" style="display:none;">
+                <form class="login-form admin-form" id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label class="form-label">Usuario</label>
                     <input type="text" class="form-input" id="username" placeholder="admin" required>
@@ -580,7 +581,8 @@
                     <input type="password" class="form-input" id="password" placeholder="Senha do admin" required>
                 </div>
                 <button type="submit" class="login-btn">Entrar como Admin</button>
-            </form>
+                </form>
+            </div>
 
             <div class="login-footer" id="loginFooter">
                 <a href="https://www.strava.com/register" target="_blank">Nao tem Strava? Crie sua conta gratis</a>
@@ -1747,6 +1749,15 @@
         function showLoginScreen() {
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('mainApp').classList.remove('visible');
+
+            // Verificar se URL tem /admin ou ?admin para mostrar login administrativo
+            const isAdminAccess = window.location.href.includes('/admin') ||
+                                  window.location.href.includes('?admin') ||
+                                  window.location.hash === '#admin';
+            const adminSection = document.getElementById('adminLoginSection');
+            if (adminSection) {
+                adminSection.style.display = isAdminAccess ? 'block' : 'none';
+            }
         }
 
         async function showMainApp(username) {
