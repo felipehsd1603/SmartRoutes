@@ -808,7 +808,13 @@
                                     <option value="Asfalto/Urbano">Asfalto</option>
                                 </select>
                             </div>
+                            <div class="filter-group" style="display:flex;align-items:flex-end;">
+                                <button class="btn btn-secondary btn-sm" onclick="clearFiltersCards()" id="clearFiltersBtn" style="display:none;">
+                                    <span class="material-icons" style="font-size:1rem;margin-right:0.25rem;">clear</span>Limpar
+                                </button>
+                            </div>
                         </div>
+                        <div style="margin-top:0.5rem;font-size:0.9rem;color:var(--text-muted);" id="routesCounter"></div>
                     </div>
                     <div id="routesCardsContainer" class="routes-grid"></div>
                 </div>
@@ -2142,8 +2148,16 @@
                 if (terr && r.terreno !== terr) return false;
                 return true;
             });
+
+            // Atualizar contador
+            const counter = document.getElementById('routesCounter');
+            const clearBtn = document.getElementById('clearFiltersBtn');
+            const hasFilters = search || diff || terr;
+            if (counter) counter.textContent = hasFilters ? `${filtered.length} de ${routesData.length} rotas` : `${routesData.length} rotas`;
+            if (clearBtn) clearBtn.style.display = hasFilters ? 'flex' : 'none';
+
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon"><span class="material-icons">search_off</span></div><h3 class="empty-state-title">Nenhuma rota</h3></div>`;
+                container.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon"><span class="material-icons">search_off</span></div><h3 class="empty-state-title">Nenhuma rota</h3><p style="color:var(--text-muted);margin-top:0.5rem;">Tente alterar os filtros</p></div>`;
                 return;
             }
             container.innerHTML = filtered.map((r, i) => {
@@ -2174,6 +2188,13 @@
         }
 
         function applyFiltersCards() { renderCards(); }
+
+        function clearFiltersCards() {
+            document.getElementById('searchInputCards').value = '';
+            document.getElementById('difficultyFilterCards').value = '';
+            document.getElementById('terrainFilterCards').value = '';
+            renderCards();
+        }
 
         function renderPending() {
             const container = document.getElementById('pendingContainer');
