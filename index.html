@@ -1650,6 +1650,37 @@
             return completedRoutesCache.includes(routeName);
         }
 
+        // ========== FAVORITES ==========
+        let favoritesCache = [];
+
+        function loadFavorites() {
+            if (!currentUser) return;
+            favoritesCache = JSON.parse(localStorage.getItem('favorites_' + currentUser) || '[]');
+        }
+
+        function saveFavorites() {
+            if (!currentUser) return;
+            localStorage.setItem('favorites_' + currentUser, JSON.stringify(favoritesCache));
+        }
+
+        function isRouteFavorite(routeName) {
+            return favoritesCache.includes(routeName);
+        }
+
+        function toggleFavorite(routeName, event) {
+            if (event) event.stopPropagation();
+            const idx = favoritesCache.indexOf(routeName);
+            if (idx > -1) {
+                favoritesCache.splice(idx, 1);
+                showToast('Removido dos favoritos');
+            } else {
+                favoritesCache.push(routeName);
+                showToast('Adicionado aos favoritos');
+            }
+            saveFavorites();
+            renderCards();
+        }
+
         // ========== LEGACY SOCIAL LOGIN (kept for compatibility) ==========
         function handleSocialLogin(data) {
             const email = data.email.toLowerCase();
@@ -1808,6 +1839,7 @@
 
             // Carregar rotas completadas do Firestore
             await getCompletedRoutes();
+            loadFavorites();
 
             loadData();
             renderAll();
@@ -2165,11 +2197,13 @@
                 const time = calcEstimatedTime(r.distancia_km, r.ganho_elevacao_m);
                 const tagsHtml = (r.tags || []).map(t => `<span class="tag ${t}">${t}</span>`).join('');
                 const completed = isRouteCompleted(r.nome);
+                const isFav = isRouteFavorite(r.nome);
                 return `
                 <div class="stat-card fade-in" style="cursor:pointer;${completed ? 'border: 2px solid var(--success);' : ''}" onclick="showDetails(${idx})">
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
                         <span class="badge badge-${getDifficultyClass(r.dificuldade)}">${r.dificuldade}</span>
                         <div style="display:flex;gap:0.5rem;align-items:center;">
+                            <span class="material-icons" style="color:${isFav ? '#f59e0b' : 'var(--text-muted)'};font-size:1.2rem;cursor:pointer;" onclick="event.stopPropagation();toggleFavorite('${r.nome.replace(/'/g, "\\'")}',event)" title="${isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">${isFav ? 'star' : 'star_border'}</span>
                             ${completed ? '<span class="material-icons" style="color:var(--success);font-size:1.2rem;" title="Completada via Strava">check_circle</span>' : ''}
                             <span class="badge badge-${r.terreno === 'Trail' ? 'trail' : 'asfalto'}">${r.terreno}</span>
                         </div>
