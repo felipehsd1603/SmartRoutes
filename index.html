@@ -1381,9 +1381,10 @@
         // Carregar usuarios do Firestore
         async function loadUsers() {
             try {
+                console.log('[Firestore] Carregando usuarios...');
                 const snapshot = await db.collection('users').get();
                 if (snapshot.empty) {
-                    // Primeira vez - criar usuarios default no Firestore
+                    console.log('[Firestore] Vazio, criando usuarios default');
                     USERS = { ...DEFAULT_USERS };
                     for (const [id, user] of Object.entries(DEFAULT_USERS)) {
                         await db.collection('users').doc(id).set(user);
@@ -1393,12 +1394,16 @@
                     snapshot.forEach(doc => {
                         USERS[doc.id] = doc.data();
                     });
+                    console.log('[Firestore] Carregados', Object.keys(USERS).length, 'usuarios:', Object.keys(USERS));
                 }
+                // Atualizar localStorage com dados do Firestore
+                localStorage.setItem('depende_users', JSON.stringify(USERS));
             } catch (err) {
-                console.error('Erro ao carregar usuarios do Firestore:', err);
+                console.error('[Firestore] ERRO ao carregar usuarios:', err);
                 // Fallback para localStorage
                 const stored = localStorage.getItem('depende_users');
                 USERS = stored ? JSON.parse(stored) : { ...DEFAULT_USERS };
+                console.warn('[Firestore] Usando dados OFFLINE:', Object.keys(USERS).length, 'usuarios');
             }
         }
 
