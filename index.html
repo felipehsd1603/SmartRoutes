@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>DEPENDE ROUTE CLUB | Trail Running</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a2e26">
@@ -65,7 +65,7 @@
             --green-gradient: linear-gradient(135deg, var(--green-dark) 0%, var(--green-medium) 100%);
             --text-primary: var(--cream);
             --text-secondary: #a8b8b0;
-            --text-muted: #9aaba3;
+            --text-muted: #7a8a82;
             --border-color: #3a5048;
             --success: #4ade80;
             --success-bg: rgba(74, 222, 128, 0.1);
@@ -88,7 +88,7 @@
             --bg-input: #ffffff;
             --text-primary: #1a2e26;
             --text-secondary: #4a5a52;
-            --text-muted: #9aaba3;
+            --text-muted: #7a8a82;
             --border-color: #d0d8d4;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -108,8 +108,6 @@
         .form-label { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); }
         .form-input { background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.25rem; color: var(--text-primary); font-size: 1rem; font-family: inherit; transition: all 0.2s ease; }
         .form-input:focus { outline: none; border-color: var(--orange-primary); box-shadow: 0 0 0 3px rgba(193, 127, 74, 0.2); }
-        .form-input.error, .form-select.error, .filter-select.error { border-color: var(--danger) !important; box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2) !important; }
-        .field-error { display: block; color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem; }
         .login-btn { background: var(--accent-gradient); border: none; border-radius: 12px; padding: 1rem; color: white; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
         .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(193, 127, 74, 0.4); }
         .login-error { background: var(--danger-bg); border: 1px solid rgba(248, 113, 113, 0.3); border-radius: 10px; padding: 0.75rem 1rem; color: #fca5a5; font-size: 0.9rem; display: none; align-items: center; gap: 0.5rem; }
@@ -272,10 +270,7 @@
         .btn-secondary:hover { border-color: var(--orange-primary); background: var(--bg-card-hover); }
         .btn-success { background: var(--success); color: var(--green-dark); }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-icon { width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 0; justify-content: center; border-radius: 8px; }
-        .btn-icon-mini { background: none; border: none; cursor: pointer; padding: 0.25rem; border-radius: 50%; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-        .btn-icon-mini:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
-        .btn-icon-mini .material-icons { font-size: 1.3rem; }
+        .btn-icon { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 8px; }
         .btn-icon .material-icons { font-size: 1.1rem; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -287,13 +282,6 @@
         .filter-select, .filter-input { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.75rem 1rem; color: var(--text-primary); font-size: 0.9rem; font-family: inherit; cursor: pointer; transition: all 0.2s ease; }
         .filter-select:hover, .filter-input:hover { border-color: var(--orange-primary); }
         .filter-select:focus, .filter-input:focus { outline: none; border-color: var(--orange-primary); }
-        .filter-chip { display: inline-flex; align-items: center; background: var(--orange-primary); color: white; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
-        .filter-chip:hover { background: var(--orange-dark); transform: scale(1.02); }
-        .filter-toggle { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; cursor: pointer; transition: all 0.2s; }
-        .filter-toggle:hover { border-color: var(--orange-primary); }
-        .filter-toggle input { display: none; }
-        .filter-toggle input:checked + .material-icons { transform: scale(1.2); }
-        .filter-toggle:has(input:checked) { background: rgba(245,158,11,0.2); border-color: #f59e0b; }
 
         /* Cards Grid */
         .routes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
@@ -406,13 +394,6 @@
         .toast.show { transform: translateY(0); }
         .toast.success { border-color: var(--success); }
         .toast.error { border-color: var(--danger); }
-
-        /* Loading Overlay */
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(4px); }
-        .loading-overlay.show { display: flex; }
-        .loading-content { text-align: center; color: var(--cream); }
-        .loading-spinner { width: 50px; height: 50px; border: 4px solid rgba(193,127,74,0.2); border-top-color: var(--orange-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Empty State */
         .empty-state { text-align: center; padding: 4rem 2rem; }
@@ -699,22 +680,22 @@
         <main class="main-content">
             <header class="content-header">
                 <div style="display: flex; align-items: center; gap: 1rem;">
-                    <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Abrir menu" aria-expanded="false" id="mobileMenuBtn">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()">
                         <span class="material-icons">menu</span>
                     </button>
                     <h1 class="page-title" id="pageTitle">Dashboard</h1>
                 </div>
                 <div class="header-actions">
                     <!-- Theme Toggle -->
-                    <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema" aria-label="Alternar tema claro/escuro" role="switch" aria-checked="false" id="themeToggleBtn">
+                    <div class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
                         <span class="material-icons" id="themeIcon">dark_mode</span>
                         <div class="theme-switch"></div>
-                    </button>
+                    </div>
 
                     <!-- Notifications -->
-                    <button class="notification-bell" onclick="toggleNotifications(event)" aria-label="Notificacoes" aria-expanded="false" aria-haspopup="true" id="notificationBellBtn">
+                    <div class="notification-bell" onclick="toggleNotifications(event)">
                         <span class="material-icons">notifications</span>
-                        <span class="notification-badge" id="notificationBadge" style="display:none;" aria-live="polite">0</span>
+                        <span class="notification-badge" id="notificationBadge" style="display:none;">0</span>
                         <div class="notification-dropdown" id="notificationDropdown">
                             <div class="notification-header">
                                 <h4><span class="material-icons">notifications_active</span> Notificacoes</h4>
@@ -727,7 +708,7 @@
                                 </div>
                             </div>
                         </div>
-                    </button>
+                    </div>
                 </div>
             </header>
 
@@ -827,19 +808,6 @@
                                     <option value="Asfalto/Urbano">Asfalto</option>
                                 </select>
                             </div>
-                            <div class="filter-group" style="display:flex;align-items:flex-end;gap:0.5rem;">
-                                <label class="filter-toggle" title="Mostrar apenas favoritos">
-                                    <input type="checkbox" id="favoritesFilterCards" onchange="applyFiltersCards()">
-                                    <span class="material-icons" style="color:#f59e0b;">star</span>
-                                </label>
-                                <button class="btn btn-secondary btn-sm" onclick="clearFiltersCards()" id="clearFiltersBtn" style="display:none;">
-                                    <span class="material-icons" style="font-size:1rem;margin-right:0.25rem;">clear</span>Limpar
-                                </button>
-                            </div>
-                        </div>
-                        <div id="activeFiltersInfo" style="display:flex;align-items:center;gap:1rem;margin-top:0.75rem;flex-wrap:wrap;">
-                            <span id="routesCounter" style="font-size:0.9rem;color:var(--text-secondary);"></span>
-                            <div id="activeFilterChips" style="display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
                         </div>
                     </div>
                     <div id="routesCardsContainer" class="routes-grid"></div>
@@ -885,13 +853,7 @@
                                     <option value="blocked">Bloqueados</option>
                                 </select>
                             </div>
-                            <div class="filter-group" style="display:flex;align-items:flex-end;">
-                                <button class="btn btn-secondary" onclick="syncUsers()" title="Sincronizar com banco de dados">
-                                    <span class="material-icons" style="font-size:1.2rem;">sync</span>
-                                </button>
-                            </div>
                         </div>
-                        <div id="syncStatus" style="margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);"></div>
                     </div>
                     <div class="routes-table-wrapper">
                         <table class="routes-table">
@@ -1151,34 +1113,9 @@
         </div>
     </div>
 
-    <div class="toast" id="toast" role="alert" aria-live="polite">
+    <div class="toast" id="toast">
         <span class="material-icons" id="toastIcon">check_circle</span>
         <span id="toastMessage">Sucesso!</span>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p id="loadingMessage">Carregando...</p>
-        </div>
-    </div>
-
-    <!-- Confirm Modal -->
-    <div class="modal-overlay" id="confirmModal">
-        <div class="modal" style="max-width:400px;">
-            <div class="modal-header">
-                <h3 id="confirmTitle">Confirmar</h3>
-                <button class="modal-close" onclick="closeConfirmModal(false)">&times;</button>
-            </div>
-            <div class="modal-body" style="padding:1.5rem;">
-                <p id="confirmMessage" style="color:var(--text-secondary);"></p>
-            </div>
-            <div style="display:flex;gap:1rem;padding:0 1.5rem 1.5rem;">
-                <button class="btn btn-secondary" onclick="closeConfirmModal(false)" style="flex:1;">Cancelar</button>
-                <button class="btn btn-danger" onclick="closeConfirmModal(true)" id="confirmBtn" style="flex:1;">Confirmar</button>
-            </div>
-        </div>
     </div>
 
     <!-- PWA Install Banner -->
@@ -1442,26 +1379,9 @@
         let isAdmin = false;
 
         // Carregar usuarios do Firestore
-        let firestoreConnected = false;
-
-        async function testFirestoreConnection() {
-            try {
-                await db.collection('users').limit(1).get();
-                firestoreConnected = true;
-                console.log('[Firestore] Conexao OK');
-                return true;
-            } catch (err) {
-                firestoreConnected = false;
-                console.error('[Firestore] Erro de conexao:', err);
-                return false;
-            }
-        }
-
         async function loadUsers() {
             try {
-                console.log('[Firestore] Carregando usuarios...');
                 const snapshot = await db.collection('users').get();
-                firestoreConnected = true;
                 if (snapshot.empty) {
                     // Primeira vez - criar usuarios default no Firestore
                     USERS = { ...DEFAULT_USERS };
@@ -1474,16 +1394,11 @@
                         USERS[doc.id] = doc.data();
                     });
                 }
-                // Sincronizar localStorage com Firestore
-                localStorage.setItem('depende_users', JSON.stringify(USERS));
-                console.log('[Firestore] Usuarios carregados:', Object.keys(USERS).length);
             } catch (err) {
                 console.error('Erro ao carregar usuarios do Firestore:', err);
-                firestoreConnected = false;
                 // Fallback para localStorage
                 const stored = localStorage.getItem('depende_users');
                 USERS = stored ? JSON.parse(stored) : { ...DEFAULT_USERS };
-                console.warn('[Firestore] Usando dados offline');
             }
         }
 
@@ -1649,39 +1564,31 @@
         }
 
         async function syncStravaActivities() {
-            showLoading('Sincronizando com Strava...');
-            try {
-                const activities = await fetchStravaActivities();
-                if (activities.length === 0) {
-                    hideLoading();
-                    showToast('Nenhuma atividade de corrida encontrada', true);
-                    return;
+            const activities = await fetchStravaActivities();
+            if (activities.length === 0) {
+                showToast('Nenhuma atividade de corrida encontrada', true);
+                return;
+            }
+
+            let matched = 0;
+            const userCompletedRoutes = await getCompletedRoutes();
+
+            for (const activity of activities) {
+                // Comparar com rotas do catalogo
+                const matchedRoute = findMatchingRoute(activity);
+                if (matchedRoute && !userCompletedRoutes.includes(matchedRoute.nome)) {
+                    userCompletedRoutes.push(matchedRoute.nome);
+                    matched++;
                 }
+            }
 
-                let matched = 0;
-                const userCompletedRoutes = await getCompletedRoutes();
+            await saveCompletedRoutes(userCompletedRoutes);
 
-                for (const activity of activities) {
-                    // Comparar com rotas do catalogo
-                    const matchedRoute = findMatchingRoute(activity);
-                    if (matchedRoute && !userCompletedRoutes.includes(matchedRoute.nome)) {
-                        userCompletedRoutes.push(matchedRoute.nome);
-                        matched++;
-                    }
-                }
-
-                await saveCompletedRoutes(userCompletedRoutes);
-                hideLoading();
-
-                if (matched > 0) {
-                    showToast(`${matched} rota(s) sincronizada(s) do Strava!`);
-                    renderAll();
-                } else {
-                    showToast('Atividades ja sincronizadas');
-                }
-            } catch (err) {
-                hideLoading();
-                showToast('Erro ao sincronizar com Strava', true);
+            if (matched > 0) {
+                showToast(`${matched} rota(s) sincronizada(s) do Strava!`);
+                renderAll();
+            } else {
+                showToast('Atividades ja sincronizadas');
             }
         }
 
@@ -1730,37 +1637,6 @@
 
         function isRouteCompleted(routeName) {
             return completedRoutesCache.includes(routeName);
-        }
-
-        // ========== FAVORITES ==========
-        let favoritesCache = [];
-
-        function loadFavorites() {
-            if (!currentUser) return;
-            favoritesCache = JSON.parse(localStorage.getItem('favorites_' + currentUser) || '[]');
-        }
-
-        function saveFavorites() {
-            if (!currentUser) return;
-            localStorage.setItem('favorites_' + currentUser, JSON.stringify(favoritesCache));
-        }
-
-        function isRouteFavorite(routeName) {
-            return favoritesCache.includes(routeName);
-        }
-
-        function toggleFavorite(routeName, event) {
-            if (event) event.stopPropagation();
-            const idx = favoritesCache.indexOf(routeName);
-            if (idx > -1) {
-                favoritesCache.splice(idx, 1);
-                showToast('Removido dos favoritos');
-            } else {
-                favoritesCache.push(routeName);
-                showToast('Adicionado aos favoritos');
-            }
-            saveFavorites();
-            renderCards();
         }
 
         // ========== LEGACY SOCIAL LOGIN (kept for compatibility) ==========
@@ -1920,14 +1796,8 @@
             // Carregar rotas completadas do Firestore
             await getCompletedRoutes();
 
-            // Carregar favoritos
-            loadFavorites();
-
             loadData();
             renderAll();
-
-            // Verificar se veio de um link compartilhado
-            checkSharedRoute();
 
             // Auto-sync Strava activities
             if (isStravaUser) {
@@ -2007,7 +1877,7 @@
             if (page === 'routes') renderCards();
             if (page === 'pending') renderPending();
             if (page === 'compare') populateCompareSelects();
-            if (page === 'users') { renderUsers(); updateSyncStatus(); }
+            if (page === 'users') renderUsers();
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
@@ -2259,20 +2129,14 @@
             const search = document.getElementById('searchInputCards')?.value.toLowerCase() || '';
             const diff = document.getElementById('difficultyFilterCards')?.value || '';
             const terr = document.getElementById('terrainFilterCards')?.value || '';
-            const favsOnly = document.getElementById('favoritesFilterCards')?.checked || false;
             let filtered = routesData.filter(r => {
                 if (search && !r.nome.toLowerCase().includes(search)) return false;
                 if (diff && r.dificuldade !== diff) return false;
                 if (terr && r.terreno !== terr) return false;
-                if (favsOnly && !isRouteFavorite(r.nome)) return false;
                 return true;
             });
-
-            // Atualizar contador e filtros ativos
-            updateFiltersInfo(filtered.length, routesData.length, search, diff, terr, favsOnly);
-
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon"><span class="material-icons">search_off</span></div><h3 class="empty-state-title">Nenhuma rota encontrada</h3><p class="empty-state-text">Tente alterar os filtros</p><button class="btn btn-primary btn-sm" onclick="clearFiltersCards()" style="margin-top:1rem;">Limpar filtros</button></div>`;
+                container.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon"><span class="material-icons">search_off</span></div><h3 class="empty-state-title">Nenhuma rota</h3></div>`;
                 return;
             }
             container.innerHTML = filtered.map((r, i) => {
@@ -2280,15 +2144,11 @@
                 const time = calcEstimatedTime(r.distancia_km, r.ganho_elevacao_m);
                 const tagsHtml = (r.tags || []).map(t => `<span class="tag ${t}">${t}</span>`).join('');
                 const completed = isRouteCompleted(r.nome);
-                const isFav = isRouteFavorite(r.nome);
                 return `
                 <div class="stat-card fade-in" style="cursor:pointer;${completed ? 'border: 2px solid var(--success);' : ''}" onclick="showDetails(${idx})">
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
                         <span class="badge badge-${getDifficultyClass(r.dificuldade)}">${r.dificuldade}</span>
                         <div style="display:flex;gap:0.5rem;align-items:center;">
-                            <button class="btn-icon-mini" onclick="toggleFavorite('${r.nome.replace(/'/g, "\\'")}', event)" title="${isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}" aria-label="${isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
-                                <span class="material-icons" style="color:${isFav ? '#f59e0b' : 'var(--text-muted)'};">${isFav ? 'star' : 'star_border'}</span>
-                            </button>
                             ${completed ? '<span class="material-icons" style="color:var(--success);font-size:1.2rem;" title="Completada via Strava">check_circle</span>' : ''}
                             <span class="badge badge-${r.terreno === 'Trail' ? 'trail' : 'asfalto'}">${r.terreno}</span>
                         </div>
@@ -2307,46 +2167,6 @@
         }
 
         function applyFiltersCards() { renderCards(); }
-
-        function updateFiltersInfo(count, total, search, diff, terr, favsOnly) {
-            const counter = document.getElementById('routesCounter');
-            const chips = document.getElementById('activeFilterChips');
-            const clearBtn = document.getElementById('clearFiltersBtn');
-
-            // Contador
-            if (count === total) {
-                counter.textContent = `${total} rotas`;
-            } else {
-                counter.textContent = `${count} de ${total} rotas`;
-            }
-
-            // Chips de filtros ativos
-            let chipsHtml = '';
-            if (search) chipsHtml += `<span class="filter-chip" onclick="clearFilter('search')">Busca: "${search}" <span class="material-icons" style="font-size:0.9rem;margin-left:0.25rem;">close</span></span>`;
-            if (diff) chipsHtml += `<span class="filter-chip" onclick="clearFilter('diff')">Dificuldade: ${diff} <span class="material-icons" style="font-size:0.9rem;margin-left:0.25rem;">close</span></span>`;
-            if (terr) chipsHtml += `<span class="filter-chip" onclick="clearFilter('terr')">Terreno: ${terr} <span class="material-icons" style="font-size:0.9rem;margin-left:0.25rem;">close</span></span>`;
-            if (favsOnly) chipsHtml += `<span class="filter-chip" onclick="clearFilter('favs')" style="background:#f59e0b;">Favoritos <span class="material-icons" style="font-size:0.9rem;margin-left:0.25rem;">close</span></span>`;
-            chips.innerHTML = chipsHtml;
-
-            // Mostrar/ocultar botao limpar
-            clearBtn.style.display = (search || diff || terr || favsOnly) ? 'flex' : 'none';
-        }
-
-        function clearFilter(type) {
-            if (type === 'search') document.getElementById('searchInputCards').value = '';
-            if (type === 'diff') document.getElementById('difficultyFilterCards').value = '';
-            if (type === 'terr') document.getElementById('terrainFilterCards').value = '';
-            if (type === 'favs') document.getElementById('favoritesFilterCards').checked = false;
-            renderCards();
-        }
-
-        function clearFiltersCards() {
-            document.getElementById('searchInputCards').value = '';
-            document.getElementById('difficultyFilterCards').value = '';
-            document.getElementById('terrainFilterCards').value = '';
-            document.getElementById('favoritesFilterCards').checked = false;
-            renderCards();
-        }
 
         function renderPending() {
             const container = document.getElementById('pendingContainer');
@@ -2472,11 +2292,8 @@
             const time = calcEstimatedTime(r.distancia_km, r.ganho_elevacao_m);
             const tagsHtml = (r.tags || []).map(t => `<span class="tag ${t}">${t}</span>`).join('');
             document.getElementById('detailsModalBody').innerHTML = `
-                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
                     <span class="badge badge-${getDifficultyClass(r.dificuldade)}">${r.dificuldade}</span>
-                    <button class="btn-icon-mini" onclick="showDifficultyInfo()" title="Como a dificuldade e calculada?" aria-label="Informacoes sobre dificuldade">
-                        <span class="material-icons" style="font-size:1rem;color:var(--text-muted);">help_outline</span>
-                    </button>
                     <span class="badge badge-${r.terreno === 'Trail' ? 'trail' : 'asfalto'}">${r.terreno}</span>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
@@ -2493,56 +2310,10 @@
             `;
             document.getElementById('detailsModalFooter').innerHTML = `
                 <button class="btn btn-secondary" onclick="closeModal('detailsModal')">Fechar</button>
-                <button class="btn btn-secondary" onclick="shareRoute(${idx})" title="Compartilhar"><span class="material-icons">share</span></button>
                 ${r.arquivo ? `<button class="btn btn-secondary" onclick="closeModal('detailsModal');showMap(${idx})"><span class="material-icons">map</span> Ver Mapa</button>` : ''}
                 ${r.arquivo ? `<button class="btn btn-primary" onclick="downloadGPX('${r.arquivo}','${sanitize(r.nome)}')"><span class="material-icons">download</span> Download</button>` : ''}
             `;
             openModal('detailsModal');
-        }
-
-        async function shareRoute(idx) {
-            const r = routesData[idx];
-            const shareData = {
-                title: r.nome,
-                text: `Confira esta rota: ${r.nome} - ${r.distancia_km}km, D+${r.ganho_elevacao_m}m (${r.dificuldade})`,
-                url: window.location.href.split('?')[0] + '?route=' + encodeURIComponent(r.nome)
-            };
-
-            if (navigator.share) {
-                try {
-                    await navigator.share(shareData);
-                } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        copyToClipboard(shareData.url);
-                    }
-                }
-            } else {
-                copyToClipboard(shareData.url);
-            }
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('Link copiado para a area de transferencia!');
-            }).catch(() => {
-                showToast('Erro ao copiar link', true);
-            });
-        }
-
-        function checkSharedRoute() {
-            const params = new URLSearchParams(window.location.search);
-            const routeName = params.get('route');
-            if (routeName) {
-                const idx = routesData.findIndex(r => r.nome === decodeURIComponent(routeName));
-                if (idx > -1) {
-                    setTimeout(() => {
-                        navigateTo('routes');
-                        setTimeout(() => showDetails(idx), 300);
-                    }, 500);
-                }
-                // Limpar URL
-                window.history.replaceState({}, '', window.location.pathname);
-            }
         }
 
         // ========== MAP ==========
@@ -2700,7 +2471,6 @@
         function handleFileSelect(e) { const f = e.target.files[0]; if (f) processGPXFile(f); }
 
         function processGPXFile(file) {
-            showLoading('Processando arquivo GPX...');
             const reader = new FileReader();
             reader.onload = e => {
                 try {
@@ -2708,9 +2478,7 @@
                     currentGpxData.rawContent = e.target.result;
                     showAnalysis(file.name, currentGpxData);
                 } catch (err) { showToast('Erro: ' + err.message, true); }
-                hideLoading();
             };
-            reader.onerror = () => { hideLoading(); showToast('Erro ao ler arquivo', true); };
             reader.readAsText(file);
         }
 
@@ -2765,53 +2533,6 @@
             const ptE = gain < 100 ? 1 : gain < 300 ? 2 : gain < 600 ? 3 : gain < 1000 ? 4 : 5;
             const avg = (ptD + ptE) / 2;
             if (avg <= 1.5) return 'Facil'; if (avg <= 2.5) return 'Moderada'; if (avg <= 3.5) return 'Dificil'; if (avg <= 4.5) return 'Muito Dificil'; return 'Extrema';
-        }
-
-        function showDifficultyInfo() {
-            const info = `
-                <div style="text-align:left;">
-                    <h4 style="margin-bottom:1rem;">Como a dificuldade e calculada?</h4>
-                    <p style="margin-bottom:1rem;color:var(--text-secondary);">A dificuldade e baseada em dois fatores:</p>
-
-                    <div style="margin-bottom:1rem;">
-                        <strong>Distancia:</strong>
-                        <ul style="margin:0.5rem 0 0 1.5rem;color:var(--text-secondary);font-size:0.9rem;">
-                            <li>&lt; 5km = 1 ponto</li>
-                            <li>5-10km = 2 pontos</li>
-                            <li>10-15km = 3 pontos</li>
-                            <li>15-25km = 4 pontos</li>
-                            <li>&gt; 25km = 5 pontos</li>
-                        </ul>
-                    </div>
-
-                    <div style="margin-bottom:1rem;">
-                        <strong>Ganho de Elevacao (D+):</strong>
-                        <ul style="margin:0.5rem 0 0 1.5rem;color:var(--text-secondary);font-size:0.9rem;">
-                            <li>&lt; 100m = 1 ponto</li>
-                            <li>100-300m = 2 pontos</li>
-                            <li>300-600m = 3 pontos</li>
-                            <li>600-1000m = 4 pontos</li>
-                            <li>&gt; 1000m = 5 pontos</li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <strong>Classificacao (media dos pontos):</strong>
-                        <ul style="margin:0.5rem 0 0 1.5rem;color:var(--text-secondary);font-size:0.9rem;">
-                            <li><span class="badge badge-easy">Facil</span> ate 1.5</li>
-                            <li><span class="badge badge-moderate">Moderada</span> 1.5-2.5</li>
-                            <li><span class="badge badge-hard">Dificil</span> 2.5-3.5</li>
-                            <li><span class="badge badge-very-hard">Muito Dificil</span> 3.5-4.5</li>
-                            <li><span class="badge badge-extreme">Extrema</span> &gt; 4.5</li>
-                        </ul>
-                    </div>
-                </div>
-            `;
-            document.getElementById('confirmTitle').textContent = 'Calculo de Dificuldade';
-            document.getElementById('confirmMessage').innerHTML = info;
-            document.getElementById('confirmBtn').style.display = 'none';
-            document.querySelector('#confirmModal .btn-secondary').textContent = 'Entendi';
-            document.getElementById('confirmModal').classList.add('active');
         }
 
         // ========== DUPLICATE DETECTION ==========
@@ -2920,15 +2641,23 @@
 
         function showDuplicateWarning(duplicates, onConfirm, onCancel) {
             const dup = duplicates[0];
-            const message = `Rota similar encontrada: "${dup.route.nome}"\n\nMotivos: ${dup.reasons.join(', ')}\n\nConfianca: ${dup.confidence.toUpperCase()}`;
+            const message = `
+                <div style="text-align:left;">
+                    <p style="margin-bottom:1rem;"><strong>Possivel rota duplicada encontrada!</strong></p>
+                    <p style="margin-bottom:0.5rem;color:var(--text-muted);">Confianca: <span style="color:${dup.confidence === 'alta' ? 'var(--danger)' : 'var(--warning)'};">${dup.confidence.toUpperCase()}</span></p>
+                    <p style="margin-bottom:0.5rem;"><strong>Rota similar:</strong> ${dup.route.nome}</p>
+                    <ul style="margin:0.5rem 0;padding-left:1.5rem;color:var(--text-secondary);font-size:0.9rem;">
+                        ${dup.reasons.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
+                    <p style="margin-top:1rem;font-size:0.9rem;">Deseja adicionar mesmo assim?</p>
+                </div>
+            `;
 
-            showConfirm(
-                'Possivel Duplicata Detectada',
-                message,
-                onConfirm,
-                'Adicionar mesmo assim',
-                'btn-warning'
-            );
+            if (confirm(`POSSIVEL DUPLICATA DETECTADA!\n\nRota similar: "${dup.route.nome}"\n\nMotivos:\n- ${dup.reasons.join('\n- ')}\n\nConfianca: ${dup.confidence.toUpperCase()}\n\nDeseja adicionar mesmo assim?`)) {
+                onConfirm();
+            } else {
+                onCancel();
+            }
         }
 
         function identificarCidade(lat, lon) {
@@ -3000,40 +2729,9 @@
             if (analysisMap) { analysisMap.remove(); analysisMap = null; }
         }
 
-        function validateRouteForm() {
-            let isValid = true;
-            const errors = [];
-
-            // Limpar erros anteriores
-            document.querySelectorAll('.form-input.error, .form-select.error').forEach(el => el.classList.remove('error'));
-            document.querySelectorAll('.field-error').forEach(el => el.remove());
-
-            const routeName = document.getElementById('routeName');
-            const routeCity = document.getElementById('routeCity');
-
-            if (!routeName.value.trim()) {
-                routeName.classList.add('error');
-                routeName.insertAdjacentHTML('afterend', '<span class="field-error">Nome da rota e obrigatorio</span>');
-                isValid = false;
-            }
-
-            if (!routeCity.value.trim()) {
-                routeCity.classList.add('error');
-                routeCity.insertAdjacentHTML('afterend', '<span class="field-error">Cidade e obrigatoria</span>');
-                isValid = false;
-            }
-
-            if (!currentGpxData) {
-                showToast('Carregue um arquivo GPX primeiro', true);
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
         function saveRoute(e) {
             e.preventDefault();
-            if (!validateRouteForm()) return;
+            if (!currentGpxData) return;
 
             const newRoute = {
                 nome: document.getElementById('routeName').value,
@@ -3169,72 +2867,14 @@
             showToast(`Usuario ${USERS[username].name} desbloqueado`);
         }
 
-        async function syncUsers() {
-            showLoading('Sincronizando usuarios...');
-            try {
-                await loadUsers();
-                renderUsers();
-                hideLoading();
-                updateSyncStatus();
-                showToast(`${Object.keys(USERS).length} usuarios sincronizados`);
-            } catch (err) {
-                hideLoading();
-                showToast('Erro ao sincronizar: ' + err.message, true);
-            }
-        }
-
-        function updateSyncStatus() {
-            const statusEl = document.getElementById('syncStatus');
-            if (statusEl) {
-                if (firestoreConnected) {
-                    statusEl.innerHTML = `<span style="color:var(--success);">● Conectado</span> - ${Object.keys(USERS).length} usuarios`;
-                } else {
-                    statusEl.innerHTML = `<span style="color:var(--danger);">● Offline</span> - Dados locais`;
-                }
-            }
-        }
-
         function deleteUser(username) {
-            console.log('=== deleteUser CHAMADO ===');
-            console.log('username:', username);
-            console.log('isAdmin:', isAdmin);
-            console.log('currentUser:', currentUser);
-
-            if (!isAdmin || username === 'admin' || username === currentUser) {
-                console.log('BLOQUEADO - motivo:', !isAdmin ? 'nao e admin' : username === 'admin' ? 'e admin' : 'e o usuario atual');
-                showToast('Nao e possivel excluir este usuario', true);
-                return;
+            if (!isAdmin || username === 'admin' || username === currentUser) return;
+            if (confirm(`Excluir usuario ${USERS[username].name}?`)) {
+                delete USERS[username];
+                saveUsers();
+                renderUsers();
+                showToast('Usuario excluido');
             }
-
-            console.log('Abrindo modal de confirmacao...');
-            showConfirm(
-                'Excluir Usuario',
-                `Tem certeza que deseja excluir o usuario ${USERS[username]?.name || username}?`,
-                async () => {
-                    showLoading('Excluindo usuario...');
-                    try {
-                        // Deletar do Firestore
-                        await db.collection('users').doc(username).delete();
-
-                        // Remover localmente
-                        delete USERS[username];
-                        localStorage.setItem('depende_users', JSON.stringify(USERS));
-
-                        // Recarregar lista
-                        await loadUsers();
-                        renderUsers();
-                        updateSyncStatus();
-                        hideLoading();
-                        showToast('Usuario excluido com sucesso');
-                    } catch (err) {
-                        hideLoading();
-                        console.error('Erro ao excluir usuario:', err);
-                        showToast('Erro ao excluir usuario: ' + err.message, true);
-                    }
-                },
-                'Excluir',
-                'btn-danger'
-            );
         }
 
         // ========== VIEW STRAVA ACTIVITIES ==========
@@ -3576,21 +3216,12 @@
             const readIds = JSON.parse(localStorage.getItem('read_notifications_' + currentUser) || '[]');
             const unreadCount = userNotifications.filter(n => !readIds.includes(n.id)).length;
 
-            // Atualizar badge visual
+            // Atualizar badge
             if (unreadCount > 0) {
                 badge.style.display = 'flex';
                 badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
             } else {
                 badge.style.display = 'none';
-            }
-
-            // Atualizar badge do icone do app (PWA)
-            if ('setAppBadge' in navigator) {
-                if (unreadCount > 0) {
-                    navigator.setAppBadge(unreadCount).catch(() => {});
-                } else {
-                    navigator.clearAppBadge().catch(() => {});
-                }
             }
 
             if (userNotifications.length === 0) {
@@ -3665,6 +3296,7 @@
             const readIds = userNotifications.map(n => n.id);
             localStorage.setItem('read_notifications_' + currentUser, JSON.stringify(readIds));
             renderNotifications();
+            showToast('Todas marcadas como lidas');
         }
 
         function toggleNotifications(e) {
@@ -3772,45 +3404,6 @@
             document.getElementById('toastIcon').textContent = isError ? 'error' : 'check_circle';
             toast.className = `toast show ${isError ? 'error' : 'success'}`;
             setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        // ========== LOADING ==========
-        function showLoading(message = 'Carregando...') {
-            document.getElementById('loadingMessage').textContent = message;
-            document.getElementById('loadingOverlay').classList.add('show');
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingOverlay').classList.remove('show');
-        }
-
-        // ========== CONFIRM MODAL ==========
-        let confirmCallback = null;
-        function showConfirm(title, message, onConfirm, btnText = 'Confirmar', btnClass = 'btn-danger') {
-            console.log('=== showConfirm CHAMADO ===');
-            console.log('title:', title);
-            console.log('message:', message);
-            try {
-                document.getElementById('confirmTitle').textContent = title;
-                document.getElementById('confirmMessage').textContent = message;
-                const btn = document.getElementById('confirmBtn');
-                btn.textContent = btnText;
-                btn.className = `btn ${btnClass}`;
-                confirmCallback = onConfirm;
-                document.getElementById('confirmModal').classList.add('active');
-                console.log('Modal aberto com sucesso');
-            } catch (err) {
-                console.error('ERRO no showConfirm:', err);
-            }
-        }
-
-        function closeConfirmModal(confirmed) {
-            document.getElementById('confirmModal').classList.remove('active');
-            if (confirmed && confirmCallback) confirmCallback();
-            confirmCallback = null;
-            // Resetar modal para estado padrao
-            document.getElementById('confirmBtn').style.display = '';
-            document.querySelector('#confirmModal .btn-secondary').textContent = 'Cancelar';
         }
 
         // ========== INIT ==========
