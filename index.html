@@ -2867,13 +2867,21 @@
             showToast(`Usuario ${USERS[username].name} desbloqueado`);
         }
 
-        function deleteUser(username) {
+        async function deleteUser(username) {
             if (!isAdmin || username === 'admin' || username === currentUser) return;
             if (confirm(`Excluir usuario ${USERS[username].name}?`)) {
-                delete USERS[username];
-                saveUsers();
-                renderUsers();
-                showToast('Usuario excluido');
+                try {
+                    // Deletar do Firestore
+                    await db.collection('users').doc(username).delete();
+                    // Remover localmente
+                    delete USERS[username];
+                    localStorage.setItem('depende_users', JSON.stringify(USERS));
+                    renderUsers();
+                    showToast('Usuario excluido');
+                } catch (err) {
+                    console.error('Erro ao excluir:', err);
+                    showToast('Erro ao excluir usuario', true);
+                }
             }
         }
 
