@@ -1684,7 +1684,9 @@
         }
 
         async function checkAuth() {
+            console.log('[Auth] Iniciando checkAuth...');
             await loadUsers();
+            console.log('[Auth] Usuarios carregados:', Object.keys(USERS));
 
             // Verificar se voltou do callback Strava
             if (checkStravaCallback()) {
