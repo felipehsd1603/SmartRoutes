@@ -1,5 +1,5 @@
 // Smart Routes - Service Worker
-const CACHE_NAME = 'smartroutes-v1';
+const CACHE_NAME = 'smartroutes-v2';
 const OFFLINE_URL = 'offline.html';
 
 // Arquivos essenciais para cache
@@ -7,7 +7,6 @@ const PRECACHE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './inventario_rotas_corrida.csv',
   './logo.png',
   './offline.html'
 ];
@@ -110,6 +109,11 @@ self.addEventListener('fetch', event => {
 
 // Cache dinâmico de GPX quando acessados
 self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('[SW] Recebido SKIP_WAITING, atualizando...');
+    self.skipWaiting();
+  }
+
   if (event.data && event.data.type === 'CACHE_ROUTES') {
     const routes = event.data.routes;
     caches.open(CACHE_NAME).then(cache => {

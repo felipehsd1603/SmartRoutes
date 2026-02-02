@@ -1,55 +1,108 @@
-# Dados pessoais do Strava - NAO publicar
-activities/
-activities.csv
-media/
-media.csv
+# ===========================
+# DEPENDE ROUTE CLUB - .gitignore
+# ===========================
+
+# ===========================
+# Dados Pessoais (NUNCA commitar)
+# ===========================
+*.csv
 profile.jpg
-profile.csv
+activities/
+media/
+clubs/
 
-# Arquivos de configuracao pessoal Strava
-applications.csv
-bikes.csv
-blocks.csv
-clubs.csv
-comments.csv
-components.csv
-connected_apps.csv
-contacts.csv
-email_preferences.csv
-events.csv
-flags.csv
-followers.csv
-following.csv
-general_preferences.csv
-global_challenges.csv
-goals.csv
-group_challenges.csv
-local_legend_segments.csv
-logins.csv
-memberships.csv
-mobile_device_identifiers.csv
-monthly_recap_achievements.csv
-orders.csv
-partner_opt_outs.csv
-posts.csv
-privacy_zones.csv
-reactions.csv
-segments.csv
-shoes.csv
-social_settings.csv
-starred_routes.csv
-starred_segments.csv
-support_tickets.csv
-visibility_settings.csv
-routes.csv
+# ===========================
+# Ambiente e Segredos
+# ===========================
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+secrets/
 
-# Arquivos temporarios
-nul
+# ===========================
+# Firebase
+# ===========================
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+*.log
+
+# ===========================
+# Node.js
+# ===========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ===========================
+# Python
+# ===========================
+*.py
 *.pyc
 __pycache__/
-.DS_Store
-Thumbs.db
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
 
-# Arquivos locais
-iniciar_servidor.bat
-inventario_rotas_corrida.txt
+# ===========================
+# IDEs e Editores
+# ===========================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# ===========================
+# Sistema Operacional
+# ===========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+nul
+
+# ===========================
+# Arquivos Temporarios
+# ===========================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+
+# ===========================
+# Build e Cache
+# ===========================
+dist/
+build/
+.cache/
+*.cache
+
+# ===========================
+# Scripts Locais
+# ===========================
+*.bat
+*.sh
+!firebase-messaging-sw.js
+!sw.js
+
+# ===========================
+# Claude Code
+# ===========================
+.claude/
