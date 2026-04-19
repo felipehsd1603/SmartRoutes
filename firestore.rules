@@ -1,9 +1,0 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Permitir leitura e escrita para todas as collections
-    match /{document=**} {
-      allow read, write: if true;
-    }
-  }
-}
