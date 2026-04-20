@@ -1,6 +1,5 @@
 require('dotenv').config();
 const { Pool } = require('pg');
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 let db;
@@ -15,10 +14,10 @@ if (process.env.DATABASE_URL) {
     });
 } else {
     console.log('Utilizando SQLite local...');
+    const sqlite3 = require('sqlite3').verbose();
     const dbPath = path.resolve(__dirname, 'database.sqlite');
     const sqliteDb = new sqlite3.Database(dbPath, (err) => {
         if (err) console.error('Error connecting to SQLite', err.message);
-        else initializeDatabase();
     });
 
     // Wrapper para simular comportamento do PG no SQLite (simplificado)
@@ -52,14 +51,12 @@ async function initializePostgres() {
     try {
         await client.query('BEGIN');
         
-        // Admins
         await client.query(`CREATE TABLE IF NOT EXISTS admins (
             id SERIAL PRIMARY KEY,
             username TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL
         )`);
 
-        // Posts
         await client.query(`CREATE TABLE IF NOT EXISTS posts (
             id SERIAL PRIMARY KEY,
             title TEXT NOT NULL,
@@ -82,17 +79,6 @@ async function initializePostgres() {
             is_sponsored INTEGER DEFAULT 0
         )`);
 
-        // Clicks
-        await client.query(`CREATE TABLE IF NOT EXISTS clicks (
-            id SERIAL PRIMARY KEY,
-            label TEXT NOT NULL,
-            href TEXT,
-            referrer TEXT,
-            user_agent TEXT,
-            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-        )`);
-
-        // E as outras tabelas... (truncado para brevidade, mas incluirei todas)
         await client.query(`CREATE TABLE IF NOT EXISTS stores (
             id SERIAL PRIMARY KEY,
             name TEXT UNIQUE NOT NULL,
@@ -141,7 +127,15 @@ async function initializePostgres() {
             published_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         )`);
 
-        // Seed default stores if empty
+        await client.query(`CREATE TABLE IF NOT EXISTS clicks (
+            id SERIAL PRIMARY KEY,
+            label TEXT NOT NULL,
+            href TEXT,
+            referrer TEXT,
+            user_agent TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`);
+
         const stores = await client.query("SELECT COUNT(*) FROM stores");
         if (parseInt(stores.rows[0].count) === 0) {
             const defaults = ['StockX', 'Kicks Crew', 'Ebay', 'Supreme', 'Aftermarket', 'Nike', 'Adidas', 'New Balance', 'Farfetch', 'Artwalk'];
@@ -158,11 +152,6 @@ async function initializePostgres() {
     } finally {
         client.release();
     }
-}
-
-function initializeDatabase() {
-    // Mantendo a lógica do SQLite para compatibilidade local
-    // (A função original do seu db.js será mantida aqui pelo wrapper acima se você rodar local)
 }
 
 module.exports = {
