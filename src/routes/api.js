@@ -230,6 +230,161 @@ router.get('/offers', async (req, res) => {
     }
 });
 
+// Feature flags (público, cacheado por 60s)
+router.get('/features', async (req, res) => {
+    try {
+        const result = await db.query("SELECT key, is_enabled FROM features");
+        const map = {};
+        for (const row of result.rows) map[row.key] = !!row.is_enabled;
+        res.set('Cache-Control', 'public, max-age=60');
+        res.json({ data: map });
+    } catch (err) {
+        res.json({ data: {} });
+    }
+});
+
+// Raffles ativos (público — gated pela flag raffles no frontend)
+router.get('/raffles', async (req, res) => {
+    try {
+        const result = await db.query(`SELECT id, title, description, image_url, source, cta_label, cta_url,
+            starts_at, ends_at, position FROM raffles WHERE is_active=1 AND (ends_at IS NULL OR ends_at >= NOW())
+            ORDER BY position ASC, ends_at ASC NULLS LAST`);
+        res.set('Cache-Control', 'public, max-age=60');
+        res.json({ data: result.rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Restocks de um post
+router.get('/posts/:slug/restocks', async (req, res) => {
+    try {
+        const p = await db.query("SELECT id FROM posts WHERE slug=$1", [req.params.slug]);
+        if (!p.rows[0]) return res.json({ data: [] });
+        const result = await db.query(
+            "SELECT id, store_name, restocked_at, price_cents, url FROM post_restocks WHERE post_id=$1 ORDER BY restocked_at DESC LIMIT 10",
+            [p.rows[0].id]
+        );
+        res.set('Cache-Control', 'public, max-age=60');
+        res.json({ data: result.rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Comments aprovados de um post
+router.get('/posts/:slug/comments', async (req, res) => {
+    try {
+        const p = await db.query("SELECT id FROM posts WHERE slug=$1", [req.params.slug]);
+        if (!p.rows[0]) return res.json({ data: [] });
+        const result = await db.query(
+            "SELECT id, author_name, body, created_at FROM comments WHERE post_id=$1 AND is_approved=1 ORDER BY created_at DESC LIMIT 100",
+            [p.rows[0].id]
+        );
+        res.json({ data: result.rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Enviar comentário (precisa ser aprovado)
+router.post('/posts/:slug/comments', async (req, res) => {
+    const ip = req.ip || req.socket?.remoteAddress || '';
+    if (!checkNotifyRate(ip)) return res.status(429).json({ error: 'Muitas requisições' });
+    try {
+        const p = await db.query("SELECT id FROM posts WHERE slug=$1", [req.params.slug]);
+        if (!p.rows[0]) return res.status(404).json({ error: 'Post não encontrado' });
+        const author = String(req.body.author_name || '').trim().slice(0, 60);
+        const body = String(req.body.body || '').trim().slice(0, 2000);
+        if (!author || body.length < 3) return res.status(400).json({ error: 'dados inválidos' });
+        await db.query(
+            "INSERT INTO comments (post_id, author_name, body, is_approved) VALUES ($1, $2, $3, 0)",
+            [p.rows[0].id, author, body]
+        );
+        res.json({ success: true, pending_moderation: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Reviews aprovados de um post (com agregado)
+router.get('/posts/:slug/reviews', async (req, res) => {
+    try {
+        const p = await db.query("SELECT id FROM posts WHERE slug=$1", [req.params.slug]);
+        if (!p.rows[0]) return res.json({ data: [], avg_rating: 0, count: 0 });
+        const list = await db.query(
+            "SELECT id, author_name, rating, body, created_at FROM reviews WHERE post_id=$1 AND is_approved=1 ORDER BY created_at DESC LIMIT 50",
+            [p.rows[0].id]
+        );
+        const agg = await db.query(
+            "SELECT AVG(rating) AS avg, COUNT(*) AS count FROM reviews WHERE post_id=$1 AND is_approved=1",
+            [p.rows[0].id]
+        );
+        res.json({
+            data: list.rows,
+            avg_rating: parseFloat(agg.rows[0].avg) || 0,
+            count: parseInt(agg.rows[0].count) || 0
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Enviar review (precisa ser aprovado)
+router.post('/posts/:slug/reviews', async (req, res) => {
+    const ip = req.ip || req.socket?.remoteAddress || '';
+    if (!checkNotifyRate(ip)) return res.status(429).json({ error: 'Muitas requisições' });
+    try {
+        const p = await db.query("SELECT id FROM posts WHERE slug=$1", [req.params.slug]);
+        if (!p.rows[0]) return res.status(404).json({ error: 'Post não encontrado' });
+        const author = String(req.body.author_name || '').trim().slice(0, 60);
+        const rating = parseInt(req.body.rating);
+        const body = String(req.body.body || '').trim().slice(0, 2000);
+        if (!author || !rating || rating < 1 || rating > 5) return res.status(400).json({ error: 'dados inválidos' });
+        await db.query(
+            "INSERT INTO reviews (post_id, author_name, rating, body, is_approved) VALUES ($1, $2, $3, $4, 0)",
+            [p.rows[0].id, author, rating, body || null]
+        );
+        res.json({ success: true, pending_moderation: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Posts de uma marca (brand_pages)
+router.get('/brand/:slug', async (req, res) => {
+    try {
+        const slug = String(req.params.slug).toLowerCase();
+        const result = await db.query(
+            `SELECT id, title, slug, category, brand, model, image_url, price_cents, excerpt, release_date, published_at
+             FROM posts WHERE LOWER(brand) = $1 AND published_at <= CURRENT_TIMESTAMP
+             ORDER BY is_pinned DESC, published_at DESC LIMIT 60`,
+            [slug]
+        );
+        res.set('Cache-Control', 'public, max-age=60');
+        res.json({ data: result.rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Cadastro na newsletter (email)
+router.post('/newsletter-subscribe', async (req, res) => {
+    const ip = req.ip || req.socket?.remoteAddress || '';
+    if (!checkNotifyRate(ip)) return res.status(429).json({ error: 'Muitas requisições' });
+    try {
+        const email = String(req.body.email || '').trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'email inválido' });
+        await db.query(
+            "INSERT INTO newsletter_subscriptions (email) VALUES ($1) ON CONFLICT (email) DO NOTHING",
+            [email]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Cupons ativos (seção "Usa agora, economiza hoje")
 router.get('/coupons', async (req, res) => {
     try {
@@ -317,7 +472,7 @@ router.post('/notify-subscribe', async (req, res) => {
     if (!checkNotifyRate(ip)) return res.status(429).json({ error: 'Muitas requisições, tente mais tarde' });
 
     try {
-        const { slug, channel, subscription, email } = req.body || {};
+        const { slug, channel, subscription, email, price_target_cents } = req.body || {};
         if (!slug || !channel) return res.status(400).json({ error: 'slug e channel obrigatórios' });
         if (!['push', 'email'].includes(channel)) return res.status(400).json({ error: 'channel inválido' });
 
@@ -340,11 +495,12 @@ router.post('/notify-subscribe', async (req, res) => {
             endpoint = String(email).toLowerCase().slice(0, 256);
         }
 
+        const priceTarget = Number.isFinite(parseInt(price_target_cents)) ? parseInt(price_target_cents) : null;
         await db.query(
-            `INSERT INTO notify_subscriptions (post_id, channel, endpoint, p256dh, auth)
-             VALUES ($1, $2, $3, $4, $5)
-             ON CONFLICT (post_id, channel, endpoint) DO NOTHING`,
-            [postId, channel, endpoint, p256dh, auth]
+            `INSERT INTO notify_subscriptions (post_id, channel, endpoint, p256dh, auth, price_target_cents)
+             VALUES ($1, $2, $3, $4, $5, $6)
+             ON CONFLICT (post_id, channel, endpoint) DO UPDATE SET price_target_cents = EXCLUDED.price_target_cents`,
+            [postId, channel, endpoint, p256dh, auth, priceTarget]
         );
 
         res.json({ success: true });

@@ -137,6 +137,14 @@
             .reveal { opacity: 1; transform: none; }
         }
 
+        /* Dark mode (feature flag dark_mode) */
+        html.sdm-dark body { background:#0b0b10; color:#e5e5ea; }
+        html.sdm-dark .bg-offWhite, html.sdm-dark .bg-white { background:#161821 !important; color:#e5e5ea !important; }
+        html.sdm-dark .text-gray-600, html.sdm-dark .text-gray-500, html.sdm-dark .text-gray-400 { color:#aaa !important; }
+        html.sdm-dark .border-gray-200, html.sdm-dark .border-gray-100 { border-color:#2a2d3a !important; }
+        html.sdm-dark .text-retroGrey { color:#e5e5ea !important; }
+        html.sdm-dark .bg-gray-100, html.sdm-dark .bg-gray-200 { background:#1f2230 !important; }
+
         /* Acessibilidade */
         .sr-only {
             position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -580,6 +588,9 @@
         </div>
     </section>
 
+    <!-- Raffles (dinâmico via /api/raffles, gated por feature) -->
+    <div id="rafflesContainer"></div>
+
     <!-- Newsletter / CTA final -->
     <section class="bg-trueBlue text-white py-16 lg:py-24">
         <div class="max-w-[1400px] mx-auto px-4 lg:px-8 text-center">
@@ -588,6 +599,16 @@
             <a href="https://t.me/s/sneakersdomionlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=cta-final-telegram" target="_blank" rel="noopener" data-track="cta-final-telegram" class="inline-flex items-center gap-3 bg-polem text-retroGrey font-black uppercase tracking-wide text-base lg:text-lg px-10 py-5 rounded-full hover:bg-white transition-colors">
                 Entrar no Telegram agora →
             </a>
+
+            <!-- Newsletter email (gated por email_newsletter) -->
+            <div id="newsletterWrap" class="max-w-md mx-auto mt-10" style="display:none;">
+                <p class="text-sm text-white/70 uppercase tracking-widest font-black mb-3">Ou receba por e-mail</p>
+                <form id="newsletterForm" class="flex gap-2">
+                    <input type="email" name="email" required placeholder="seu@email.com" class="flex-1 px-4 py-3 rounded-full text-retroGrey text-sm font-medium placeholder:text-gray-400 focus:outline-none">
+                    <button type="submit" class="bg-retroGrey hover:bg-black text-white font-black uppercase tracking-widest text-xs px-5 py-3 rounded-full">Inscrever</button>
+                </form>
+                <p data-status class="text-xs text-white/80 mt-2 min-h-[1em]"></p>
+            </div>
         </div>
     </section>
 
@@ -1165,7 +1186,7 @@
                     const dateLabel = date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
                     const href = p.slug ? `/post/${escapeHtml(p.slug)}` : '#';
                     return `
-                    <article class="group bg-white rounded-2xl overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow">
+                    <article data-release="${date.getTime()}" class="group bg-white rounded-2xl overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow">
                         <div class="product-bg sm:w-2/5 aspect-square sm:aspect-auto relative overflow-hidden">
                             ${p.image_url
                                 ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title)}" loading="lazy" class="w-full h-full object-cover">`
@@ -1177,6 +1198,7 @@
                                 <div class="flex gap-2 mb-3 flex-wrap">
                                     <span class="bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">${dateLabel}</span>
                                     ${p.brand ? `<span class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">${escapeHtml(p.brand)}</span>` : ''}
+                                    <span data-countdown-badge class="bg-infrared text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded" style="display:${window.SDM_FEATURES?.countdown_cards ? 'inline-block' : 'none'};"></span>
                                 </div>
                                 <h3 class="font-black text-xl lg:text-2xl leading-tight mb-2 uppercase">${escapeHtml(p.title)}</h3>
                                 ${p.model ? `<p class="text-base text-gray-600 mb-4 font-serif leading-snug">${escapeHtml(p.model)}</p>` : ''}
@@ -1217,12 +1239,155 @@
             }
         }
 
-        loadOffers();
-        loadCoupons();
-        loadPartnerships();
-        loadUpcoming();
-        loadHeroTicker();
-        loadPosts(true);
+        // --- Feature flags loader ---
+        window.SDM_FEATURES = {};
+        async function loadFeatures() {
+            try {
+                const res = await fetch('/api/features');
+                const { data } = await res.json();
+                window.SDM_FEATURES = data || {};
+            } catch { window.SDM_FEATURES = {}; }
+        }
+
+        // --- Tier 3: Dark mode ---
+        function initDarkMode() {
+            if (!window.SDM_FEATURES.dark_mode) return;
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.setAttribute('aria-label', 'Alternar modo escuro');
+            btn.className = 'fixed bottom-4 right-4 z-40 w-11 h-11 rounded-full bg-retroGrey text-white shadow-lg flex items-center justify-center text-lg';
+            btn.textContent = localStorage.getItem('sdm_dark') === '1' ? '☀' : '🌙';
+            btn.addEventListener('click', () => {
+                const on = document.documentElement.classList.toggle('sdm-dark');
+                localStorage.setItem('sdm_dark', on ? '1' : '0');
+                btn.textContent = on ? '☀' : '🌙';
+            });
+            if (localStorage.getItem('sdm_dark') === '1') document.documentElement.classList.add('sdm-dark');
+            document.body.appendChild(btn);
+        }
+
+        // --- Tier 1: Countdown live nos cards de próximos lançamentos ---
+        function formatCountdown(ms) {
+            if (ms <= 0) return 'Drop hoje';
+            const s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
+            if (d > 0) return `${d}d ${h}h`;
+            if (h > 0) return `${h}h ${m}m`;
+            return `${m}m`;
+        }
+        function enhanceCountdowns() {
+            if (!window.SDM_FEATURES.countdown_cards) return;
+            const cards = document.querySelectorAll('[data-release]');
+            const tick = () => {
+                cards.forEach(card => {
+                    const ts = parseInt(card.dataset.release, 10);
+                    const badge = card.querySelector('[data-countdown-badge]');
+                    if (!ts || !badge) return;
+                    badge.textContent = formatCountdown(ts - Date.now());
+                });
+            };
+            tick();
+            setInterval(tick, 60000);
+        }
+
+        // --- Tier 1: Just-dropped widget ---
+        async function loadJustDropped() {
+            if (!window.SDM_FEATURES.just_dropped) return;
+            const dismissed = localStorage.getItem('sdm_dropped_dismissed');
+            try {
+                const res = await fetch('/api/posts?limit=1&offset=0');
+                const { data } = await res.json();
+                const p = data?.[0];
+                if (!p || dismissed === String(p.id)) return;
+                const el = document.createElement('div');
+                el.className = 'fixed bottom-4 left-4 z-40 max-w-xs bg-white shadow-2xl rounded-2xl overflow-hidden border-2 border-trueBlue';
+                el.innerHTML = `
+                    <div class="flex gap-3 p-3 items-center">
+                        ${p.image_url ? `<img src="${escapeHtml(p.image_url)}" alt="" class="w-16 h-16 object-cover rounded-lg shrink-0">` : '<div class="w-16 h-16 bg-gray-100 rounded-lg shrink-0"></div>'}
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-trueBlue mb-0.5">Acabou de cair</p>
+                            <p class="font-black text-xs uppercase leading-tight line-clamp-2">${escapeHtml(p.title)}</p>
+                            <a href="/post/${escapeHtml(p.slug)}" class="text-[10px] font-black uppercase tracking-widest text-trueBlue hover:underline">Ver →</a>
+                        </div>
+                        <button type="button" aria-label="Fechar" class="text-gray-400 hover:text-retroGrey text-lg leading-none shrink-0" onclick="localStorage.setItem('sdm_dropped_dismissed','${p.id}'); this.closest('div.fixed').remove();">✕</button>
+                    </div>`;
+                document.body.appendChild(el);
+            } catch {}
+        }
+
+        // --- Tier 2: Raffles ---
+        async function loadRaffles() {
+            const container = document.getElementById('rafflesContainer');
+            if (!container) return;
+            if (!window.SDM_FEATURES.raffles) return;
+            try {
+                const res = await fetch('/api/raffles');
+                const { data } = await res.json();
+                if (!data || !data.length) return;
+                container.innerHTML = `
+                <section id="raffles" class="py-12 lg:py-20 bg-retroGrey text-white">
+                    <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+                        <div class="mb-8 reveal">
+                            <span class="inline-block bg-polem text-retroGrey text-xs font-black uppercase tracking-widest px-3 py-1 mb-3">Raffles</span>
+                            <h2 class="text-4xl sm:text-5xl lg:text-6xl font-display uppercase tracking-tighter leading-none">Sorteios ao vivo</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                            ${data.map(r => `
+                                <article class="bg-white text-retroGrey rounded-2xl overflow-hidden">
+                                    ${r.image_url ? `<img src="${escapeHtml(r.image_url)}" alt="${escapeHtml(r.title)}" class="w-full aspect-video object-cover">` : ''}
+                                    <div class="p-5">
+                                        ${r.source ? `<p class="text-[10px] font-black uppercase tracking-widest text-trueBlue mb-2">${escapeHtml(r.source)}</p>` : ''}
+                                        <h3 class="font-black text-lg uppercase leading-tight mb-2">${escapeHtml(r.title)}</h3>
+                                        ${r.description ? `<p class="text-sm text-gray-600 mb-4">${escapeHtml(r.description)}</p>` : ''}
+                                        ${r.ends_at ? `<p class="text-xs text-gray-500 mb-3"><b>Encerra:</b> ${new Date(r.ends_at).toLocaleString('pt-BR')}</p>` : ''}
+                                        ${r.cta_url ? `<a href="${escapeHtml(r.cta_url)}" target="_blank" rel="noopener" data-track="raffle-${r.id}" class="block text-center bg-trueBlue text-white font-black uppercase tracking-widest text-xs py-3 rounded-full hover:bg-retroBlue">${escapeHtml(r.cta_label || 'Participar →')}</a>` : ''}
+                                    </div>
+                                </article>`).join('')}
+                        </div>
+                    </div>
+                </section>`;
+            } catch {}
+        }
+
+        // --- Tier 3: Newsletter ---
+        function initNewsletter() {
+            const form = document.getElementById('newsletterForm');
+            if (!form) return;
+            if (!window.SDM_FEATURES.email_newsletter) { form.closest('#newsletterWrap').style.display = 'none'; return; }
+            form.closest('#newsletterWrap').style.display = '';
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = form.querySelector('input[type=email]').value;
+                const status = form.querySelector('[data-status]');
+                try {
+                    const r = await fetch('/api/newsletter-subscribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    if (!r.ok) throw new Error();
+                    status.textContent = '✓ Inscrito! Fique de olho no seu e-mail.';
+                    form.reset();
+                } catch {
+                    status.textContent = 'Erro. Tenta de novo.';
+                }
+            });
+        }
+
+        // Inicialização encadeada: features primeiro, depois tudo que depende delas
+        (async () => {
+            await loadFeatures();
+            loadOffers();
+            loadCoupons();
+            loadPartnerships();
+            await loadUpcoming();
+            enhanceCountdowns();
+            loadHeroTicker();
+            loadRaffles();
+            loadJustDropped();
+            initDarkMode();
+            initNewsletter();
+            loadPosts(true);
+        })();
 
         // --- Push Logic ---
         function closePush(subscribed = false) {

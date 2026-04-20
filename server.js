@@ -33,23 +33,39 @@ function escAttr(str) {
     return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-// Post page — injeta meta tags server-side para crawlers/OG
+// Helper: retorna mapa de feature flags (cacheado em memória 30s)
+let _featuresCache = { data: {}, expiresAt: 0 };
+async function getFeatures() {
+    if (Date.now() < _featuresCache.expiresAt) return _featuresCache.data;
+    try {
+        const r = await db.query("SELECT key, is_enabled FROM features");
+        const map = {};
+        for (const row of r.rows) map[row.key] = !!row.is_enabled;
+        _featuresCache = { data: map, expiresAt: Date.now() + 30000 };
+        return map;
+    } catch { return {}; }
+}
+
+// Post page — injeta meta tags server-side + JSON-LD enriquecido
 app.get('/post/:slug', async (req, res) => {
     const slug = req.params.slug;
     try {
         const result = await db.query(
-            'SELECT title, excerpt, image_url, brand, model, slug FROM posts WHERE slug = $1',
+            'SELECT id, title, excerpt, image_url, brand, model, slug, price_cents, retail_price_cents FROM posts WHERE slug = $1',
             [slug]
         );
         const p = result.rows[0];
         if (!p) return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 
+        const features = await getFeatures();
         const html = fs.readFileSync(POST_HTML_PATH, 'utf8');
         const title = escAttr(`${p.title} | SDM Links`);
         const desc  = escAttr(p.excerpt || `${[p.brand, p.model].filter(Boolean).join(' ')} — SDM Links`);
         const image = escAttr(p.image_url || `${SITE_URL}/og-cover.png`);
         const url   = escAttr(`${SITE_URL}/post/${p.slug}`);
-        const jsonld = JSON.stringify({
+
+        // JSON-LD: básico sempre, enriquecido só se seo_rich_products ON
+        let ld = {
             '@context': 'https://schema.org',
             '@type': p.brand ? 'Product' : 'Article',
             name: p.title,
@@ -57,7 +73,35 @@ app.get('/post/:slug', async (req, res) => {
             image: p.image_url || '',
             url: `${SITE_URL}/post/${p.slug}`,
             ...(p.brand ? { brand: { '@type': 'Brand', name: p.brand } } : {})
-        }).replace(/<\/script>/gi, '<\\/script>');
+        };
+        if (features.seo_rich_products && p.brand) {
+            if (p.price_cents) {
+                ld.offers = {
+                    '@type': 'Offer',
+                    priceCurrency: 'BRL',
+                    price: (p.price_cents / 100).toFixed(2),
+                    availability: 'https://schema.org/InStock',
+                    url: `${SITE_URL}/post/${p.slug}`
+                };
+            }
+            if (features.reviews) {
+                try {
+                    const agg = await db.query(
+                        "SELECT AVG(rating) AS avg, COUNT(*) AS count FROM reviews WHERE post_id=$1 AND is_approved=1",
+                        [p.id]
+                    );
+                    const count = parseInt(agg.rows[0].count) || 0;
+                    if (count > 0) {
+                        ld.aggregateRating = {
+                            '@type': 'AggregateRating',
+                            ratingValue: parseFloat(agg.rows[0].avg).toFixed(1),
+                            reviewCount: count
+                        };
+                    }
+                } catch {}
+            }
+        }
+        const jsonld = JSON.stringify(ld).replace(/<\/script>/gi, '<\\/script>');
 
         const injected = html
             .replace(/__OG_TITLE__/g, title)
@@ -70,6 +114,24 @@ app.get('/post/:slug', async (req, res) => {
     } catch {
         res.sendFile(POST_HTML_PATH);
     }
+});
+
+// Página de marca (/brand/:slug) — gated por brand_pages
+app.get('/brand/:slug', async (req, res) => {
+    const features = await getFeatures();
+    if (!features.brand_pages) return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+    const brandPath = path.join(__dirname, 'public', 'brand.html');
+    if (fs.existsSync(brandPath)) return res.sendFile(brandPath);
+    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+});
+
+// Comparador de modelos (/vs/:a/:b) — gated por vs_compare
+app.get('/vs/:a/:b', async (req, res) => {
+    const features = await getFeatures();
+    if (!features.vs_compare) return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+    const vsPath = path.join(__dirname, 'public', 'vs.html');
+    if (fs.existsSync(vsPath)) return res.sendFile(vsPath);
+    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 // Calendário de lançamentos

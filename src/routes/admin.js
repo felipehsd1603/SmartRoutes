@@ -140,6 +140,7 @@ async function collectRichPayload(req) {
         hero_url: heroUrl,
         cover_url: coverUrl,
         hero_color: heroColor || null,
+        video_url: b.video_url ? String(b.video_url).trim() : null,
         gallery_urls: galleryUrls,
         stores: parseJSONField(b.stores),
         related: parseJSONField(b.related),
@@ -270,11 +271,11 @@ router.post('/posts', isAuthenticated, uploadRich, async (req, res) => {
         const result = await db.query(`INSERT INTO posts (
             title, category, image_url, content, slug, brand, model, sku, color,
             price_cents, retail_price_cents, release_date, excerpt, author, tags, is_pinned, is_sponsored,
-            hero_color, cover_image_url
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) RETURNING id`,
+            hero_color, cover_image_url, video_url
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) RETURNING id`,
             [p.title, p.category, p.hero_url, p.content, slug, p.brand, p.model, p.sku, p.color,
              p.price_cents, p.retail_price_cents, p.release_date, p.excerpt, p.author, p.tags, p.is_pinned, p.is_sponsored,
-             p.hero_color, p.cover_url]);
+             p.hero_color, p.cover_url, p.video_url]);
         
         const postId = result.rows[0].id;
         await replaceChildren(postId, p);
@@ -305,11 +306,12 @@ router.put('/posts/:id', isAuthenticated, uploadRich, async (req, res) => {
             hero_color=$17,
             image_url = COALESCE($18, image_url),
             cover_image_url = COALESCE($19, cover_image_url),
+            video_url = $20,
             updated_at = CURRENT_TIMESTAMP
-            WHERE id=$20`,
+            WHERE id=$21`,
             [p.title, p.category, p.content, slug, p.brand, p.model, p.sku, p.color,
              p.price_cents, p.retail_price_cents, p.release_date, p.excerpt, p.author, p.tags,
-             p.is_pinned, p.is_sponsored, p.hero_color, p.hero_url, p.cover_url, id]);
+             p.is_pinned, p.is_sponsored, p.hero_color, p.hero_url, p.cover_url, p.video_url, id]);
 
         const shouldReplace = p.gallery_urls.length || p.stores.length || p.related.length ||
                             req.body.stores !== undefined || req.body.related !== undefined;
@@ -621,6 +623,154 @@ router.patch('/partnerships/:id/toggle', isAuthenticated, async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+});
+
+// --- Feature Flags ---
+router.get('/features', isAuthenticated, async (req, res) => {
+    try {
+        const r = await db.query("SELECT * FROM features ORDER BY position ASC, key ASC");
+        res.json({ data: r.rows });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.patch('/features/:key/toggle', isAuthenticated, async (req, res) => {
+    try {
+        await db.query("UPDATE features SET is_enabled = CASE WHEN is_enabled=1 THEN 0 ELSE 1 END WHERE key=$1", [req.params.key]);
+        const r = await db.query("SELECT is_enabled FROM features WHERE key=$1", [req.params.key]);
+        res.json({ success: true, is_enabled: r.rows[0]?.is_enabled });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Raffles ---
+function collectRafflePayload(req) {
+    const b = req.body || {};
+    return {
+        title: String(b.title || '').trim(),
+        description: b.description || null,
+        image_url: b.image_url || null,
+        source: b.source || null,
+        cta_label: b.cta_label || null,
+        cta_url: b.cta_url || null,
+        starts_at: b.starts_at || null,
+        ends_at: b.ends_at || null,
+        position: intOrNull(b.position) ?? 0,
+        is_active: b.is_active === 'false' || b.is_active === '0' ? 0 : 1
+    };
+}
+router.get('/raffles', isAuthenticated, async (req, res) => {
+    try { const r = await db.query("SELECT * FROM raffles ORDER BY position ASC, published_at DESC"); res.json({ data: r.rows }); }
+    catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.get('/raffles/:id', isAuthenticated, async (req, res) => {
+    try { const r = await db.query("SELECT * FROM raffles WHERE id=$1", [req.params.id]);
+        if (r.rows.length === 0) return res.status(404).json({ error: 'Raffle não encontrado' });
+        res.json({ data: r.rows[0] });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.post('/raffles', isAuthenticated, upload.single('image'), async (req, res) => {
+    try {
+        const p = collectRafflePayload(req);
+        if (req.file) p.image_url = await uploadToSupabase(req.file);
+        if (!p.title) return res.status(400).json({ error: 'title obrigatório' });
+        const r = await db.query(`INSERT INTO raffles
+            (title, description, image_url, source, cta_label, cta_url, starts_at, ends_at, position, is_active)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id`,
+            [p.title, p.description, p.image_url, p.source, p.cta_label, p.cta_url, p.starts_at, p.ends_at, p.position, p.is_active]);
+        res.json({ success: true, id: r.rows[0].id });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.put('/raffles/:id', isAuthenticated, upload.single('image'), async (req, res) => {
+    try {
+        const p = collectRafflePayload(req);
+        if (req.file) p.image_url = await uploadToSupabase(req.file);
+        await db.query(`UPDATE raffles SET title=$1, description=$2,
+            image_url=COALESCE(NULLIF($3,''), image_url),
+            source=$4, cta_label=$5, cta_url=$6, starts_at=$7, ends_at=$8,
+            position=$9, is_active=$10 WHERE id=$11`,
+            [p.title, p.description, p.image_url, p.source, p.cta_label, p.cta_url, p.starts_at, p.ends_at, p.position, p.is_active, req.params.id]);
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.delete('/raffles/:id', isAuthenticated, async (req, res) => {
+    try { await db.query("DELETE FROM raffles WHERE id=$1", [req.params.id]); res.json({ success: true }); }
+    catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.patch('/raffles/:id/toggle', isAuthenticated, async (req, res) => {
+    try { await db.query("UPDATE raffles SET is_active = CASE WHEN is_active=1 THEN 0 ELSE 1 END WHERE id=$1", [req.params.id]);
+        const r = await db.query("SELECT is_active FROM raffles WHERE id=$1", [req.params.id]);
+        res.json({ success: true, is_active: r.rows[0]?.is_active });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Restocks por post ---
+router.get('/posts/:id/restocks', isAuthenticated, async (req, res) => {
+    try { const r = await db.query("SELECT * FROM post_restocks WHERE post_id=$1 ORDER BY restocked_at DESC", [req.params.id]);
+        res.json({ data: r.rows });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.post('/posts/:id/restocks', isAuthenticated, async (req, res) => {
+    try {
+        const b = req.body || {};
+        if (!b.restocked_at) return res.status(400).json({ error: 'restocked_at obrigatório' });
+        const r = await db.query(
+            "INSERT INTO post_restocks (post_id, store_name, restocked_at, price_cents, url) VALUES ($1,$2,$3,$4,$5) RETURNING id",
+            [req.params.id, b.store_name || null, b.restocked_at, priceToCents(b.price), b.url || null]
+        );
+        res.json({ success: true, id: r.rows[0].id });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.delete('/restocks/:id', isAuthenticated, async (req, res) => {
+    try { await db.query("DELETE FROM post_restocks WHERE id=$1", [req.params.id]); res.json({ success: true }); }
+    catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Comments moderation ---
+router.get('/comments', isAuthenticated, async (req, res) => {
+    try {
+        const status = req.query.status;
+        let sql, params = [];
+        if (status === 'approved') { sql = `SELECT c.*, p.title AS post_title, p.slug AS post_slug FROM comments c LEFT JOIN posts p ON p.id=c.post_id WHERE c.is_approved=1 ORDER BY c.created_at DESC LIMIT 200`; }
+        else if (status === 'all') { sql = `SELECT c.*, p.title AS post_title, p.slug AS post_slug FROM comments c LEFT JOIN posts p ON p.id=c.post_id ORDER BY c.created_at DESC LIMIT 200`; }
+        else { sql = `SELECT c.*, p.title AS post_title, p.slug AS post_slug FROM comments c LEFT JOIN posts p ON p.id=c.post_id WHERE c.is_approved=0 ORDER BY c.created_at DESC LIMIT 200`; }
+        const r = await db.query(sql, params);
+        res.json({ data: r.rows });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.patch('/comments/:id/approve', isAuthenticated, async (req, res) => {
+    try { await db.query("UPDATE comments SET is_approved=1 WHERE id=$1", [req.params.id]); res.json({ success: true }); }
+    catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.delete('/comments/:id', isAuthenticated, async (req, res) => {
+    try { await db.query("DELETE FROM comments WHERE id=$1", [req.params.id]); res.json({ success: true }); }
+    catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Reviews moderation ---
+router.get('/reviews', isAuthenticated, async (req, res) => {
+    try {
+        const status = req.query.status;
+        let sql;
+        if (status === 'approved') { sql = `SELECT r.*, p.title AS post_title, p.slug AS post_slug FROM reviews r LEFT JOIN posts p ON p.id=r.post_id WHERE r.is_approved=1 ORDER BY r.created_at DESC LIMIT 200`; }
+        else if (status === 'all') { sql = `SELECT r.*, p.title AS post_title, p.slug AS post_slug FROM reviews r LEFT JOIN posts p ON p.id=r.post_id ORDER BY r.created_at DESC LIMIT 200`; }
+        else { sql = `SELECT r.*, p.title AS post_title, p.slug AS post_slug FROM reviews r LEFT JOIN posts p ON p.id=r.post_id WHERE r.is_approved=0 ORDER BY r.created_at DESC LIMIT 200`; }
+        const r = await db.query(sql);
+        res.json({ data: r.rows });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.patch('/reviews/:id/approve', isAuthenticated, async (req, res) => {
+    try { await db.query("UPDATE reviews SET is_approved=1 WHERE id=$1", [req.params.id]); res.json({ success: true }); }
+    catch (err) { res.status(500).json({ error: err.message }); }
+});
+router.delete('/reviews/:id', isAuthenticated, async (req, res) => {
+    try { await db.query("DELETE FROM reviews WHERE id=$1", [req.params.id]); res.json({ success: true }); }
+    catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- Newsletter subscribers ---
+router.get('/newsletter', isAuthenticated, async (req, res) => {
+    try {
+        const r = await db.query("SELECT id, email, created_at FROM newsletter_subscriptions ORDER BY created_at DESC LIMIT 500");
+        res.json({ data: r.rows, total: r.rows.length });
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // --- Settings / Banner ---

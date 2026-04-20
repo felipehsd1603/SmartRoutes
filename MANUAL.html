@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Manual SDM Links</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 11pt;
+    line-height: 1.55;
+    background: #fff;
+  }
+  h1, h2, h3, h4 { font-weight: 900; letter-spacing: -0.01em; color: #0A1F44; margin: 0; }
+  h1 { font-size: 34pt; line-height: 1; text-transform: uppercase; }
+  h2 { font-size: 20pt; margin: 24pt 0 10pt; border-bottom: 3px solid #0065FC; padding-bottom: 4pt; text-transform: uppercase; }
+  h3 { font-size: 13pt; margin: 14pt 0 6pt; color: #0065FC; text-transform: uppercase; letter-spacing: 0.03em; }
+  h4 { font-size: 11pt; margin: 10pt 0 4pt; color: #333; }
+  p  { margin: 6pt 0; }
+  ul, ol { margin: 6pt 0 6pt 18pt; padding: 0; }
+  li { margin: 3pt 0; }
+  code { font-family: "JetBrains Mono", Consolas, monospace; background: #f1f3f7; padding: 1pt 4pt; border-radius: 3pt; font-size: 9.5pt; }
+  pre { background: #0A1F44; color: #EDE6B6; padding: 10pt; border-radius: 6pt; font-size: 9pt; line-height: 1.45; overflow-x: auto; font-family: "JetBrains Mono", Consolas, monospace; white-space: pre-wrap; word-break: break-word; }
+  .cover { page-break-after: always; display: flex; flex-direction: column; justify-content: center; min-height: 250mm; text-align: center; }
+  .cover .badge { display:inline-block; background:#EDE6B6; color:#0A1F44; padding:4pt 14pt; font-size:9pt; font-weight:900; text-transform:uppercase; letter-spacing:0.2em; border-radius:999px; margin-bottom:20pt;}
+  .cover h1 { font-size: 60pt; line-height: 0.9; color: #0065FC; }
+  .cover .sub { font-size: 13pt; color: #555; margin-top: 16pt; }
+  .cover .meta { margin-top: 40pt; font-size: 9pt; color: #888; letter-spacing: 0.2em; text-transform: uppercase; }
+  .toc { page-break-after: always; }
+  .toc ol { list-style: none; margin: 0; padding: 0; }
+  .toc li { margin: 6pt 0; border-bottom: 1px dotted #ccc; padding-bottom: 4pt; }
+  .toc .num { display:inline-block; width: 26pt; color:#0065FC; font-weight:900;}
+  .callout { border-left: 4px solid #EDE6B6; background: #FFF9D6; padding: 8pt 12pt; margin: 10pt 0; border-radius: 0 4pt 4pt 0; }
+  .callout.warn { border-color: #FF4D4D; background: #FFF0F0; }
+  .callout.info { border-color: #0065FC; background: #EAF2FF; }
+  .callout strong { display:block; margin-bottom: 2pt; text-transform: uppercase; font-size:9pt; letter-spacing:0.1em; }
+  table { width: 100%; border-collapse: collapse; margin: 8pt 0; font-size: 10pt; }
+  th, td { padding: 6pt 8pt; border: 1px solid #e0e0e0; text-align: left; vertical-align: top; }
+  th { background: #0A1F44; color: #fff; font-size: 9pt; text-transform: uppercase; letter-spacing: 0.05em; }
+  tbody tr:nth-child(even) { background: #f8f9fb; }
+  .section { page-break-before: always; }
+  .step { background:#f8f9fb; border-left:3px solid #0065FC; padding:8pt 12pt; margin:6pt 0; border-radius:0 4pt 4pt 0;}
+  .step b { color:#0065FC; }
+  .tag { display:inline-block; background:#0A1F44; color:#fff; font-size:8pt; padding:2pt 6pt; border-radius:3pt; text-transform:uppercase; letter-spacing:0.05em; font-weight:900;}
+  .tag.yellow { background:#EDE6B6; color:#0A1F44; }
+  footer.pagefoot { position: fixed; bottom: 8mm; left: 0; right: 0; text-align:center; font-size: 8pt; color:#aaa; }
+</style>
+</head>
+<body>
+
+<!-- CAPA -->
+<section class="cover">
+  <span class="badge">Manual oficial</span>
+  <h1>SDM Links</h1>
+  <div class="sub">Guia completo de uso · público, admin e operação</div>
+  <div class="meta">versão 1.0 · abril 2026</div>
+</section>
+
+<!-- SUMÁRIO -->
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol>
+    <li><span class="num">1.</span> Visão geral do projeto</li>
+    <li><span class="num">2.</span> Arquitetura e stack</li>
+    <li><span class="num">3.</span> Área pública — o que o visitante vê</li>
+    <li><span class="num">4.</span> Página do produto (post)</li>
+    <li><span class="num">5.</span> Calendário de lançamentos</li>
+    <li><span class="num">6.</span> Painel Admin — acesso e navegação</li>
+    <li><span class="num">7.</span> Admin · Posts (CRUD)</li>
+    <li><span class="num">8.</span> Admin · Ofertas (CRUD)</li>
+    <li><span class="num">9.</span> Admin · Cupons (CRUD)</li>
+    <li><span class="num">10.</span> Admin · Parcerias (CRUD)</li>
+    <li><span class="num">11.</span> Admin · Configurações (banner + ads)</li>
+    <li><span class="num">12.</span> Admin · Cliques e estatísticas</li>
+    <li><span class="num">13.</span> Banco de dados e tabelas</li>
+    <li><span class="num">14.</span> Endpoints da API</li>
+    <li><span class="num">15.</span> Deploy e variáveis de ambiente</li>
+    <li><span class="num">16.</span> Troubleshooting</li>
+    <li><span class="num">17.</span> Checklist operacional diária</li>
+  </ol>
+</section>
+
+<!-- 1. VISÃO GERAL -->
+<section class="section">
+  <h2>1. Visão geral do projeto</h2>
+  <p><b>SDM Links</b> é o portal oficial do canal Sneakers do Mio. É uma vitrine editorial de sneakers focada em três coisas: <b>drops em primeira mão</b>, <b>ofertas com cupom</b> e <b>conteúdo editorial</b> sobre cada modelo. O site converte o público do Telegram (265K), Instagram (186K) e TikTok (24.5K) em cliques de afiliado.</p>
+  <h3>O que o site resolve</h3>
+  <ul>
+    <li><b>Para o visitante:</b> encontrar rapidamente o tênis certo pelo preço certo, com cupom ativo e link direto da loja.</li>
+    <li><b>Para o admin (você):</b> publicar posts, ofertas, cupons e banners de parceria sem precisar tocar em código ou subir deploy.</li>
+    <li><b>Para o negócio:</b> rastrear cliques em cada CTA (data-track) e medir conversão via dashboard interno.</li>
+  </ul>
+  <h3>Princípios editoriais</h3>
+  <ul>
+    <li>Imagem real do produto (nunca placeholder).</li>
+    <li>Preço em BRL, com preço tabela riscado quando há desconto.</li>
+    <li>Cupom sempre visível no card quando existir.</li>
+    <li>Link de afiliado com UTM automático (<code>utm_source=sdmlinks</code>).</li>
+  </ul>
+</section>
+
+<!-- 2. STACK -->
+<section class="section">
+  <h2>2. Arquitetura e stack</h2>
+  <table>
+    <thead><tr><th>Camada</th><th>Tecnologia</th><th>Papel</th></tr></thead>
+    <tbody>
+      <tr><td>Frontend público</td><td>HTML + TailwindCSS (CDN) + vanilla JS</td><td>Render estático servido por Express; todo conteúdo é injetado via fetch.</td></tr>
+      <tr><td>Frontend admin</td><td>HTML + TailwindCSS + vanilla JS</td><td>Interface CRUD autenticada por sessão.</td></tr>
+      <tr><td>Servidor</td><td>Node.js + Express 5</td><td>Rotas em <code>src/routes/api.js</code> (público) e <code>src/routes/admin.js</code> (autenticado).</td></tr>
+      <tr><td>Banco (prod)</td><td>PostgreSQL no Supabase</td><td>Conectado via <code>DATABASE_URL</code>.</td></tr>
+      <tr><td>Banco (dev)</td><td>SQLite local</td><td>Fallback automático se <code>DATABASE_URL</code> não estiver setada.</td></tr>
+      <tr><td>Storage de imagens</td><td>Supabase Storage (bucket <code>images</code>)</td><td>Upload via Multer + client Supabase.</td></tr>
+      <tr><td>Deploy</td><td>Render (onrender.com)</td><td>Auto-deploy a partir do <code>main</code> no GitHub.</td></tr>
+      <tr><td>SEO / PWA</td><td>sitemap.xml, robots.txt, service worker</td><td>SSR injeta meta tags no <code>/post/:slug</code>; SW cacheia assets estáticos.</td></tr>
+      <tr><td>Analytics</td><td>Microsoft Clarity + tabela <code>clicks</code></td><td>Clarity para heatmap; clicks para tracking de CTAs internos.</td></tr>
+      <tr><td>Notificações</td><td>Web Push (VAPID)</td><td>"Me avise quando lançar" para posts com <code>release_date</code>.</td></tr>
+    </tbody>
+  </table>
+  <h3>Estrutura de pastas</h3>
+  <pre>Sdmpage/
+├─ public/            # HTML, CSS, JS, assets estáticos
+│  ├─ index.html      # home
+│  ├─ post.html       # detalhe de produto
+│  ├─ calendario.html # calendário de drops
+│  ├─ admin.html      # painel admin
+│  ├─ login.html      # login admin
+│  ├─ 404.html
+│  ├─ sw.js           # service worker
+│  └─ manifest.json   # PWA
+├─ src/
+│  ├─ database/db.js  # conexão Postgres/SQLite + init
+│  ├─ routes/api.js   # endpoints públicos
+│  ├─ routes/admin.js # endpoints autenticados (CRUD)
+│  └─ seo.js          # injeção de meta tags SSR
+├─ server.js          # boot do Express
+└─ package.json</pre>
+</section>
+
+<!-- 3. ÁREA PÚBLICA -->
+<section class="section">
+  <h2>3. Área pública — o que o visitante vê</h2>
+  <p>URL: <code>https://sdm-links.onrender.com/</code> (ou domínio custom). A home é dividida em 9 blocos, todos alimentados pelo banco exceto categorias/filtros fixos.</p>
+
+  <h3>3.1 Faixa de anúncio (opcional)</h3>
+  <p>Barra no topo com texto em marquee + botões do Telegram/WhatsApp. <b>Controlada em Admin → Configurações.</b> Quando <code>banner_active=false</code>, a faixa some.</p>
+
+  <h3>3.2 Hero (blobs animados)</h3>
+  <p>Chamada principal "Achamos o tênis certo. Pelo preço certo." com 3 botões: Telegram, Instagram, TikTok. <b>Conteúdo fixo no HTML.</b></p>
+
+  <h3>3.3 Ticker de ofertas</h3>
+  <p>Faixa inferior do hero em loop horizontal. <b>Dinâmico via <code>/api/offers</code></b> — puxa as 6 primeiras ofertas ativas. Se não houver oferta, o ticker some.</p>
+
+  <h3>3.4 Busca + filtros por marca</h3>
+  <p>Barra de busca instantânea (<code>/api/search</code>) + 10 chips de filtro (Nike, Adidas, NB, Jordan, Lifestyle, Treino, Futebol, Skateboarding, Basquete, Favoritos). Favoritos usa <code>localStorage</code>.</p>
+
+  <h3>3.5 Ofertas de hoje</h3>
+  <p>Grid de até 3 colunas, <b>dinâmico via <code>/api/offers</code></b>. Cada card mostra imagem, marca, preço tabela riscado, preço atual, cupom (se houver) e botão "Pegar oferta".</p>
+
+  <h3>3.6 Banners de parceria</h3>
+  <p>Seção escura full-width, <b>dinâmica via <code>/api/partnerships</code></b>. Renderiza um banner por parceria ativa (ordenado por <code>position</code>).</p>
+
+  <h3>3.7 Próximos lançamentos</h3>
+  <p>Grid 2 colunas, <b>dinâmico via <code>/api/posts/upcoming</code></b>. Filtra posts com <code>release_date</code> futuro e renderiza até 6 com imagem + marca + data.</p>
+
+  <h3>3.8 Cupons ativos</h3>
+  <p>Grid 4 colunas (2 no mobile), <b>dinâmico via <code>/api/coupons</code></b>. Suporta 4 variantes visuais (primary/dark/accent/outline). Click copia o código ou abre URL externa (se configurada).</p>
+
+  <h3>3.9 Feed editorial (posts)</h3>
+  <p>Layout em 2 colunas: esquerda = post em destaque sticky, direita = timeline com scroll infinito. <b>Dinâmico via <code>/api/posts?limit=12&amp;offset=X</code></b>. Suporta filtro por marca/categoria.</p>
+
+  <h3>3.10 CTA final + Footer</h3>
+  <p>Chamada pro Telegram + rodapé com links institucionais.</p>
+</section>
+
+<!-- 4. POST DETAIL -->
+<section class="section">
+  <h2>4. Página do produto (post)</h2>
+  <p>URL: <code>/post/:slug</code>. Renderizada a partir de <code>public/post.html</code> com meta tags injetadas via SSR (<code>src/seo.js</code>) para compartilhamento limpo no WhatsApp/Telegram.</p>
+  <h3>Blocos</h3>
+  <ul>
+    <li><b>Hero</b> — imagem principal, título, marca, modelo, preço.</li>
+    <li><b>Galeria</b> — até 20 imagens extras (<code>post_images</code>).</li>
+    <li><b>Onde comprar</b> — lista de lojas vinculadas (<code>post_stores</code>) com CTAs.</li>
+    <li><b>Me avise quando lançar</b> — aparece só se o <code>release_date</code> for futuro. Ativa Web Push ou e-mail.</li>
+    <li><b>Relacionados</b> — produtos da mesma marca (<code>/api/posts/:slug/related</code>).</li>
+    <li><b>Botão de like</b> — incrementa <code>posts.likes</code>.</li>
+    <li><b>Compartilhar</b> — botões para WhatsApp, Telegram, Twitter + copiar link.</li>
+    <li><b>Story Generator</b> — gera imagem 9:16 pronta pra Instagram Story (canvas nativo).</li>
+  </ul>
+</section>
+
+<!-- 5. CALENDÁRIO -->
+<section class="section">
+  <h2>5. Calendário de lançamentos</h2>
+  <p>URL: <code>/calendario</code>. Lista todos os posts com <code>release_date</code> agrupados por "Hoje", "Esta semana", "Em breve" e "Passados". Usa <code>/api/posts/upcoming</code> com limite 60.</p>
+  <ul>
+    <li>Cada card mostra imagem, contagem regressiva ao vivo e link para o post.</li>
+    <li>Ordenação: futuros primeiro (mais próximos no topo), depois passados.</li>
+    <li>Acessível pelo menu/footer via <code>#lancamentos</code> ou link direto <code>/calendario</code>.</li>
+  </ul>
+</section>
+
+<!-- 6. ADMIN ACESSO -->
+<section class="section">
+  <h2>6. Painel Admin — acesso e navegação</h2>
+  <h3>6.1 Login</h3>
+  <p>URL: <code>/admin/login</code>. Credenciais são armazenadas hasheadas (bcrypt) na tabela <code>admins</code>. Ao autenticar, uma sessão é criada (<code>express-session</code>) e guardada num cookie. Expira em 24h.</p>
+  <div class="callout warn">
+    <strong>Importante</strong>
+    Se esqueceu a senha, é preciso resetar direto no banco rodando um script Node que faça <code>bcrypt.hash(novaSenha, 10)</code> e atualize <code>admins.password</code>. Não há fluxo de "esqueci minha senha".
+  </div>
+
+  <h3>6.2 Layout do painel</h3>
+  <p>Após login você cai em <code>/admin</code>. A barra superior tem 5 abas:</p>
+  <table>
+    <thead><tr><th>Aba</th><th>Função</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag">Posts</span></td><td>Criar e gerenciar reviews editoriais de cada tênis.</td></tr>
+      <tr><td><span class="tag">Ofertas</span></td><td>Gerenciar os cards de "Ofertas de hoje" na home.</td></tr>
+      <tr><td><span class="tag">Cupons</span></td><td>Gerenciar a seção "Usa agora, economiza hoje".</td></tr>
+      <tr><td><span class="tag">Parcerias</span></td><td>Gerenciar banners full-width (ex: hotsite Nike).</td></tr>
+      <tr><td><span class="tag yellow">Configurações</span></td><td>Controlar faixa de anúncio do topo + Google AdSense.</td></tr>
+    </tbody>
+  </table>
+  <p>Cada aba tem um formulário à esquerda (criar/editar) e tabela à direita (listar/editar/excluir).</p>
+</section>
+
+<!-- 7. POSTS -->
+<section class="section">
+  <h2>7. Admin · Posts (CRUD)</h2>
+  <p>Posts são o conteúdo editorial principal. Cada post vira uma URL <code>/post/:slug</code> e aparece no feed da home.</p>
+
+  <h3>7.1 Criar um post novo</h3>
+  <div class="step"><b>Passo 1.</b> Aba <b>Posts</b> → formulário à esquerda.</div>
+  <div class="step"><b>Passo 2.</b> Preencha <b>Título</b> (obrigatório) e <b>Categoria</b> (obrigatório: Lifestyle, Basquete, Treino, etc).</div>
+  <div class="step"><b>Passo 3.</b> Envie a <b>imagem principal</b> (hero) — arquivo do seu PC. Vai parar no Supabase Storage automaticamente.</div>
+  <div class="step"><b>Passo 4.</b> Preencha os metadados: marca, modelo, SKU, colorway, preço atual, preço tabela e data de lançamento (se for drop futuro).</div>
+  <div class="step"><b>Passo 5.</b> <b>Galeria</b> (opcional, até 20 imagens) — aparecem no carrossel da página do produto.</div>
+  <div class="step"><b>Passo 6.</b> <b>Onde comprar</b> — selecione loja e cole URL. Repita para cada loja. Marque status (disponível agora, em breve, esgotado).</div>
+  <div class="step"><b>Passo 7.</b> <b>Relacionados</b> (opcional) — produtos similares com nome, imagem e link.</div>
+  <div class="step"><b>Passo 8.</b> Flags: <b>Destaque</b> (fixa no topo do feed) e <b>Patrocinado</b> (marca o card).</div>
+  <div class="step"><b>Passo 9.</b> Clique em <b>Publicar post</b>. Redireciona pra página nova.</div>
+
+  <h3>7.2 Editar um post</h3>
+  <ol>
+    <li>Na tabela à direita, clique em <b>Editar</b> na linha desejada.</li>
+    <li>O formulário carrega com os dados atuais.</li>
+    <li>Mude o que precisar. A imagem hero só é substituída se você enviar uma nova.</li>
+    <li>Clique em <b>Salvar alterações</b>.</li>
+  </ol>
+  <div class="callout info">
+    <strong>Slug automático</strong>
+    Se você mudar o título, o slug é recalculado (mantendo a unicidade). URLs antigas passam a redirecionar sozinhas.
+  </div>
+
+  <h3>7.3 Excluir</h3>
+  <p>Clique em <b>Excluir</b> na linha. Confirma no prompt. Imagens no Storage <b>não</b> são apagadas (precisam ser limpas manualmente no Supabase se quiser poupar cota).</p>
+
+  <h3>7.4 Boas práticas</h3>
+  <ul>
+    <li>Use imagens com <b>fundo transparente ou branco</b> e proporção quadrada ou 4:3.</li>
+    <li><code>release_date</code> futuro = aparece em "Próximos lançamentos" e "Calendário".</li>
+    <li><code>price_cents</code> em centavos: R$ 449,99 = <code>44999</code>.</li>
+    <li>Tags separadas por vírgula (ex: <code>nike,air max,retro</code>) ajudam a busca.</li>
+  </ul>
+</section>
+
+<!-- 8. OFERTAS -->
+<section class="section">
+  <h2>8. Admin · Ofertas (CRUD)</h2>
+  <p>Ofertas são cards curtos de promoção que aparecem em <b>"Ofertas de hoje"</b> na home. Diferente dos posts, não têm página própria — são só call-to-action direto pra loja.</p>
+
+  <h3>8.1 Criar oferta</h3>
+  <ol>
+    <li><b>Título</b> — ex: "Air Force 1 Low 'Oil Green' · -44%".</li>
+    <li><b>Marca</b> (obrigatória) e <b>Categoria</b> (opcional).</li>
+    <li><b>Imagem</b> — obrigatória em ofertas novas. Sobe direto pro Supabase.</li>
+    <li><b>Preço</b> e <b>Preço tabela</b> — em reais com vírgula.</li>
+    <li><b>Cupom</b> (opcional) — mostra um chip amarelo no card.</li>
+    <li><b>Badge</b> (opcional, até 24 chars) — ex: "-44%", "Menor preço".</li>
+    <li><b>URL afiliado</b> — link de destino.</li>
+    <li><b>Posição</b> — ordem crescente (0 = primeiro).</li>
+    <li><b>Ativa</b> — desmarca para ocultar sem apagar.</li>
+    <li>Clique em <b>Publicar oferta</b>.</li>
+  </ol>
+
+  <h3>8.2 Editar / excluir / alternar</h3>
+  <ul>
+    <li><b>Editar</b> — carrega os dados. A imagem só troca se você enviar nova.</li>
+    <li><b>Toggle status</b> — clique no badge "Ativa/Inativa" da tabela para alternar sem abrir o form.</li>
+    <li><b>Excluir</b> — botão vermelho. Pede confirmação.</li>
+  </ul>
+  <div class="callout">
+    <strong>Dica</strong>
+    As 6 primeiras ofertas ativas também alimentam o <b>ticker do hero</b>. Mantenha a posição ordenada para controlar a prioridade visual.
+  </div>
+</section>
+
+<!-- 9. CUPONS -->
+<section class="section">
+  <h2>9. Admin · Cupons (CRUD)</h2>
+  <p>Cupons são os 4 cards da seção "Usa agora, economiza hoje". Cada cupom pode <b>copiar o código</b> ao ser clicado (padrão) ou <b>abrir uma URL externa</b> (ex: canal secreto do Telegram).</p>
+
+  <h3>9.1 Campos do formulário</h3>
+  <table>
+    <thead><tr><th>Campo</th><th>Função</th></tr></thead>
+    <tbody>
+      <tr><td>Código</td><td>Obrigatório. Sempre maiúsculo (ex: <code>NIKE20</code>).</td></tr>
+      <tr><td>Marca / rótulo</td><td>Texto pequeno no topo do card (ex: "Nike", "New Balance").</td></tr>
+      <tr><td>Descrição do desconto</td><td>Linha inferior do card (ex: "30% cashback", "20% OFF").</td></tr>
+      <tr><td>URL externa</td><td>Se preenchida, o card vira link em vez de copiador. Use para cupom secreto do Telegram.</td></tr>
+      <tr><td>Estilo do card</td><td>4 variantes: <b>primary</b> (azul), <b>dark</b> (cinza escuro), <b>accent</b> (amarelo), <b>outline</b> (borda).</td></tr>
+      <tr><td>Posição</td><td>Ordem de exibição (0 = primeiro).</td></tr>
+      <tr><td>Ativo</td><td>Desmarca para ocultar.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.2 Fluxos</h3>
+  <p>Criar, editar, toggle e excluir funcionam igual ao das ofertas. <b>Recomendado: manter 4 cupons ativos</b> para o grid ficar visualmente balanceado.</p>
+  <div class="callout info">
+    <strong>UX do clique</strong>
+    Quando o visitante clica no card sem URL, o código é copiado pro clipboard e um toast aparece. Quando tem URL, abre em nova aba com <code>rel="noopener"</code>.
+  </div>
+</section>
+
+<!-- 10. PARCERIAS -->
+<section class="section">
+  <h2>10. Admin · Parcerias (CRUD)</h2>
+  <p>Parcerias são os banners escuros full-width que ficam entre "Ofertas" e "Próximos lançamentos". Servem para ações especiais (hotsite exclusivo, campanha com marca).</p>
+
+  <h3>10.1 Campos</h3>
+  <table>
+    <thead><tr><th>Campo</th><th>Função</th></tr></thead>
+    <tbody>
+      <tr><td>Título</td><td>Obrigatório. Tipografia grande (ex: "Hotsite Nike × SDM").</td></tr>
+      <tr><td>Badge</td><td>Pill amarelo acima do título (ex: "Parceria oficial").</td></tr>
+      <tr><td>Subtítulo</td><td>Linha de descrição (ex: "Produtos exclusivos com cupom").</td></tr>
+      <tr><td>Destaque</td><td>Palavra em amarelo dentro do subtítulo (ex: "NIKE20").</td></tr>
+      <tr><td>Texto do botão</td><td>CTA (ex: "Acessar hotsite →").</td></tr>
+      <tr><td>URL do botão</td><td>Link de destino.</td></tr>
+      <tr><td>Posição / Ativa</td><td>Ordem + on/off.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.2 Dicas</h3>
+  <ul>
+    <li>Mantenha <b>no máximo 2 parcerias</b> ativas ao mesmo tempo para não poluir a home.</li>
+    <li>Use o campo <b>Destaque</b> para evidenciar o cupom ou desconto.</li>
+    <li>URL deve incluir UTM: <code>?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=banner-X</code>.</li>
+  </ul>
+</section>
+
+<!-- 11. CONFIGURAÇÕES -->
+<section class="section">
+  <h2>11. Admin · Configurações (banner + ads)</h2>
+  <h3>11.1 Faixa de anúncio (topo)</h3>
+  <p>É aquela barra colorida que passa texto em loop no topo do site.</p>
+  <ol>
+    <li>Abra a aba <b>Configurações</b>.</li>
+    <li>Ligue/desligue no toggle <b>Faixa ativa</b>.</li>
+    <li><b>Texto</b> — o que vai passar no loop (ex: "🔔 Receba drops em tempo real!").</li>
+    <li><b>URL Telegram</b> e <b>URL WhatsApp</b> — botões flutuantes na faixa.</li>
+    <li><b>Cor de fundo</b> — picker + input hex. Preview ao vivo no quadro à direita.</li>
+    <li>Clique em <b>Salvar configurações</b>.</li>
+  </ol>
+  <div class="callout">
+    <strong>Cache</strong>
+    A API <code>/api/banner</code> tem cache padrão do cliente (sem <code>Cache-Control</code> explícito). Alterações aparecem no próximo carregamento. Para forçar, hard reload (Ctrl+Shift+R).
+  </div>
+
+  <h3>11.2 Google AdSense (se habilitado)</h3>
+  <p>Mesmo bloco de configurações permite ligar ou desligar a exibição de ads e setar:</p>
+  <ul>
+    <li><code>ads_publisher_id</code> — seu ID do AdSense.</li>
+    <li><code>ads_slot_feed</code>, <code>ads_slot_post</code>, <code>ads_slot_sidebar</code> — os slots.</li>
+  </ul>
+  <p>Quando <code>ads_enabled=false</code>, nenhum script do AdSense é carregado — útil em período de aprovação ou se quiser pausar.</p>
+</section>
+
+<!-- 12. CLIQUES -->
+<section class="section">
+  <h2>12. Admin · Cliques e estatísticas</h2>
+  <p>Todo botão importante no site tem um atributo <code>data-track="&lt;label&gt;"</code>. Clicar dispara um POST em <code>/api/track</code> que grava uma linha em <code>clicks</code>.</p>
+
+  <h3>12.1 O que você vê no dashboard (aba Posts)</h3>
+  <ul>
+    <li><b>Totais por período</b> — 24h, 7d, 30d, histórico total.</li>
+    <li><b>Gráfico por dia</b> — últimos 14 dias.</li>
+    <li><b>Top 50 labels</b> — ranking dos CTAs mais clicados + timestamp da última ação.</li>
+  </ul>
+
+  <h3>12.2 Labels usados no site</h3>
+  <table>
+    <thead><tr><th>Label</th><th>Origem</th></tr></thead>
+    <tbody>
+      <tr><td><code>hero-telegram</code> / <code>hero-instagram</code> / <code>hero-tiktok</code></td><td>Botões do hero.</td></tr>
+      <tr><td><code>offer-click</code></td><td>Botão "Pegar oferta" em qualquer card.</td></tr>
+      <tr><td><code>coupon</code> / <code>coupon-inline</code> / <code>coupon-link</code></td><td>Cards de cupom.</td></tr>
+      <tr><td><code>partnership-N</code></td><td>CTA de um banner de parceria.</td></tr>
+      <tr><td><code>upcoming-click</code></td><td>"Ver detalhes" dos cards de próximos lançamentos.</td></tr>
+      <tr><td><code>banner-hotsite-nike</code></td><td>Legado (pre-CRUD) — ainda pode aparecer.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>12.3 Rate limit</h3>
+  <p>O endpoint <code>/api/track</code> aceita <b>60 requests/min por IP</b>. Evita flood sem bloquear uso legítimo.</p>
+</section>
+
+<!-- 13. BANCO -->
+<section class="section">
+  <h2>13. Banco de dados e tabelas</h2>
+  <p>Schema completo inicializado em <code>src/database/db.js</code> via <code>initializePostgres()</code> ao subir o server com <code>DATABASE_URL</code> setado. Para dev local (sem env), usa SQLite em <code>src/database/database.sqlite</code>.</p>
+
+  <table>
+    <thead><tr><th>Tabela</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><code>admins</code></td><td>Usuários autenticados (senha hasheada bcrypt).</td></tr>
+      <tr><td><code>posts</code></td><td>Reviews editoriais — o conteúdo principal.</td></tr>
+      <tr><td><code>post_images</code></td><td>Galeria de imagens de cada post (até 20).</td></tr>
+      <tr><td><code>post_stores</code></td><td>Lojas vinculadas a um post (onde comprar).</td></tr>
+      <tr><td><code>stores</code></td><td>Catálogo de lojas (StockX, Nike, Adidas, etc).</td></tr>
+      <tr><td><code>related_products</code></td><td>Produtos relacionados manualmente a cada post.</td></tr>
+      <tr><td><code>offers</code></td><td>Cards de "Ofertas de hoje" + ticker hero.</td></tr>
+      <tr><td><code>coupons</code></td><td>Cards da seção "Usa agora, economiza hoje".</td></tr>
+      <tr><td><code>partnerships</code></td><td>Banners de parceria full-width.</td></tr>
+      <tr><td><code>settings</code></td><td>Config chave-valor (banner, ads).</td></tr>
+      <tr><td><code>clicks</code></td><td>Log de todos os cliques rastreados.</td></tr>
+      <tr><td><code>notify_subscriptions</code></td><td>Inscrições de "Me avise" (push/email).</td></tr>
+    </tbody>
+  </table>
+
+  <h3>13.1 Campos críticos de <code>posts</code></h3>
+  <ul>
+    <li><code>slug</code> — único, usado na URL.</li>
+    <li><code>image_url</code> — hero principal. Sem ela, o card vira placeholder cinza.</li>
+    <li><code>release_date</code> — se futuro, o post aparece em "Próximos lançamentos" e "Calendário".</li>
+    <li><code>is_pinned=1</code> — fixa o post no topo do feed.</li>
+    <li><code>likes</code> — incrementado pelo botão na página do post.</li>
+  </ul>
+</section>
+
+<!-- 14. API -->
+<section class="section">
+  <h2>14. Endpoints da API</h2>
+  <h3>14.1 Públicos (<code>src/routes/api.js</code>)</h3>
+  <table>
+    <thead><tr><th>Método</th><th>Rota</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td>GET</td><td><code>/api/banner</code></td><td>Config da faixa do topo.</td></tr>
+      <tr><td>GET</td><td><code>/api/ads-config</code></td><td>Config do AdSense.</td></tr>
+      <tr><td>GET</td><td><code>/api/posts</code></td><td>Feed paginado (<code>?limit=&amp;offset=&amp;brand=</code>).</td></tr>
+      <tr><td>GET</td><td><code>/api/posts/upcoming</code></td><td>Posts com <code>release_date</code>.</td></tr>
+      <tr><td>GET</td><td><code>/api/posts/:slug</code></td><td>Detalhe completo de um post.</td></tr>
+      <tr><td>GET</td><td><code>/api/posts/:slug/related</code></td><td>Relacionados (mesma marca).</td></tr>
+      <tr><td>GET</td><td><code>/api/posts/:slug/notify-count</code></td><td>Quantos assinaram "me avise".</td></tr>
+      <tr><td>GET</td><td><code>/api/search?q=</code></td><td>Busca instantânea.</td></tr>
+      <tr><td>GET</td><td><code>/api/offers</code></td><td>Cards de ofertas ativas.</td></tr>
+      <tr><td>GET</td><td><code>/api/coupons</code></td><td>Cupons ativos.</td></tr>
+      <tr><td>GET</td><td><code>/api/partnerships</code></td><td>Banners de parceria ativos.</td></tr>
+      <tr><td>POST</td><td><code>/api/posts/:id/like</code></td><td>+1 no contador de likes.</td></tr>
+      <tr><td>POST</td><td><code>/api/track</code></td><td>Registra clique (rate limited).</td></tr>
+      <tr><td>POST</td><td><code>/api/notify-subscribe</code></td><td>Cadastra push/email para drop.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>14.2 Admin autenticados (<code>src/routes/admin.js</code>)</h3>
+  <p>Todos exigem sessão. Sem login, redireciona para <code>/admin/login</code>.</p>
+  <table>
+    <thead><tr><th>Entidade</th><th>Rotas</th></tr></thead>
+    <tbody>
+      <tr><td>Posts</td><td>GET <code>:id</code> · POST · PUT <code>:id</code> · DELETE <code>:id</code></td></tr>
+      <tr><td>Ofertas</td><td>GET list · GET <code>:id</code> · POST · PUT <code>:id</code> · DELETE <code>:id</code> · PATCH <code>:id/toggle</code></td></tr>
+      <tr><td>Cupons</td><td>GET list · GET <code>:id</code> · POST · PUT <code>:id</code> · DELETE <code>:id</code> · PATCH <code>:id/toggle</code></td></tr>
+      <tr><td>Parcerias</td><td>GET list · GET <code>:id</code> · POST · PUT <code>:id</code> · DELETE <code>:id</code> · PATCH <code>:id/toggle</code></td></tr>
+      <tr><td>Lojas</td><td>GET list (select no form de posts)</td></tr>
+      <tr><td>Cliques</td><td>GET <code>/admin/clicks/stats?range=</code></td></tr>
+      <tr><td>Settings</td><td>GET/POST <code>/admin/settings/banner</code></td></tr>
+      <tr><td>Auth</td><td>POST <code>/admin/login</code> · POST <code>/admin/logout</code></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 15. DEPLOY -->
+<section class="section">
+  <h2>15. Deploy e variáveis de ambiente</h2>
+  <h3>15.1 Fluxo de deploy</h3>
+  <p>Push para <code>main</code> no GitHub → Render detecta → builda (<code>npm install</code>) → sobe o server (<code>node server.js</code>). Leva cerca de 1–2 min.</p>
+
+  <h3>15.2 Variáveis necessárias</h3>
+  <table>
+    <thead><tr><th>Variável</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><code>DATABASE_URL</code></td><td>Connection string do Supabase Postgres. Sem ela, cai no SQLite local.</td></tr>
+      <tr><td><code>SUPABASE_URL</code></td><td>URL do projeto Supabase (usado pelo client JS).</td></tr>
+      <tr><td><code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>Service key para upload de imagens no Storage.</td></tr>
+      <tr><td><code>SESSION_SECRET</code></td><td>Chave de assinatura dos cookies de sessão.</td></tr>
+      <tr><td><code>VAPID_PUBLIC_KEY</code> / <code>VAPID_PRIVATE_KEY</code></td><td>Opcional. Ativa Web Push. Sem elas, "Me avise" só aceita e-mail.</td></tr>
+      <tr><td><code>VAPID_SUBJECT</code></td><td>Opcional. Email de contato do VAPID (default: admin@sdmlinks.com.br).</td></tr>
+      <tr><td><code>CLARITY_ID</code></td><td>Opcional. ID do Microsoft Clarity para heatmap.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn">
+    <strong>Segurança</strong>
+    Nunca commite <code>.env</code>. Nunca cole <code>DATABASE_URL</code> em chat/Slack. Se vazar, <b>troque a senha</b> no Supabase → Settings → Database → Reset password e atualize a env no Render.
+  </div>
+
+  <h3>15.3 Rodar localmente</h3>
+  <pre>npm install
+# crie .env com SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY no mínimo
+node server.js
+# abre http://localhost:3000</pre>
+</section>
+
+<!-- 16. TROUBLESHOOTING -->
+<section class="section">
+  <h2>16. Troubleshooting</h2>
+
+  <h3>16.1 "Erro ao carregar oferta" ao editar</h3>
+  <p>Causa histórica: service worker cacheava respostas do <code>/admin/*</code>. <b>Corrigido no commit 17c95c7</b> (SW agora ignora rotas admin). Se voltar a aparecer, limpe o SW: DevTools → Application → Service Workers → Unregister → hard reload.</p>
+
+  <h3>16.2 Card sem imagem</h3>
+  <p>Sempre que um post/oferta tem <code>image_url = null</code>, o frontend mostra um fallback cinza com texto. Solução: abra o item no admin e envie a imagem, ou cole uma URL pública (ex: StockX CDN) no campo <code>image_url</code> via SQL.</p>
+
+  <h3>16.3 Deploy não atualiza</h3>
+  <ul>
+    <li>Confira no Render se o build está em "Live" (não "Building" ou "Failed").</li>
+    <li>Hard reload no browser (Ctrl+Shift+R) pra pular cache local + SW.</li>
+    <li>Se ainda falhar: DevTools → Application → Storage → Clear site data.</li>
+  </ul>
+
+  <h3>16.4 Login redireciona infinitamente</h3>
+  <p>Sessão não está sendo persistida. Verifique: (a) <code>SESSION_SECRET</code> setado; (b) cookie secure flag compatível com HTTPS do Render; (c) horário do servidor correto.</p>
+
+  <h3>16.5 Upload de imagem falhando</h3>
+  <p>Geralmente é <code>SUPABASE_SERVICE_ROLE_KEY</code> errada ou bucket <code>images</code> sem policy pública. No Supabase → Storage → <code>images</code> → Policies → "Public read" ativo.</p>
+
+  <h3>16.6 Post não aparece na home</h3>
+  <ul>
+    <li>Confira <code>published_at &lt;= NOW()</code>. Se no futuro, só aparece na hora.</li>
+    <li>Se tem <code>release_date</code> futuro, pode estar listado só em "Próximos lançamentos".</li>
+  </ul>
+</section>
+
+<!-- 17. CHECKLIST -->
+<section class="section">
+  <h2>17. Checklist operacional diária</h2>
+  <h3>Rotina da manhã (5 minutos)</h3>
+  <ul>
+    <li>☐ Abrir <code>/admin</code> e conferir a aba <b>Ofertas</b>: todas as ativas ainda estão válidas? Preço mudou? Cupom caducou?</li>
+    <li>☐ Desativar ofertas que não estão mais ao vivo (toggle, sem apagar).</li>
+    <li>☐ Verificar <b>Cupons</b>: o SECRETO aponta para o link certo do Telegram?</li>
+    <li>☐ Dashboard de cliques: olhar top 5 labels das últimas 24h pra saber o que está bombando.</li>
+  </ul>
+
+  <h3>Ao publicar um drop</h3>
+  <ul>
+    <li>☐ Criar o post com título, imagem hero, marca, modelo e <b>release_date</b>.</li>
+    <li>☐ Subir galeria (mínimo 3 fotos) e adicionar as lojas.</li>
+    <li>☐ Revisar a URL final (<code>/post/slug</code>) em aba anônima.</li>
+    <li>☐ Compartilhar no Telegram/Instagram usando o botão "Compartilhar" da própria página.</li>
+  </ul>
+
+  <h3>Uma vez por semana</h3>
+  <ul>
+    <li>☐ Conferir posts com <code>release_date</code> passado — ainda fazem sentido? Atualizar excerpt, preço.</li>
+    <li>☐ Limpar ofertas inativas muito antigas (tabela do admin).</li>
+    <li>☐ Rodar backup do banco (Supabase → Database → Backups).</li>
+    <li>☐ Checar Clarity para ver heatmap e session recordings dos últimos dias.</li>
+  </ul>
+
+  <div class="callout info" style="margin-top:24pt;">
+    <strong>Dúvidas ou bug?</strong>
+    O código-fonte está em <code>github.com/felipehsd1603/SmartRoutes</code>. Qualquer alteração no frontend ou CRUD: edite o arquivo correspondente, commit no <code>main</code>, Render faz o resto.
+  </div>
+</section>
+
+</body>
+</html>

@@ -85,6 +85,10 @@
             <button type="button" role="tab" aria-selected="false" data-tab="offers" class="tab-btn whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-widest border-b-2 border-transparent text-gray-500 hover:text-retroGrey">Ofertas</button>
             <button type="button" role="tab" aria-selected="false" data-tab="coupons" class="tab-btn whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-widest border-b-2 border-transparent text-gray-500 hover:text-retroGrey">Cupons</button>
             <button type="button" role="tab" aria-selected="false" data-tab="partnerships" class="tab-btn whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-widest border-b-2 border-transparent text-gray-500 hover:text-retroGrey">Parcerias</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="raffles" class="tab-btn whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-widest border-b-2 border-transparent text-gray-500 hover:text-retroGrey">Raffles</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="moderation" class="tab-btn whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-widest border-b-2 border-transparent text-gray-500 hover:text-retroGrey">Moderação</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="newsletter" class="tab-btn whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-widest border-b-2 border-transparent text-gray-500 hover:text-retroGrey">Newsletter</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="features" class="tab-btn whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-widest border-b-2 border-transparent text-gray-500 hover:text-retroGrey">⚡ Funcionalidades</button>
             <button type="button" role="tab" aria-selected="false" data-tab="settings" class="tab-btn whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-widest border-b-2 border-transparent text-gray-500 hover:text-retroGrey">⚙️ Configurações</button>
         </div>
 
@@ -215,6 +219,11 @@
                             <input type="text" name="hero_color" id="hero_color" value="" placeholder="#RRGGBB (vazio = sem cor)" class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-trueBlue text-sm font-mono">
                             <button type="button" id="clearHeroColor" class="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-retroGrey">Limpar</button>
                         </div>
+                    </div>
+
+                    <div>
+                        <label for="video_url" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">URL do vídeo (YouTube) <span class="text-gray-400 normal-case tracking-normal font-normal">(opcional — aparece se feature "Vídeo no post" estiver ativa)</span></label>
+                        <input type="url" name="video_url" id="video_url" placeholder="https://www.youtube.com/watch?v=..." class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
                     </div>
 
                     <div>
@@ -580,6 +589,108 @@
                         <tbody id="partnershipsTableBody" class="divide-y divide-gray-100" aria-live="polite" aria-busy="true"></tbody>
                     </table>
                 </div>
+            </section>
+        </div>
+
+        <!-- Aba Raffles -->
+        <div id="tab-raffles" class="hidden grid lg:grid-cols-3 gap-6 lg:gap-8">
+            <section class="lg:col-span-1 bg-white rounded-2xl p-6 lg:p-8 h-fit shadow-sm">
+                <div class="flex items-start justify-between gap-3 mb-6">
+                    <h2 class="font-black uppercase text-lg"><span id="raffleFormMode">Novo raffle</span></h2>
+                    <button type="button" id="raffleResetBtn" class="hidden text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-retroGrey">Novo</button>
+                </div>
+                <form id="raffleForm" enctype="multipart/form-data" class="space-y-4" novalidate>
+                    <input type="hidden" name="raffle_id" id="raffle_id" value="">
+                    <div><label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Título</label>
+                        <input type="text" name="title" id="raffle_title" required placeholder="Nike SNKRS · AJ1 Chicago" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm"></div>
+                    <div><label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Fonte</label>
+                        <input type="text" name="source" id="raffle_source" placeholder="Nike SNKRS, END., Footshop..." class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-sm"></div>
+                    <div><label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Descrição</label>
+                        <textarea name="description" id="raffle_description" rows="3" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-sm resize-none"></textarea></div>
+                    <div><label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Imagem</label>
+                        <input type="file" name="image" id="raffle_image" accept="image/*" class="w-full text-sm"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Abre em</label>
+                            <input type="datetime-local" name="starts_at" id="raffle_starts_at" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm"></div>
+                        <div><label class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Encerra em</label>
+                            <input type="datetime-local" name="ends_at" id="raffle_ends_at" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Botão</label>
+                            <input type="text" name="cta_label" id="raffle_cta_label" placeholder="Participar →" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm"></div>
+                        <div><label class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Posição</label>
+                            <input type="number" name="position" id="raffle_position" value="0" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm"></div>
+                    </div>
+                    <div><label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">URL</label>
+                        <input type="url" name="cta_url" id="raffle_cta_url" placeholder="https://..." class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-sm"></div>
+                    <label class="inline-flex items-center gap-2"><input type="checkbox" name="is_active" id="raffle_is_active" checked class="w-4 h-4 accent-trueBlue"><span class="text-[10px] font-black uppercase tracking-widest text-gray-700">Ativo</span></label>
+                    <button type="submit" id="raffleSubmitBtn" class="w-full bg-trueBlue hover:bg-retroBlue text-white font-black uppercase tracking-wide text-sm py-4 rounded-full">Publicar raffle</button>
+                </form>
+            </section>
+            <section class="lg:col-span-2 bg-white rounded-2xl p-6 lg:p-8 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-black uppercase text-lg">Raffles cadastrados</h2>
+                    <span id="raffleCount" class="text-xs font-black uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">0</span>
+                </div>
+                <div class="overflow-x-auto -mx-6 lg:-mx-8 px-6 lg:px-8"><table class="min-w-full">
+                    <thead><tr class="border-b-2 border-gray-100">
+                        <th class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Título</th>
+                        <th class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Fonte</th>
+                        <th class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Encerra</th>
+                        <th class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Status</th>
+                        <th class="text-right py-3 text-[10px] font-black uppercase tracking-widest text-gray-500">Ações</th>
+                    </tr></thead>
+                    <tbody id="rafflesTableBody" class="divide-y divide-gray-100"></tbody>
+                </table></div>
+            </section>
+        </div>
+
+        <!-- Aba Moderação (Comments + Reviews) -->
+        <div id="tab-moderation" class="hidden space-y-8">
+            <section class="bg-white rounded-2xl p-6 lg:p-8 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-black uppercase text-lg">Comentários pendentes</h2>
+                    <div class="flex gap-2">
+                        <button type="button" data-cfilter="pending" class="cfilter-btn text-[10px] font-black uppercase tracking-widest bg-retroGrey text-white px-3 py-1 rounded-full">Pendentes</button>
+                        <button type="button" data-cfilter="approved" class="cfilter-btn text-[10px] font-black uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">Aprovados</button>
+                        <button type="button" data-cfilter="all" class="cfilter-btn text-[10px] font-black uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">Todos</button>
+                    </div>
+                </div>
+                <ul id="commentsModList" class="divide-y divide-gray-100"></ul>
+            </section>
+            <section class="bg-white rounded-2xl p-6 lg:p-8 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-black uppercase text-lg">Reviews pendentes</h2>
+                    <div class="flex gap-2">
+                        <button type="button" data-rfilter="pending" class="rfilter-btn text-[10px] font-black uppercase tracking-widest bg-retroGrey text-white px-3 py-1 rounded-full">Pendentes</button>
+                        <button type="button" data-rfilter="approved" class="rfilter-btn text-[10px] font-black uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">Aprovados</button>
+                        <button type="button" data-rfilter="all" class="rfilter-btn text-[10px] font-black uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">Todos</button>
+                    </div>
+                </div>
+                <ul id="reviewsModList" class="divide-y divide-gray-100"></ul>
+            </section>
+        </div>
+
+        <!-- Aba Newsletter -->
+        <div id="tab-newsletter" class="hidden">
+            <section class="bg-white rounded-2xl p-6 lg:p-8 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-black uppercase text-lg">Inscritos na newsletter</h2>
+                    <div class="flex gap-3 items-center">
+                        <span id="newsletterCount" class="text-xs font-black uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">0</span>
+                        <button type="button" id="newsletterExportBtn" class="text-xs font-black uppercase tracking-widest bg-trueBlue text-white px-3 py-1 rounded-full hover:bg-retroBlue">Exportar CSV</button>
+                    </div>
+                </div>
+                <ul id="newsletterList" class="divide-y divide-gray-100 text-sm"></ul>
+            </section>
+        </div>
+
+        <!-- Aba Funcionalidades -->
+        <div id="tab-features" class="hidden max-w-4xl">
+            <section class="bg-white rounded-2xl p-6 lg:p-8 shadow-sm">
+                <h2 class="font-black uppercase text-lg mb-2">Funcionalidades do site</h2>
+                <p class="text-sm text-gray-500 mb-6">Ligue/desligue recursos sem precisar de deploy. Mudanças levam até 1 min para refletir (cache).</p>
+                <div id="featuresList" class="space-y-2"></div>
             </section>
         </div>
 
@@ -961,6 +1072,7 @@
                 document.getElementById('content').value = data.content || '';
                 document.getElementById('author').value = data.author || '';
                 document.getElementById('tags').value = data.tags || '';
+                document.getElementById('video_url').value = data.video_url || '';
                 document.getElementById('is_pinned').checked = !!data.is_pinned;
                 document.getElementById('is_sponsored').checked = !!data.is_sponsored;
 
@@ -1169,9 +1281,17 @@
                 document.getElementById('tab-coupons').classList.toggle('hidden', target !== 'coupons');
                 document.getElementById('tab-partnerships').classList.toggle('hidden', target !== 'partnerships');
                 document.getElementById('tab-settings').classList.toggle('hidden', target !== 'settings');
+                document.getElementById('tab-raffles').classList.toggle('hidden', target !== 'raffles');
+                document.getElementById('tab-moderation').classList.toggle('hidden', target !== 'moderation');
+                document.getElementById('tab-newsletter').classList.toggle('hidden', target !== 'newsletter');
+                document.getElementById('tab-features').classList.toggle('hidden', target !== 'features');
                 if (target === 'offers') loadOffers();
                 if (target === 'coupons') loadCoupons();
                 if (target === 'partnerships') loadPartnerships();
+                if (target === 'raffles') loadRaffles();
+                if (target === 'moderation') { loadCommentsMod(); loadReviewsMod(); }
+                if (target === 'newsletter') loadNewsletter();
+                if (target === 'features') loadFeaturesList();
                 if (target === 'settings') { loadBannerSettings(); loadAdsSettings(); }
             });
         });
@@ -1787,6 +1907,210 @@
         }
         window.closeStory = closeStory;
         window.generateStory = generateStory;
+
+        /* ============ Feature Flags ============ */
+        async function loadFeaturesList() {
+            const container = document.getElementById('featuresList');
+            container.innerHTML = '<p class="text-sm text-gray-500">Carregando…</p>';
+            try {
+                const res = await fetch('/admin/features');
+                const { data } = await res.json();
+                const byCat = {};
+                data.forEach(f => { (byCat[f.category] = byCat[f.category] || []).push(f); });
+                const catOrder = ['tier1','tier2','tier3','roadmap','general'];
+                const catLabels = { tier1: '🔥 Tier 1 — alto impacto', tier2: '📈 Tier 2 — diferencial', tier3: '✨ Tier 3 — nice-to-have', roadmap: '🛣 Roadmap', general: 'Outros' };
+                container.innerHTML = catOrder.filter(c => byCat[c]).map(c => `
+                    <div class="mb-6">
+                        <h3 class="text-xs font-black uppercase tracking-widest text-retroGrey mb-3">${catLabels[c] || c}</h3>
+                        <div class="space-y-2">
+                            ${byCat[c].map(f => `
+                                <div class="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl">
+                                    <div class="min-w-0 flex-1">
+                                        <p class="font-black text-sm">${escapeHtml(f.label)}</p>
+                                        <p class="text-xs text-gray-500 mt-0.5">${escapeHtml(f.description || '')}</p>
+                                        <code class="text-[10px] text-gray-400">${escapeHtml(f.key)}</code>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" data-feature-toggle="${escapeHtml(f.key)}" ${f.is_enabled ? 'checked' : ''} class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-trueBlue"></div>
+                                    </label>
+                                </div>`).join('')}
+                        </div>
+                    </div>`).join('');
+                container.querySelectorAll('[data-feature-toggle]').forEach(cb => {
+                    cb.addEventListener('change', async () => {
+                        await fetch(`/admin/features/${encodeURIComponent(cb.dataset.featureToggle)}/toggle`, { method: 'PATCH' });
+                    });
+                });
+            } catch {
+                container.innerHTML = '<p class="text-sm text-red-500">Erro ao carregar.</p>';
+            }
+        }
+
+        /* ============ Raffles CRUD ============ */
+        const raffleForm = document.getElementById('raffleForm');
+        const raffleResetBtn = document.getElementById('raffleResetBtn');
+        const raffleSubmitBtn = document.getElementById('raffleSubmitBtn');
+        const raffleFormMode = document.getElementById('raffleFormMode');
+        function resetRaffleForm() {
+            raffleForm.reset();
+            document.getElementById('raffle_id').value = '';
+            document.getElementById('raffle_position').value = '0';
+            document.getElementById('raffle_is_active').checked = true;
+            raffleFormMode.textContent = 'Novo raffle';
+            raffleSubmitBtn.textContent = 'Publicar raffle';
+            raffleResetBtn.classList.add('hidden');
+        }
+        raffleResetBtn.addEventListener('click', resetRaffleForm);
+
+        async function loadRaffles() {
+            try {
+                const res = await fetch('/admin/raffles');
+                const { data } = await res.json();
+                document.getElementById('raffleCount').textContent = `${data.length}`;
+                const tbody = document.getElementById('rafflesTableBody');
+                if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-sm text-gray-500">Nenhum raffle.</td></tr>'; return; }
+                tbody.innerHTML = data.map(r => `
+                    <tr>
+                        <td class="py-3 pr-4 text-sm font-black">${escapeHtml(r.title)}</td>
+                        <td class="py-3 pr-4 text-xs text-gray-500">${escapeHtml(r.source || '—')}</td>
+                        <td class="py-3 pr-4 text-xs">${r.ends_at ? new Date(r.ends_at).toLocaleString('pt-BR') : '—'}</td>
+                        <td class="py-3 pr-4"><button type="button" data-raffle-toggle="${r.id}" class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded ${r.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">${r.is_active ? 'Ativo' : 'Inativo'}</button></td>
+                        <td class="py-3 text-right whitespace-nowrap">
+                            <button type="button" data-raffle-edit="${r.id}" class="text-xs font-black text-trueBlue hover:underline mr-3">Editar</button>
+                            <button type="button" data-raffle-delete="${r.id}" class="text-xs font-black text-red-500 hover:underline">Excluir</button>
+                        </td>
+                    </tr>`).join('');
+            } catch { document.getElementById('rafflesTableBody').innerHTML = '<tr><td colspan="5" class="py-6 text-center text-sm text-red-500">Erro.</td></tr>'; }
+        }
+        document.getElementById('rafflesTableBody').addEventListener('click', async e => {
+            const edit = e.target.dataset.raffleEdit, del = e.target.dataset.raffleDelete, tog = e.target.dataset.raffleToggle;
+            if (edit) {
+                const r = await (await fetch(`/admin/raffles/${edit}`)).json();
+                const d = r.data;
+                document.getElementById('raffle_id').value = d.id;
+                document.getElementById('raffle_title').value = d.title || '';
+                document.getElementById('raffle_source').value = d.source || '';
+                document.getElementById('raffle_description').value = d.description || '';
+                document.getElementById('raffle_cta_label').value = d.cta_label || '';
+                document.getElementById('raffle_cta_url').value = d.cta_url || '';
+                document.getElementById('raffle_position').value = d.position ?? 0;
+                document.getElementById('raffle_is_active').checked = !!d.is_active;
+                document.getElementById('raffle_starts_at').value = d.starts_at ? new Date(d.starts_at).toISOString().slice(0,16) : '';
+                document.getElementById('raffle_ends_at').value = d.ends_at ? new Date(d.ends_at).toISOString().slice(0,16) : '';
+                raffleFormMode.textContent = `Editando #${d.id}`;
+                raffleSubmitBtn.textContent = 'Salvar';
+                raffleResetBtn.classList.remove('hidden');
+                raffleForm.scrollIntoView({ behavior: 'smooth' });
+            }
+            if (del) { if (!confirm('Excluir raffle?')) return; await fetch(`/admin/raffles/${del}`, { method: 'DELETE' }); loadRaffles(); }
+            if (tog) { await fetch(`/admin/raffles/${tog}/toggle`, { method: 'PATCH' }); loadRaffles(); }
+        });
+        raffleForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const id = document.getElementById('raffle_id').value;
+            const fd = new FormData();
+            ['title','source','description','cta_label','cta_url','starts_at','ends_at','position'].forEach(k => fd.append(k, document.getElementById(`raffle_${k}`).value));
+            fd.append('is_active', document.getElementById('raffle_is_active').checked ? 'true' : 'false');
+            const file = document.getElementById('raffle_image').files[0];
+            if (file) fd.append('image', file);
+            raffleSubmitBtn.disabled = true;
+            try {
+                const url = id ? `/admin/raffles/${id}` : '/admin/raffles';
+                const r = await fetch(url, { method: id ? 'PUT' : 'POST', body: fd });
+                if (!r.ok) throw new Error();
+                resetRaffleForm(); loadRaffles();
+            } catch { alert('Erro ao salvar'); }
+            finally { raffleSubmitBtn.disabled = false; }
+        });
+
+        /* ============ Moderation (comments + reviews) ============ */
+        let commentFilter = 'pending', reviewFilter = 'pending';
+        async function loadCommentsMod() {
+            const list = document.getElementById('commentsModList');
+            try {
+                const res = await fetch(`/admin/comments?status=${commentFilter}`);
+                const { data } = await res.json();
+                if (!data.length) { list.innerHTML = '<li class="py-4 text-sm text-gray-500 text-center">Nada.</li>'; return; }
+                list.innerHTML = data.map(c => `
+                    <li class="py-4">
+                        <div class="flex items-center justify-between mb-1">
+                            <div class="text-xs"><b>${escapeHtml(c.author_name)}</b> em <a href="/post/${escapeHtml(c.post_slug || '')}" target="_blank" class="text-trueBlue hover:underline">${escapeHtml(c.post_title || '—')}</a> · <span class="text-gray-400">${new Date(c.created_at).toLocaleString('pt-BR')}</span></div>
+                            <div class="flex gap-2">
+                                ${!c.is_approved ? `<button type="button" data-comment-approve="${c.id}" class="text-[10px] font-black uppercase tracking-widest bg-green-600 text-white px-2 py-1 rounded">Aprovar</button>` : '<span class="text-[10px] font-black uppercase tracking-widest bg-green-100 text-green-700 px-2 py-1 rounded">Aprovado</span>'}
+                                <button type="button" data-comment-delete="${c.id}" class="text-[10px] font-black uppercase tracking-widest bg-red-600 text-white px-2 py-1 rounded">Excluir</button>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-700 whitespace-pre-line">${escapeHtml(c.body)}</p>
+                    </li>`).join('');
+            } catch { list.innerHTML = '<li class="py-4 text-sm text-red-500 text-center">Erro.</li>'; }
+        }
+        document.querySelectorAll('.cfilter-btn').forEach(b => b.addEventListener('click', () => {
+            document.querySelectorAll('.cfilter-btn').forEach(x => { x.classList.remove('bg-retroGrey','text-white'); x.classList.add('bg-gray-100'); });
+            b.classList.remove('bg-gray-100'); b.classList.add('bg-retroGrey','text-white');
+            commentFilter = b.dataset.cfilter; loadCommentsMod();
+        }));
+        document.getElementById('commentsModList').addEventListener('click', async e => {
+            const ap = e.target.dataset.commentApprove, del = e.target.dataset.commentDelete;
+            if (ap) { await fetch(`/admin/comments/${ap}/approve`, { method: 'PATCH' }); loadCommentsMod(); }
+            if (del) { if (!confirm('Excluir?')) return; await fetch(`/admin/comments/${del}`, { method: 'DELETE' }); loadCommentsMod(); }
+        });
+
+        async function loadReviewsMod() {
+            const list = document.getElementById('reviewsModList');
+            try {
+                const res = await fetch(`/admin/reviews?status=${reviewFilter}`);
+                const { data } = await res.json();
+                if (!data.length) { list.innerHTML = '<li class="py-4 text-sm text-gray-500 text-center">Nada.</li>'; return; }
+                list.innerHTML = data.map(r => `
+                    <li class="py-4">
+                        <div class="flex items-center justify-between mb-1">
+                            <div class="text-xs"><b>${escapeHtml(r.author_name)}</b> · <span class="text-polem">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span> em <a href="/post/${escapeHtml(r.post_slug || '')}" target="_blank" class="text-trueBlue hover:underline">${escapeHtml(r.post_title || '—')}</a></div>
+                            <div class="flex gap-2">
+                                ${!r.is_approved ? `<button type="button" data-review-approve="${r.id}" class="text-[10px] font-black uppercase tracking-widest bg-green-600 text-white px-2 py-1 rounded">Aprovar</button>` : '<span class="text-[10px] font-black uppercase tracking-widest bg-green-100 text-green-700 px-2 py-1 rounded">Aprovado</span>'}
+                                <button type="button" data-review-delete="${r.id}" class="text-[10px] font-black uppercase tracking-widest bg-red-600 text-white px-2 py-1 rounded">Excluir</button>
+                            </div>
+                        </div>
+                        ${r.body ? `<p class="text-sm text-gray-700 whitespace-pre-line">${escapeHtml(r.body)}</p>` : ''}
+                    </li>`).join('');
+            } catch { list.innerHTML = '<li class="py-4 text-sm text-red-500 text-center">Erro.</li>'; }
+        }
+        document.querySelectorAll('.rfilter-btn').forEach(b => b.addEventListener('click', () => {
+            document.querySelectorAll('.rfilter-btn').forEach(x => { x.classList.remove('bg-retroGrey','text-white'); x.classList.add('bg-gray-100'); });
+            b.classList.remove('bg-gray-100'); b.classList.add('bg-retroGrey','text-white');
+            reviewFilter = b.dataset.rfilter; loadReviewsMod();
+        }));
+        document.getElementById('reviewsModList').addEventListener('click', async e => {
+            const ap = e.target.dataset.reviewApprove, del = e.target.dataset.reviewDelete;
+            if (ap) { await fetch(`/admin/reviews/${ap}/approve`, { method: 'PATCH' }); loadReviewsMod(); }
+            if (del) { if (!confirm('Excluir?')) return; await fetch(`/admin/reviews/${del}`, { method: 'DELETE' }); loadReviewsMod(); }
+        });
+
+        /* ============ Newsletter ============ */
+        let newsletterCache = [];
+        async function loadNewsletter() {
+            try {
+                const res = await fetch('/admin/newsletter');
+                const { data, total } = await res.json();
+                newsletterCache = data;
+                document.getElementById('newsletterCount').textContent = `${total} inscritos`;
+                const list = document.getElementById('newsletterList');
+                if (!data.length) { list.innerHTML = '<li class="py-4 text-center text-gray-500">Nenhum inscrito ainda.</li>'; return; }
+                list.innerHTML = data.map(s => `
+                    <li class="flex items-center justify-between py-2">
+                        <span class="font-mono text-sm">${escapeHtml(s.email)}</span>
+                        <span class="text-xs text-gray-400">${new Date(s.created_at).toLocaleDateString('pt-BR')}</span>
+                    </li>`).join('');
+            } catch {}
+        }
+        document.getElementById('newsletterExportBtn').addEventListener('click', () => {
+            const csv = 'email,created_at\n' + newsletterCache.map(s => `${s.email},${s.created_at}`).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `newsletter-${Date.now()}.csv`;
+            a.click();
+        });
     </script>
 </body>
 </html>

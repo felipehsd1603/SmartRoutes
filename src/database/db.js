@@ -153,6 +153,65 @@ async function initializePostgres() {
             published_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         )`);
 
+        await client.query(`CREATE TABLE IF NOT EXISTS features (
+            key TEXT PRIMARY KEY,
+            label TEXT NOT NULL,
+            description TEXT,
+            category TEXT DEFAULT 'general',
+            is_enabled INTEGER DEFAULT 0,
+            position INTEGER DEFAULT 0
+        )`);
+
+        await client.query(`CREATE TABLE IF NOT EXISTS raffles (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT,
+            image_url TEXT,
+            source TEXT,
+            cta_label TEXT,
+            cta_url TEXT,
+            starts_at TIMESTAMPTZ,
+            ends_at TIMESTAMPTZ,
+            position INTEGER DEFAULT 0,
+            is_active INTEGER DEFAULT 1,
+            published_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        await client.query(`CREATE TABLE IF NOT EXISTS post_restocks (
+            id SERIAL PRIMARY KEY,
+            post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+            store_name TEXT,
+            restocked_at TIMESTAMPTZ NOT NULL,
+            price_cents INTEGER,
+            url TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        await client.query(`CREATE TABLE IF NOT EXISTS comments (
+            id SERIAL PRIMARY KEY,
+            post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+            author_name TEXT NOT NULL,
+            body TEXT NOT NULL,
+            is_approved INTEGER DEFAULT 0,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        await client.query(`CREATE TABLE IF NOT EXISTS reviews (
+            id SERIAL PRIMARY KEY,
+            post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+            author_name TEXT NOT NULL,
+            rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+            body TEXT,
+            is_approved INTEGER DEFAULT 0,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        await client.query(`CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
+            id SERIAL PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`);
+
         await client.query(`CREATE TABLE IF NOT EXISTS settings (
             key TEXT PRIMARY KEY,
             value TEXT NOT NULL
@@ -210,6 +269,36 @@ async function initializePostgres() {
         await client.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS hero_color TEXT");
         await client.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS cover_image_url TEXT");
         await client.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP");
+
+        // Migration: video embed + price alerts
+        await client.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS video_url TEXT");
+        await client.query("ALTER TABLE notify_subscriptions ADD COLUMN IF NOT EXISTS price_target_cents INTEGER");
+
+        // Seed feature flags (nasce tudo desligado — admin liga depois)
+        const flagsSeed = [
+            ['countdown_cards', 'Countdown ao vivo nos cards', 'Badge "07d 12h" nos próximos lançamentos da home.', 'tier1', 10],
+            ['price_alert', 'Alerta de preço', 'Visitante pede para ser avisado se preço cair abaixo de X.', 'tier1', 20],
+            ['seo_rich_products', 'Rich snippets (schema.org)', 'JSON-LD Product nas páginas de post para Google.', 'tier1', 30],
+            ['brand_pages', 'Páginas de marca', 'Hub /brand/:slug agrupando posts por marca.', 'tier1', 40],
+            ['just_dropped', 'Widget "Acabou de cair"', 'Toast flutuante com último post publicado.', 'tier1', 50],
+            ['raffles', 'Sorteios / raffles', 'Seção dedicada + CRUD admin.', 'tier2', 60],
+            ['restock_history', 'Histórico de restock', 'Mostra restocks anteriores na página do post.', 'tier2', 70],
+            ['price_compare', 'Comparador de preço entre lojas', 'Ordena lojas por preço e destaca menor.', 'tier2', 80],
+            ['comments', 'Comentários moderados', 'Comentários na página do post com moderação.', 'tier2', 90],
+            ['reviews', 'Avaliações 1-5 estrelas', 'Reviews com rating agregado em JSON-LD.', 'tier2', 100],
+            ['dark_mode', 'Modo escuro', 'Toggle na header + preferência no localStorage.', 'tier3', 110],
+            ['email_newsletter', 'Newsletter por e-mail', 'Captura de e-mail no CTA final.', 'tier3', 120],
+            ['post_video', 'Vídeo no post', 'Campo video_url embed YouTube.', 'tier3', 130],
+            ['vs_compare', 'Comparador de modelos', 'Página /vs/:a/:b com specs/preços lado a lado.', 'tier3', 140],
+            ['user_wishlist', 'Wishlist com login (roadmap)', 'Requer contas de usuário. Deixado para fase futura.', 'roadmap', 150]
+        ];
+        for (const [key, label, description, category, position] of flagsSeed) {
+            await client.query(
+                `INSERT INTO features (key, label, description, category, is_enabled, position)
+                 VALUES ($1, $2, $3, $4, 0, $5) ON CONFLICT (key) DO NOTHING`,
+                [key, label, description, category, position]
+            );
+        }
 
         const offersCount = await client.query("SELECT COUNT(*) FROM offers");
         if (parseInt(offersCount.rows[0].count) === 0) {

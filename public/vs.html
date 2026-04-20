@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparador — SDM Links</title>
+<link rel="stylesheet" href="/a11y.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;700;800;900&family=Archivo+Black&display=swap" rel="stylesheet">
+<script>tailwind.config={theme:{extend:{colors:{trueBlue:'#0065FC',polem:'#EDE6B6',retroGrey:'#1a1a1a',offWhite:'#f5f5f2'},fontFamily:{sans:['Archivo','sans-serif'],display:['"Archivo Black"','sans-serif']}}}}</script>
+<style>body{font-family:Archivo,sans-serif;background:#f5f5f2;color:#1a1a1a}</style>
+</head>
+<body>
+<header class="bg-retroGrey text-white py-4"><div class="max-w-[1400px] mx-auto px-4 lg:px-8 flex items-center justify-between"><a href="/" class="font-display text-2xl uppercase tracking-tight">SDM Links</a><a href="/" class="text-sm font-black uppercase tracking-widest hover:text-polem">← Voltar</a></div></header>
+
+<section class="bg-trueBlue text-white py-12">
+  <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+    <span class="inline-block bg-polem text-retroGrey text-xs font-black uppercase tracking-widest px-3 py-1 mb-4">Comparador</span>
+    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display uppercase tracking-tighter leading-[0.85]">Qual leva?</h1>
+  </div>
+</section>
+
+<section class="py-12 lg:py-16">
+  <div id="vsRoot" class="max-w-[1400px] mx-auto px-4 lg:px-8">
+    <p class="text-gray-500 text-center py-12">Carregando…</p>
+  </div>
+</section>
+
+<script>
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = c => c != null ? (c/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : '—';
+async function getPost(slug){
+  try { const r = await fetch(`/api/posts/${encodeURIComponent(slug)}`); if (!r.ok) return null; const { data } = await r.json(); return data; } catch { return null; }
+}
+async function load(){
+  const parts = location.pathname.split('/').filter(Boolean); // ['vs','a','b']
+  const [a, b] = [parts[1], parts[2]];
+  const [pa, pb] = await Promise.all([getPost(a), getPost(b)]);
+  const root = document.getElementById('vsRoot');
+  if (!pa || !pb) { root.innerHTML = '<p class="text-center text-red-500 py-12">Um dos modelos não foi encontrado.</p>'; return; }
+  document.title = `${pa.title} vs ${pb.title} — SDM Links`;
+  const card = p => `
+    <div class="bg-white rounded-3xl overflow-hidden shadow-sm">
+      <div class="aspect-square bg-gray-100">
+        ${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.title)}" class="w-full h-full object-cover">` : ''}
+      </div>
+      <div class="p-6">
+        <p class="text-xs font-black uppercase tracking-widest text-trueBlue mb-1">${esc(p.brand || '')}</p>
+        <h2 class="font-black text-2xl uppercase leading-tight mb-4">${esc(p.title)}</h2>
+        <dl class="text-sm space-y-2">
+          <div class="flex justify-between border-b py-2"><dt class="text-gray-500 uppercase text-xs tracking-widest">Modelo</dt><dd class="font-black">${esc(p.model || '—')}</dd></div>
+          <div class="flex justify-between border-b py-2"><dt class="text-gray-500 uppercase text-xs tracking-widest">Colorway</dt><dd class="font-black">${esc(p.color || '—')}</dd></div>
+          <div class="flex justify-between border-b py-2"><dt class="text-gray-500 uppercase text-xs tracking-widest">SKU</dt><dd class="font-black">${esc(p.sku || '—')}</dd></div>
+          <div class="flex justify-between border-b py-2"><dt class="text-gray-500 uppercase text-xs tracking-widest">Preço</dt><dd class="font-black text-trueBlue">${money(p.price_cents)}</dd></div>
+          <div class="flex justify-between border-b py-2"><dt class="text-gray-500 uppercase text-xs tracking-widest">Tabela</dt><dd class="font-black text-gray-400 line-through">${money(p.retail_price_cents)}</dd></div>
+          <div class="flex justify-between py-2"><dt class="text-gray-500 uppercase text-xs tracking-widest">Release</dt><dd class="font-black">${p.release_date ? new Date(p.release_date).toLocaleDateString('pt-BR') : '—'}</dd></div>
+        </dl>
+        <a href="/post/${esc(p.slug)}" class="block mt-6 w-full text-center bg-trueBlue text-white font-black uppercase tracking-widest text-sm py-3 rounded-full hover:bg-retroBlue">Ver detalhes</a>
+      </div>
+    </div>`;
+  root.innerHTML = `<div class="grid md:grid-cols-2 gap-6 lg:gap-10">${card(pa)}${card(pb)}</div>`;
+}
+load();
+</script>
+</body>
+</html>
