@@ -4,34 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — SDM Links Admin</title>
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Archivo', 'sans-serif'],
-                        display: ['"Archivo Black"', 'Archivo', 'sans-serif'],
-                        serif: ['"Libre Caslon Display"', 'serif']
-                    },
-                    colors: {
-                        retroBlue: '#003F9E',
-                        trueBlue: '#0065FC',
-                        uncBlue: '#00AAFF',
-                        starfish: '#FF6600',
-                        polem: '#FFC600',
-                        infrared: '#FF002A',
-                        darkMocha: '#4C3A30',
-                        retroGrey: '#2E2E2E',
-                        offWhite: '#FFFFFF'
+        window.tailwind = {
+            config: {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Archivo', 'sans-serif'],
+                            display: ['"Archivo Black"', 'Archivo', 'sans-serif'],
+                            serif: ['"Libre Caslon Display"', 'serif']
+                        },
+                        colors: {
+                            retroBlue: '#003F9E',
+                            trueBlue: '#0065FC',
+                            uncBlue: '#00AAFF',
+                            starfish: '#FF6600',
+                            polem: '#FFC600',
+                            infrared: '#FF002A',
+                            darkMocha: '#4C3A30',
+                            retroGrey: '#2E2E2E',
+                            offWhite: '#FFFFFF'
+                        }
                     }
                 }
             }
         }
     </script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
     <style>
         .sr-only {
             position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;

@@ -51,48 +51,49 @@
             }
         ]
     }
-    <!-- Configuração do App (PWA) -->
+    </script>
+
+    <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(reg => {
-                    console.log('App SDM Links registrado!');
-                }).catch(err => {
-                    console.log('Erro ao registrar App:', err);
-                });
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
             });
         }
     </script>
 
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
+    <!-- Tailwind v4: config DEVE vir antes do CDN -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Archivo', 'sans-serif'],
-                        display: ['"Archivo Black"', 'Archivo', 'sans-serif'],
-                        serif: ['"Libre Caslon Display"', 'serif']
-                    },
-                    colors: {
-                        retroBlue: '#003F9E',
-                        trueBlue: '#0065FC',
-                        uncBlue: '#00AAFF',
-                        starfish: '#FF6600',
-                        polem: '#FFC600',
-                        infrared: '#FF002A',
-                        darkMocha: '#4C3A30',
-                        retroGrey: '#2E2E2E',
-                        offWhite: '#FFFFFF'
+        window.tailwind = {
+            config: {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Archivo', 'sans-serif'],
+                            display: ['"Archivo Black"', 'Archivo', 'sans-serif'],
+                            serif: ['"Libre Caslon Display"', 'serif']
+                        },
+                        colors: {
+                            retroBlue: '#003F9E',
+                            trueBlue: '#0065FC',
+                            uncBlue: '#00AAFF',
+                            starfish: '#FF6600',
+                            polem: '#FFC600',
+                            infrared: '#FF002A',
+                            darkMocha: '#4C3A30',
+                            retroGrey: '#2E2E2E',
+                            offWhite: '#FFFFFF'
+                        }
                     }
                 }
             }
         }
     </script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
     <style>
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
