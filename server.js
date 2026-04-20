@@ -19,7 +19,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        secure: process.env.NODE_ENV === 'production',
+        secure: false, // Desativado para garantir compatibilidade total no Render
         maxAge: 1000 * 60 * 60 * 24 // 24 horas
     }
 }));
