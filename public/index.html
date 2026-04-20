@@ -245,43 +245,10 @@
             </div>
 
             <!-- News Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
 
-                <!-- News 1 -->
-                <div class="group cursor-pointer">
-                    <div class="relative overflow-hidden mb-4 h-64 bg-gray-100">
-                        <img src="https://studiosol-a.akamaihd.net/uploadfile/letras/fotos/b/c/7/d/bc7d8c6b6d510d9af905b682664989e2.jpg" alt="Manoel Gomes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold uppercase tracking-widest text-gray-500">--.--.--</span>
-                        <div class="font-oswald font-bold text-lg text-red-600">92.50°</div>
-                    </div>
-                    <h3 class="font-oswald text-2xl font-bold uppercase leading-tight group-hover:text-gray-600 transition-colors">Manoel Gomes lança novos sapatos da Caneta Azul para 2026</h3>
-                </div>
-
-                <!-- News 2 -->
-                <div class="group cursor-pointer">
-                    <div class="relative overflow-hidden mb-4 h-64 bg-gray-100">
-                        <img src="https://studiosol-a.akamaihd.net/uploadfile/letras/fotos/b/c/7/d/bc7d8c6b6d510d9af905b682664989e2.jpg" alt="Manoel Gomes" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold uppercase tracking-widest text-gray-500">--.--.--</span>
-                        <div class="font-oswald font-bold text-lg text-red-600">87.20°</div>
-                    </div>
-                    <h3 class="font-oswald text-2xl font-bold uppercase leading-tight group-hover:text-gray-600 transition-colors">Novo Hit: "Caneta Azul" Manoel Gomes Joins 35th Anniversary</h3>
-                </div>
-
-                <!-- News 3 -->
-                <div class="group cursor-pointer">
-                    <div class="relative overflow-hidden mb-4 h-64 bg-gray-100">
-                        <img src="https://studiosol-a.akamaihd.net/uploadfile/letras/fotos/b/c/7/d/bc7d8c6b6d510d9af905b682664989e2.jpg" alt="Manoel Gomes Caneta Azul" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                    </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Dropped</span>
-                        <div class="font-oswald font-bold text-lg text-red-600">80.70°</div>
-                    </div>
-                    <h3 class="font-oswald text-2xl font-bold uppercase leading-tight group-hover:text-gray-600 transition-colors">Where to Buy: Manoel Gomes 11 Low "Lá ele"</h3>
-                </div>
+            <!-- News Grid -->
+            <div id="dynamicNewsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                <!-- Posts will be loaded here dynamically via JS -->
             </div>
 
             <div class="mt-12 text-center">
@@ -392,5 +359,45 @@
         }
     });
 </script>
+
+    <!-- Dynamic Fetch Script -->
+    <script>
+        async function fetchPosts() {
+            try {
+                const res = await fetch('/api/posts');
+                const data = await res.json();
+                const grid = document.getElementById('dynamicNewsGrid');
+                grid.innerHTML = '';
+
+                if(data.data && data.data.length > 0) {
+                    data.data.forEach(post => {
+                        const date = new Date(post.published_at).toLocaleDateString();
+                        const html = `
+                            <div class="group cursor-pointer">
+                                <div class="relative overflow-hidden mb-4 h-64 bg-gray-100">
+                                    <img src="${post.image_url}" alt="${post.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                </div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold uppercase tracking-widest text-gray-500">${date} - ${post.category}</span>
+                                    <div class="font-oswald font-bold text-lg text-red-600">NEW</div>
+                                </div>
+                                <h3 class="font-oswald text-2xl font-bold uppercase leading-tight group-hover:text-gray-600 transition-colors">${post.title}</h3>
+                            </div>
+                        `;
+                        grid.innerHTML += html;
+                    });
+                } else {
+                    grid.innerHTML = '<p class="col-span-full text-center text-gray-500">No posts available yet.</p>';
+                }
+            } catch (err) {
+                console.error("Failed to fetch posts:", err);
+            }
+        }
+
+        // Call it immediately after DOM is parsed
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPosts();
+        });
+    </script>
 </body>
 </html>
