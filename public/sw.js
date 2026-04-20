@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdm-links-v6';
+const CACHE_NAME = 'sdm-links-v7';
 const STATIC_ASSETS = [
   '/manifest.json',
   '/logo.png',

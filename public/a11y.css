@@ -1,0 +1,94 @@
+/* SDM Links — Accessibility base styles (load on every page) */
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    html { scroll-behavior: auto !important; }
+}
+
+/* Focus visible — consistent ring across the site (sobrescreve Tailwind) */
+:focus-visible {
+    outline: 3px solid #0065FC !important;
+    outline-offset: 3px !important;
+    border-radius: 4px;
+}
+/* Em fundos escuros usa amarelo para contraste */
+.bg-retroGrey :focus-visible,
+.bg-retroBlue :focus-visible,
+.bg-trueBlue  :focus-visible {
+    outline-color: #FFC600 !important;
+}
+
+/* Screen-reader-only (padrão consistente) */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+.sr-only.focus\:not-sr-only:focus,
+.not-sr-only-on-focus:focus {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: inherit !important;
+    margin: inherit !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+}
+
+/* Skip link universal */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 1rem;
+    z-index: 9999;
+    background: #0065FC;
+    color: #fff;
+    padding: .75rem 1.25rem;
+    border-radius: .5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    font-size: .875rem;
+    transition: top .2s;
+}
+.skip-link:focus {
+    top: 1rem;
+}
+
+/* Aumenta alvo de toque em mobile (mínimo 44x44 WCAG) */
+@media (pointer: coarse) {
+    button, a[role="button"], input[type="checkbox"], input[type="radio"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* Modal scroll lock + inert background */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Contraste mínimo: garante texto legível em cores de baixa opacidade */
+.text-retroGrey\/40 { color: rgba(46, 46, 46, 0.65) !important; } /* era .40 — AA ruim em branco */
+.text-retroGrey\/50 { color: rgba(46, 46, 46, 0.7) !important; }
+.text-white\/40 { color: rgba(255, 255, 255, 0.7) !important; }
+
+/* High-contrast mode (sistema operacional) */
+@media (forced-colors: active) {
+    button, a {
+        forced-color-adjust: none;
+    }
+}

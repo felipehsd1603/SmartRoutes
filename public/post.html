@@ -8,6 +8,9 @@
     <script src="/clarity.js" async></script>
     <!-- AdSense loader (consent-gated) -->
     <script src="/ads.js" defer></script>
+    <!-- Accessibility base -->
+    <link rel="stylesheet" href="/a11y.css">
+    <script src="/a11y.js" defer></script>
     <meta name="description" content="__OG_DESC__">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="SDM Links">
@@ -125,8 +128,8 @@
     <main id="main" tabindex="-1">
 
         <!-- COVER editorial (atleta / celebridade / lifestyle) — só renderiza se cover_image_url -->
-        <section id="coverSection" class="hidden relative overflow-hidden bg-retroGrey">
-            <div id="coverBg" class="min-h-[45vh] md:min-h-[65vh] bg-cover bg-no-repeat"></div>
+        <section id="coverSection" class="hidden relative overflow-hidden bg-retroGrey" role="img" aria-label="Imagem de capa do post">
+            <div id="coverBg" class="min-h-[45vh] md:min-h-[65vh] bg-cover bg-no-repeat" aria-hidden="true"></div>
         </section>
 
         <!-- HERO: Imagem + Título + Ficha técnica -->
@@ -405,6 +408,7 @@
             t.classList.add('show');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => t.classList.remove('show'), dur);
+            window.a11y?.announce(msg, 'polite'); // também anuncia via sr-only live region
         }
         const money = cents => cents == null ? null : `R$ ${(cents/100).toFixed(2).replace('.',',')}`;
         const dateBR = iso => iso ? new Date(iso.replace(' ','T')).toLocaleDateString('pt-BR') : '—';
@@ -524,11 +528,11 @@
                     const portrait = probe.naturalHeight > probe.naturalWidth;
                     coverBg.style.backgroundImage = `url("${p.cover_image_url}")`;
                     coverBg.style.backgroundPosition = portrait ? 'center 15%' : 'center center';
-                    // Em portrait, contain evita perder corpo do atleta; com hero_color de fundo fica editorial
                     if (portrait) {
                         coverBg.style.backgroundSize = 'contain';
                         if (p.hero_color) coverSec.style.backgroundColor = p.hero_color;
                     }
+                    coverSec.setAttribute('aria-label', `Capa editorial: ${p.brand || ''} ${p.model || p.title}`.trim());
                     coverSec.classList.remove('hidden');
                 };
                 probe.onerror = () => console.warn('Cover não carregou:', p.cover_image_url);
@@ -687,16 +691,13 @@
             }
 
             ov.classList.add('show');
-            ov.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
-            document.getElementById('buyClose').focus();
+            window.a11y?.openModal(ov, document.getElementById('buyClose'));
         }
 
         function closeBuy() {
             const ov = document.getElementById('buyOverlay');
             ov.classList.remove('show');
-            ov.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
+            window.a11y?.closeModal(ov);
         }
 
         /* ---- CTA mode: "Me avise" vs "Ver onde comprar" ---- */
@@ -740,16 +741,13 @@
             document.getElementById('notifyEmailInput').value = '';
 
             ov.classList.add('show');
-            ov.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
-            document.getElementById('notifyClose').focus();
+            window.a11y?.openModal(ov, document.getElementById('notifyClose'));
         }
 
         function closeNotify() {
             const ov = document.getElementById('notifyOverlay');
             ov.classList.remove('show');
-            ov.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
+            window.a11y?.closeModal(ov);
         }
 
         function openCTA() {
