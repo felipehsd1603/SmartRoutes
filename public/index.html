@@ -49,6 +49,18 @@
             }
         ]
     }
+    <!-- Configuração do App (PWA) -->
+    <link rel="manifest" href="/manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('App SDM Links registrado!');
+                }).catch(err => {
+                    console.log('Erro ao registrar App:', err);
+                });
+            });
+        }
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
