@@ -9,3 +9,7 @@ public/uploads/*
 *.webm
 *.mkv
 *.zip
+
+# Dev-only artifacts
+frames/
+extract_frames.py
