@@ -153,6 +153,18 @@ async function initializePostgres() {
             created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         )`);
 
+        await client.query(`CREATE TABLE IF NOT EXISTS notify_subscriptions (
+            id SERIAL PRIMARY KEY,
+            post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+            channel TEXT NOT NULL,
+            endpoint TEXT NOT NULL,
+            p256dh TEXT,
+            auth TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(post_id, channel, endpoint)
+        )`);
+        await client.query("CREATE INDEX IF NOT EXISTS idx_notify_post ON notify_subscriptions(post_id)");
+
         const stores = await client.query("SELECT COUNT(*) FROM stores");
         if (parseInt(stores.rows[0].count) === 0) {
             const defaults = ['StockX', 'Kicks Crew', 'Ebay', 'Supreme', 'Aftermarket', 'Nike', 'Adidas', 'New Balance', 'Farfetch', 'Artwalk'];

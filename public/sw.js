@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdm-links-v4';
+const CACHE_NAME = 'sdm-links-v5';
 const STATIC_ASSETS = [
   '/manifest.json',
   '/logo.png',
@@ -55,16 +55,32 @@ self.addEventListener('fetch', (event) => {
 });
 
 self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : { title: 'Drop Novo!', body: 'Confira os últimos tênis no SDM Links.' };
+  let data = { title: 'SDM Links', body: 'Novo drop disponível', url: '/' };
+  if (event.data) {
+    try { data = { ...data, ...event.data.json() }; }
+    catch { data.body = event.data.text() || data.body; }
+  }
   event.waitUntil(self.registration.showNotification(data.title, {
     body: data.body,
-    icon: '/icon-192.png',
+    icon: data.icon || '/icon-192.png',
     badge: '/icon-192.png',
+    image: data.image || undefined,
+    tag: data.tag || 'sdm-drop',
+    renotify: true,
+    vibrate: [100, 50, 100],
     data: { url: data.url || '/' }
   }));
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  event.waitUntil(clients.openWindow(event.notification.data.url));
+  const targetUrl = event.notification.data?.url || '/';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      for (const client of windowClients) {
+        if (client.url.includes(targetUrl) && 'focus' in client) return client.focus();
+      }
+      return clients.openWindow(targetUrl);
+    })
+  );
 });

@@ -1,6 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
+const webpush = require('web-push');
+
+// Web Push (VAPID) — opcional, só ativa se as envs estiverem setadas
+const VAPID_PUBLIC = process.env.VAPID_PUBLIC_KEY || '';
+const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY || '';
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@sdmlinks.com.br';
+if (VAPID_PUBLIC && VAPID_PRIVATE) {
+    webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC, VAPID_PRIVATE);
+}
 
 // Rate limiter simples para /track
 const trackRateMap = new Map();
@@ -12,6 +21,20 @@ function checkTrackRate(ip) {
         return true;
     }
     if (entry.count >= 60) return false;
+    entry.count++;
+    return true;
+}
+
+// Rate limiter para /notify-subscribe (10 req/min/IP)
+const notifyRateMap = new Map();
+function checkNotifyRate(ip) {
+    const now = Date.now();
+    const entry = notifyRateMap.get(ip);
+    if (!entry || now > entry.resetAt) {
+        notifyRateMap.set(ip, { count: 1, resetAt: now + 60000 });
+        return true;
+    }
+    if (entry.count >= 10) return false;
     entry.count++;
     return true;
 }
@@ -219,6 +242,70 @@ router.post('/track', express.text({ type: '*/*', limit: '2kb' }), async (req, r
         );
     } catch {}
     res.status(204).end();
+});
+
+// Chave pública VAPID para o frontend usar no pushManager.subscribe
+router.get('/vapid-public-key', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.type('text/plain').send(VAPID_PUBLIC);
+});
+
+// Contador de "me avise" por post (prova social)
+router.get('/posts/:slug/notify-count', async (req, res) => {
+    try {
+        const postResult = await db.query("SELECT id FROM posts WHERE slug = $1", [req.params.slug]);
+        if (!postResult.rows[0]) return res.json({ data: { count: 0 } });
+        const result = await db.query(
+            "SELECT COUNT(*) AS count FROM notify_subscriptions WHERE post_id = $1",
+            [postResult.rows[0].id]
+        );
+        res.set('Cache-Control', 'public, max-age=30');
+        res.json({ data: { count: parseInt(result.rows[0].count) } });
+    } catch (err) {
+        res.json({ data: { count: 0 } });
+    }
+});
+
+// Cadastro de "me avise quando lançar"
+router.post('/notify-subscribe', async (req, res) => {
+    const ip = req.ip || req.socket?.remoteAddress || '';
+    if (!checkNotifyRate(ip)) return res.status(429).json({ error: 'Muitas requisições, tente mais tarde' });
+
+    try {
+        const { slug, channel, subscription, email } = req.body || {};
+        if (!slug || !channel) return res.status(400).json({ error: 'slug e channel obrigatórios' });
+        if (!['push', 'email'].includes(channel)) return res.status(400).json({ error: 'channel inválido' });
+
+        const postResult = await db.query("SELECT id FROM posts WHERE slug = $1", [slug]);
+        if (!postResult.rows[0]) return res.status(404).json({ error: 'Post não encontrado' });
+        const postId = postResult.rows[0].id;
+
+        let endpoint, p256dh = null, auth = null;
+        if (channel === 'push') {
+            if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) {
+                return res.status(400).json({ error: 'subscription inválida' });
+            }
+            endpoint = String(subscription.endpoint).slice(0, 512);
+            p256dh = String(subscription.keys.p256dh).slice(0, 256);
+            auth = String(subscription.keys.auth).slice(0, 64);
+        } else {
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                return res.status(400).json({ error: 'email inválido' });
+            }
+            endpoint = String(email).toLowerCase().slice(0, 256);
+        }
+
+        await db.query(
+            `INSERT INTO notify_subscriptions (post_id, channel, endpoint, p256dh, auth)
+             VALUES ($1, $2, $3, $4, $5)
+             ON CONFLICT (post_id, channel, endpoint) DO NOTHING`,
+            [postId, channel, endpoint, p256dh, auth]
+        );
+
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 module.exports = router;

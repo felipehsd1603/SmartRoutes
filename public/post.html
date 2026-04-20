@@ -286,6 +286,73 @@
         </section>
     </main>
 
+    <!-- =================== POP-UP "Me Avise" =================== -->
+    <div id="notifyOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="notifyTitle" aria-hidden="true">
+        <div class="overlay-panel" role="document">
+            <div class="flex items-start justify-between p-6 lg:p-8 border-b border-retroGrey/10">
+                <div>
+                    <p class="font-mono text-[10px] uppercase tracking-widest text-trueBlue mb-1">Aviso de lançamento</p>
+                    <h2 id="notifyTitle" class="font-display text-2xl lg:text-3xl tracking-tight">—</h2>
+                    <p class="text-retroGrey/60 text-sm mt-2">Te avisamos <strong>24h antes</strong> e <strong>na hora do drop</strong>. Sem spam.</p>
+                </div>
+                <button type="button" id="notifyClose" aria-label="Fechar"
+                    class="w-10 h-10 rounded-full bg-retroGrey/10 text-retroGrey font-black text-xl hover:bg-infrared hover:text-white transition-colors flex items-center justify-center">×</button>
+            </div>
+
+            <div class="p-6 lg:p-8 space-y-3">
+                <!-- Opção 1: Push notification -->
+                <button type="button" id="notifyPushBtn"
+                    class="w-full flex items-center gap-4 p-4 bg-retroGrey/3 rounded-xl border border-retroGrey/8 hover:border-trueBlue/50 hover:bg-trueBlue/5 transition-colors text-left">
+                    <div class="w-12 h-12 rounded-full bg-trueBlue/10 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-trueBlue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-retroGrey">Notificação no navegador</p>
+                        <p class="text-[12px] text-retroGrey/60 mt-0.5">Recomendado · chega na hora exata do drop</p>
+                    </div>
+                    <svg class="w-4 h-4 text-retroGrey/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </button>
+
+                <!-- Opção 2: Email -->
+                <div id="notifyEmailBlock" class="bg-retroGrey/3 rounded-xl border border-retroGrey/8 overflow-hidden">
+                    <button type="button" id="notifyEmailBtn"
+                        class="w-full flex items-center gap-4 p-4 hover:bg-trueBlue/5 transition-colors text-left">
+                        <div class="w-12 h-12 rounded-full bg-retroGrey/10 flex items-center justify-center shrink-0">
+                            <svg class="w-6 h-6 text-retroGrey" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-bold text-retroGrey">Receber por email</p>
+                            <p class="text-[12px] text-retroGrey/60 mt-0.5">Avisamos 24h e 1h antes</p>
+                        </div>
+                        <svg class="w-4 h-4 text-retroGrey/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                    <form id="notifyEmailForm" class="hidden flex gap-2 p-4 pt-0">
+                        <input type="email" id="notifyEmailInput" placeholder="seu@email.com" required
+                            class="flex-1 px-4 py-2.5 border-2 border-retroGrey/15 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                        <button type="submit" class="bg-trueBlue text-white text-[11px] font-black uppercase tracking-widest px-5 rounded-lg hover:bg-retroBlue transition-colors">OK</button>
+                    </form>
+                </div>
+
+                <!-- Opção 3: Telegram -->
+                <a href="https://t.me/s/sneakersdomionlinks" target="_blank" rel="noopener" data-track="notify-telegram"
+                    class="flex items-center gap-4 p-4 bg-retroGrey/3 rounded-xl border border-retroGrey/8 hover:border-trueBlue/50 hover:bg-trueBlue/5 transition-colors">
+                    <div class="w-12 h-12 rounded-full bg-[#229ED9]/10 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-[#229ED9]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-retroGrey">Entrar no Telegram</p>
+                        <p class="text-[12px] text-retroGrey/60 mt-0.5">265K membros · drops em tempo real</p>
+                    </div>
+                    <svg class="w-4 h-4 text-retroGrey/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>
+
+                <p class="text-[11px] font-mono uppercase tracking-wider text-retroGrey/40 text-center pt-2">
+                    <span id="notifyCount">0</span> pessoas já se cadastraram nesse drop
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- =================== POP-UP "Onde Comprar" =================== -->
     <div id="buyOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="buyTitle" aria-hidden="true">
         <div class="overlay-panel" role="document">
@@ -341,6 +408,46 @@
 
         let current = null;
         let cdInterval = null;
+        let isPreRelease = false;
+
+        /* ---- Helpers: Push subscription ---- */
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const raw = atob(base64);
+            return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+        }
+
+        async function subscribeToPush() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                throw new Error('Seu navegador não suporta notificações push');
+            }
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') throw new Error('Permissão negada');
+
+            const reg = await navigator.serviceWorker.ready;
+            const keyRes = await fetch('/api/vapid-public-key');
+            const vapidKey = (await keyRes.text()).trim();
+            if (!vapidKey) throw new Error('Servidor sem VAPID configurado');
+
+            const sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(vapidKey)
+            });
+            return sub.toJSON();
+        }
+
+        async function notifySubscribe(payload) {
+            const res = await fetch('/api/notify-subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ slug, ...payload })
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ error: 'erro' }));
+                throw new Error(err.error || 'Falha ao cadastrar');
+            }
+        }
 
         /* ---- Countdown ---- */
         function startCountdown(dateStr) {
@@ -414,6 +521,9 @@
             const ctaSection = document.getElementById('buyCtaSection');
             ctaSection.classList.remove('hidden');
             document.getElementById('buyCtaTitle').textContent = `${p.brand||''} ${p.model||p.title}`.trim();
+
+            // Decide modo: "Me avise" (pré-lançamento) ou "Ver onde comprar"
+            updateCTAs(p);
 
             // Spec list
             const specs = [
@@ -524,6 +634,106 @@
             document.body.style.overflow = '';
         }
 
+        /* ---- CTA mode: "Me avise" vs "Ver onde comprar" ---- */
+        function updateCTAs(p) {
+            const releaseDate = p.release_date ? new Date(p.release_date.replace(' ','T')) : null;
+            const hasAvailableStore = (p.stores || []).some(s => s.status === 'available_now');
+            isPreRelease = releaseDate && releaseDate > new Date() && !hasAvailableStore;
+
+            const ctaLabel = isPreRelease ? 'Me avise quando lançar' : 'Ver onde comprar';
+            const topLabel = isPreRelease ? 'Me avise' : 'Comprar';
+
+            const topBtn = document.getElementById('topBuyBtn');
+            if (topBtn) topBtn.childNodes[topBtn.childNodes.length-1].textContent = ' ' + topLabel;
+
+            const mainBtn = document.getElementById('mainBuyBtn');
+            if (mainBtn) mainBtn.childNodes[mainBtn.childNodes.length-1].textContent = ' ' + ctaLabel;
+
+            const ctaBtn = document.getElementById('ctaBuyBtn');
+            if (ctaBtn) ctaBtn.childNodes[ctaBtn.childNodes.length-1].textContent = ' ' + ctaLabel;
+
+            if (isPreRelease) loadNotifyCount();
+        }
+
+        async function loadNotifyCount() {
+            try {
+                const res = await fetch(`/api/posts/${encodeURIComponent(slug)}/notify-count`);
+                const { data } = await res.json();
+                document.getElementById('notifyCount').textContent = data.count || 0;
+            } catch {}
+        }
+
+        /* ---- Pop-up "Me Avise" ---- */
+        function openNotify() {
+            if (!current) return;
+            const ov = document.getElementById('notifyOverlay');
+            document.getElementById('notifyTitle').textContent =
+                `${current.brand||''} ${current.model||current.title}`.trim();
+
+            // Reset email form state
+            document.getElementById('notifyEmailForm').classList.add('hidden');
+            document.getElementById('notifyEmailInput').value = '';
+
+            ov.classList.add('show');
+            ov.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('notifyClose').focus();
+        }
+
+        function closeNotify() {
+            const ov = document.getElementById('notifyOverlay');
+            ov.classList.remove('show');
+            ov.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        function openCTA() {
+            if (isPreRelease) openNotify();
+            else openBuy();
+        }
+
+        // Push subscribe
+        document.getElementById('notifyPushBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('notifyPushBtn');
+            btn.disabled = true;
+            try {
+                const subscription = await subscribeToPush();
+                await notifySubscribe({ channel: 'push', subscription });
+                closeNotify();
+                showToast('Pronto! Te avisaremos no drop.');
+                loadNotifyCount();
+            } catch (err) {
+                showToast(err.message || 'Não foi possível ativar');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // Email toggle + submit
+        document.getElementById('notifyEmailBtn').addEventListener('click', () => {
+            const form = document.getElementById('notifyEmailForm');
+            form.classList.toggle('hidden');
+            if (!form.classList.contains('hidden')) document.getElementById('notifyEmailInput').focus();
+        });
+        document.getElementById('notifyEmailForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('notifyEmailInput').value.trim();
+            if (!email) return;
+            try {
+                await notifySubscribe({ channel: 'email', email });
+                closeNotify();
+                showToast('Pronto! Te avisaremos por email.');
+                loadNotifyCount();
+            } catch (err) {
+                showToast(err.message || 'Erro ao cadastrar email');
+            }
+        });
+
+        document.getElementById('notifyClose').addEventListener('click', closeNotify);
+        document.getElementById('notifyOverlay').addEventListener('click', e => {
+            if (e.target.id === 'notifyOverlay') closeNotify();
+        });
+
         // Share: copiar link
         document.getElementById('shareCopy').addEventListener('click', () => {
             if (navigator.clipboard) {
@@ -533,14 +743,16 @@
             }
         });
 
-        // Bind all buy buttons
+        // Bind all CTA buttons (abrem buy OU notify dependendo do modo)
         ['topBuyBtn','mainBuyBtn','ctaBuyBtn'].forEach(id =>
-            document.getElementById(id)?.addEventListener('click', openBuy));
+            document.getElementById(id)?.addEventListener('click', openCTA));
         document.getElementById('buyClose').addEventListener('click', closeBuy);
         document.getElementById('buyOverlay').addEventListener('click', e => {
             if (e.target.id === 'buyOverlay') closeBuy();
         });
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBuy(); });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { closeBuy(); closeNotify(); }
+        });
 
         /* ---- Click tracking ---- */
         document.addEventListener('click', e => {
