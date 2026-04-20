@@ -1,3 +1,11 @@
 node_modules/
 database.sqlite
 public/uploads/*
+
+# Binary/media files (não devem ir pro repo)
+*.mp4
+*.mov
+*.avi
+*.webm
+*.mkv
+*.zip
