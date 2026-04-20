@@ -76,7 +76,8 @@ async function initializePostgres() {
             author TEXT,
             tags TEXT,
             is_pinned INTEGER DEFAULT 0,
-            is_sponsored INTEGER DEFAULT 0
+            is_sponsored INTEGER DEFAULT 0,
+            likes INTEGER DEFAULT 0
         )`);
 
         await client.query(`CREATE TABLE IF NOT EXISTS stores (
@@ -159,6 +160,9 @@ async function initializePostgres() {
                 await client.query("INSERT INTO stores (name) VALUES ($1) ON CONFLICT DO NOTHING", [name]);
             }
         }
+
+        // Migration: Add likes column if not exists
+        await client.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0");
 
         const offersCount = await client.query("SELECT COUNT(*) FROM offers");
         if (parseInt(offersCount.rows[0].count) === 0) {

@@ -156,6 +156,21 @@
             outline-color: #FFC600;
         }
 
+        /* Wishlist/Like Styles */
+        .btn-heart.active svg { fill: #FF002A; stroke: #FF002A; animation: heartPop 0.4s ease; }
+        @keyframes heartPop { 
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+        .btn-fire.active svg { fill: #FF6600; filter: drop-shadow(0 0 8px #FF6600); }
+        
+        /* Countdown Styles */
+        .countdown-timer {
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.02em;
+        }
+
         /* Toast */
         .toast {
             position: fixed; left: 50%; bottom: 1.5rem; transform: translate(-50%, 150%);
@@ -483,6 +498,10 @@
                 <button type="button" data-filter="Futebol" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Futebol</button>
                 <button type="button" data-filter="Skateboarding" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Skateboarding</button>
                 <button type="button" data-filter="Basquete" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Basquete</button>
+                <button type="button" data-filter="favorites" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-infrared hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.7 0l-1.1 1-1.1-1a5.5 5.5 0 0 0-7.7 7.8l1.2 1.2L12 21.4l7.7-7.8 1.2-1.2a5.5 5.5 0 0 0 0-7.8z"/></svg>
+                    Favoritos
+                </button>
             </div>
         </div>
     </section>
@@ -722,6 +741,21 @@
         </div>
     </footer>
 
+    <!-- Push Notification Prompt (Modern Floating) -->
+    <div id="pushPrompt" class="fixed bottom-6 left-6 z-[60] transform translate-y-[150%] transition-transform duration-700 max-w-[320px] bg-white rounded-3xl shadow-2xl p-5 border border-gray-100 flex gap-4 hidden lg:flex">
+        <div class="w-14 h-14 shrink-0 bg-trueBlue/10 flex items-center justify-center rounded-2xl">
+            <svg class="w-7 h-7 text-trueBlue animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        </div>
+        <div class="min-w-0">
+            <h4 class="text-xs font-black uppercase tracking-widest text-retroGrey mb-1">Push de Ofertas 🚀</h4>
+            <p class="text-[11px] text-gray-500 font-medium mb-3 leading-tight">Quer receber cupons relâmpago antes de todo mundo?</p>
+            <div class="flex gap-2">
+                <button type="button" onclick="closePush(true)" class="bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full hover:bg-retroBlue transition-colors">Sim, aceito</button>
+                <button type="button" onclick="closePush()" class="text-gray-400 text-[10px] font-black uppercase tracking-widest px-2 hover:text-retroGrey">Agora não</button>
+            </div>
+        </div>
+    </div>
+
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -818,11 +852,57 @@
         const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         const money = cents => cents != null ? `R$ ${(cents/100).toFixed(2).replace('.',',')}` : null;
 
-        // ——— Feed de posts com filtros + scroll infinito ———
-        let feedOffset = 0;
-        let feedTotal = Infinity;
-        let feedLoading = false;
-        let feedFilter = '';  // brand or category filter
+        // ——— Modern Features Core (Wishlist & Likes) ———
+        const wishlist = {
+            get: () => JSON.parse(localStorage.getItem('sdm_wishlist') || '[]'),
+            add: (id) => {
+                const favs = wishlist.get();
+                if (!favs.includes(id)) { favs.push(id); localStorage.setItem('sdm_wishlist', JSON.stringify(favs)); }
+            },
+            remove: (id) => {
+                const favs = wishlist.get().filter(fid => fid !== id);
+                localStorage.setItem('sdm_wishlist', JSON.stringify(favs));
+            },
+            toggle: (id) => {
+                const favs = wishlist.get();
+                if (favs.includes(id)) wishlist.remove(id); else wishlist.add(id);
+                return wishlist.get().includes(id);
+            }
+        };
+
+        const heat = {
+            liked: (id) => JSON.parse(localStorage.getItem('sdm_likes') || '[]').includes(id),
+            add: async (id) => {
+                const likes = JSON.parse(localStorage.getItem('sdm_likes') || '[]');
+                if (likes.includes(id)) return;
+                try {
+                    const res = await fetch(`/api/posts/${id}/like`, { method: 'POST' });
+                    const { data } = await res.json();
+                    likes.push(id);
+                    localStorage.setItem('sdm_likes', JSON.stringify(likes));
+                    return data.likes;
+                } catch { return null; }
+            }
+        };
+
+        // ——— Countdown Timer Logic ———
+        function updateCountdowns() {
+            document.querySelectorAll('[data-countdown]').forEach(el => {
+                const target = new Date(el.dataset.countdown).getTime();
+                const now = new Date().getTime();
+                const diff = target - now;
+                if (diff <= 0) {
+                    el.innerHTML = '<span class="text-infrared font-black text-[10px] uppercase">Disponível!</span>';
+                    return;
+                }
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                el.innerHTML = `<div class="flex items-center gap-1 countdown-timer font-mono text-[10px] font-black"><div class="bg-retroGrey text-white px-1 rounded">${d}d</div><span>:</span><div class="bg-retroGrey text-white px-1 rounded">${h}h</div><span>:</span><div class="bg-retroGrey text-white px-1 rounded">${m}m</div><span>:</span><div class="bg-retroGrey text-white px-1 rounded">${s}s</div></div>`;
+            });
+        }
+        setInterval(updateCountdowns, 1000);
 
         function postCard(post, i) {
             const title = escapeHtml(post.title);
@@ -830,14 +910,21 @@
             const brand = escapeHtml(post.brand || '');
             const price = money(post.price_cents);
             const human = new Date(post.published_at).toLocaleDateString('pt-BR');
+            const isFav = wishlist.get().includes(post.id);
+            const isHot = heat.liked(post.id);
+            const isFuture = post.release_date && new Date(post.release_date) > new Date();
             
             return `
-            <article class="flex gap-5 group cursor-pointer reveal" onclick="location.href='/post/${encodeURIComponent(post.slug || post.id)}'">
-                <div class="w-28 h-28 sm:w-36 sm:h-36 shrink-0 rounded-2xl overflow-hidden bg-gray-100 border border-gray-100">
+            <article class="flex gap-5 group cursor-pointer reveal relative" onclick="if(event.target.closest('button'))return; location.href='/post/${encodeURIComponent(post.slug || post.id)}'">
+                <div class="w-28 h-28 sm:w-36 sm:h-36 shrink-0 rounded-2xl overflow-hidden bg-gray-100 border border-gray-100 relative">
                     ${post.image_url 
                         ? `<img src="${escapeHtml(post.image_url)}" alt="${title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">`
                         : `<div class="w-full h-full flex items-center justify-center text-gray-300 font-black text-xs uppercase">${brand || 'SDM'}</div>`
                     }
+                    <button type="button" class="btn-heart ${isFav ? 'active' : ''} absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 shadow-md flex items-center justify-center hover:bg-white transition-colors" onclick="const a=wishlist.toggle(${post.id}); this.classList.toggle('active', a); showToast(a?'Adicionado aos favoritos':'Removido dos favoritos')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.7 0l-1.1 1-1.1-1a5.5 5.5 0 0 0-7.7 7.8l1.2 1.2L12 21.4l7.7-7.8 1.2-1.2a5.5 5.5 0 0 0 0-7.8z"/></svg>
+                    </button>
+                    ${isFuture ? `<div class="absolute bottom-0 left-0 right-0 bg-polem/95 py-1 px-1 flex justify-center" data-countdown="${post.release_date}"></div>` : ''}
                 </div>
                 <div class="flex flex-col justify-center min-w-0 pr-2">
                     <span class="text-[9px] font-black uppercase tracking-widest text-trueBlue mb-1.5">${category}</span>
@@ -845,6 +932,10 @@
                     <div class="flex items-center gap-3">
                         ${price ? `<span class="text-trueBlue font-black text-xs sm:text-sm">${price}</span>` : ''}
                         <span class="text-[10px] text-gray-400 font-medium">${human}</span>
+                        <button type="button" class="btn-fire ${isHot ? 'active' : ''} ml-auto flex items-center gap-1 text-[10px] font-black text-gray-400 hover:text-starfish" onclick="heat.add(${post.id}).then(l=>{if(l){this.classList.add('active'); this.querySelector('span').innerText=l;}}) ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2c0 0-4.5 4-4.5 9.5a4.5 4.5 0 0 0 9 0C16.5 6 12 2 12 2zM12 18s-3-2.5-3-5 3-5 3-5 3 2.5 3 5-3 5-3 5z"/></svg>
+                            <span>${post.likes || 0}</span>
+                        </button>
                     </div>
                 </div>
             </article>`;
@@ -856,42 +947,61 @@
             const brand = escapeHtml(post.brand || '');
             const price = money(post.price_cents);
             const excerpt = escapeHtml(post.excerpt || '');
-            const iso = new Date(post.published_at).toISOString();
             const human = new Date(post.published_at).toLocaleDateString('pt-BR');
+            const isFav = wishlist.get().includes(post.id);
+            const isHot = heat.liked(post.id);
+            const isFuture = post.release_date && new Date(post.release_date) > new Date();
 
             return `
-            <article class="group cursor-pointer" onclick="location.href='/post/${encodeURIComponent(post.slug || post.id)}'">
+            <article class="group cursor-pointer relative" onclick="if(event.target.closest('button'))return; location.href='/post/${encodeURIComponent(post.slug || post.id)}'">
                 <div class="aspect-video rounded-[2rem] overflow-hidden bg-gray-100 mb-8 border border-gray-100 shadow-2xl relative">
                      ${post.image_url 
                         ? `<img src="${escapeHtml(post.image_url)}" alt="${title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">`
                         : `<div class="w-full h-full flex items-center justify-center text-gray-300 font-black text-6xl uppercase">${brand || 'SDM'}</div>`
                     }
                     <div class="absolute top-6 left-6 flex gap-2">
-                        <span class="bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">Em destaque</span>
-                        ${post.is_pinned ? '<span class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">📌 Fixado</span>' : ''}
+                        <span class="bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-lg">Em destaque agora</span>
+                        ${post.is_pinned ? '<span class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-lg">📌 Fixado</span>' : ''}
                     </div>
+                    <button type="button" class="btn-heart ${isFav ? 'active' : ''} absolute top-6 right-6 w-12 h-12 rounded-full bg-white shadow-xl flex items-center justify-center hover:scale-110 transition-transform" onclick="const a=wishlist.toggle(${post.id}); this.classList.toggle('active', a); showToast(a?'Adicionado aos favoritos':'Removido dos favoritos')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.7 0l-1.1 1-1.1-1a5.5 5.5 0 0 0-7.7 7.8l1.2 1.2L12 21.4l7.7-7.8 1.2-1.2a5.5 5.5 0 0 0 0-7.8z"/></svg>
+                    </button>
+                    ${isFuture ? `
+                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur px-6 py-3 rounded-2xl shadow-2xl flex flex-col items-center gap-1 border border-polem">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-retroGrey">Lançamento em:</p>
+                        <div class="text-2xl" data-countdown="${post.release_date}"></div>
+                    </div>` : ''}
                 </div>
                 <div class="px-2">
                     <div class="flex items-center gap-3 mb-5">
                         <span class="text-xs font-black uppercase tracking-widest text-trueBlue">${category}</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
-                        <time datetime="${iso}" class="text-xs text-gray-400 font-medium">${human}</time>
+                        <span class="text-xs text-gray-400 font-medium">${human}</span>
+                        <button type="button" class="btn-fire ${isHot ? 'active' : ''} ml-auto flex items-center gap-2 text-sm font-black text-gray-400 hover:text-starfish" onclick="heat.add(${post.id}).then(l=>{if(l){this.classList.add('active'); this.querySelector('span').innerText=l;}}) ">
+                               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2c0 0-4.5 4-4.5 9.5a4.5 4.5 0 0 0 9 0C16.5 6 12 2 12 2zM12 18s-3-2.5-3-5 3-5 3-5 3 2.5 3 5-3 5-3 5z"/></svg>
+                               <span>${post.likes || 0}</span>
+                        </button>
                     </div>
-                    <h2 class="text-4xl sm:text-5xl lg:text-4xl xl:text-5xl font-display uppercase tracking-tighter leading-[0.95] mb-5 group-hover:text-trueBlue transition-colors">${title}</h2>
-                    <p class="text-base sm:text-lg text-gray-500 font-serif leading-relaxed line-clamp-3 mb-8">${excerpt}</p>
+                    <h2 class="text-4xl sm:text-5xl lg:text-4xl xl:text-5xl font-display uppercase tracking-tighter leading-[0.9] mb-6 group-hover:text-trueBlue transition-colors">${title}</h2>
+                    <p class="text-lg sm:text-xl text-gray-600 font-serif leading-relaxed line-clamp-2 mb-8">${excerpt}</p>
                     <div class="flex items-center gap-6">
                         ${price ? `
                         <div>
                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Preço sugerido</p>
-                           <span class="text-2xl font-black text-trueBlue">${price}</span>
+                           <span class="text-3xl font-black text-trueBlue">${price}</span>
                         </div>` : ''}
                         <div class="ml-auto">
-                            <span class="inline-flex items-center gap-2 text-retroGrey font-black uppercase tracking-widest text-xs border-b-2 border-retroGrey pb-1 group-hover:gap-4 transition-all">Explorar lançamento →</span>
+                            <span class="inline-flex items-center gap-3 text-retroGrey font-black uppercase tracking-widest text-sm border-b-2 border-retroGrey pb-1 group-hover:gap-6 transition-all duration-300">Explorar Drop completo →</span>
                         </div>
                     </div>
                 </div>
             </article>`;
         }
+
+        let feedOffset = 0;
+        let feedTotal = Infinity;
+        let feedLoading = false;
+        let feedFilter = '';
 
         async function loadPosts(reset = false) {
             if (feedLoading) return;
@@ -912,37 +1022,38 @@
 
             try {
                 let url = `/api/posts?limit=12&offset=${feedOffset}`;
-                if (feedFilter) url += `&brand=${encodeURIComponent(feedFilter)}`;
+                if (feedFilter && feedFilter !== 'favorites') url += `&brand=${encodeURIComponent(feedFilter)}`;
 
                 const res = await fetch(url);
                 const json = await res.json();
-                const data = json.data || [];
+                let data = json.data || [];
                 feedTotal = json.total ?? data.length;
+
+                if (feedFilter === 'favorites') {
+                    const favs = wishlist.get();
+                    data = data.filter(p => favs.includes(p.id));
+                    feedTotal = data.length;
+                }
 
                 if (reset) {
                     grid.innerHTML = '';
                     if (data.length > 0) {
                         highlight.innerHTML = highlightCard(data[0]);
-                        // Small items for the rest of the array
-                        data.slice(1).forEach((post, i) => {
-                            grid.insertAdjacentHTML('beforeend', postCard(post, i));
-                        });
+                        data.slice(1).forEach((post, i) => grid.insertAdjacentHTML('beforeend', postCard(post, i)));
                     } else {
-                        highlight.innerHTML = '<p class="text-gray-400">Nenhum destaque encontrado.</p>';
-                        grid.innerHTML = '<p class="text-center text-gray-400 py-12 font-mono text-sm">Nenhum post encontrado para esse filtro.</p>';
+                        highlight.innerHTML = '<div class="bg-white p-12 rounded-[2rem] text-center border-2 border-dashed border-gray-200"><p class="text-gray-400 font-serif text-xl">Nada aqui por enquanto.</p></div>';
+                        grid.innerHTML = '<p class="text-center text-gray-400 py-12 font-mono text-xs text-center border-2 border-dashed border-gray-100 rounded-3xl">Vazio...</p>';
                     }
                     feedOffset += data.length;
-                    // Trigger reveal for newly added cards
                     document.querySelectorAll('#posts .reveal').forEach(el => io.observe(el));
                 } else {
-                    data.forEach((post, i) => {
-                        grid.insertAdjacentHTML('beforeend', postCard(post, i));
-                    });
+                    data.forEach((post, i) => grid.insertAdjacentHTML('beforeend', postCard(post, i)));
                     feedOffset += data.length;
                     document.querySelectorAll('#posts .reveal').forEach(el => io.observe(el));
                 }
 
-                if (sentinel) sentinel.classList.toggle('hidden', feedOffset >= feedTotal);
+                if (sentinel) sentinel.classList.toggle('hidden', feedOffset >= feedTotal || feedFilter === 'favorites');
+                updateCountdowns();
             } catch (err) {
                 console.error(err);
                 if (reset) grid.innerHTML = '<p class="text-center text-red-400 py-12 text-sm">Erro ao carregar posts.</p>';
@@ -1065,6 +1176,33 @@
 
         loadOffers();
         loadPosts(true);
+
+        // --- Push Logic ---
+        function closePush(subscribed = false) {
+            const prompt = document.getElementById('pushPrompt');
+            if (!prompt) return;
+            prompt.style.transform = 'translateY(150%)';
+            if (subscribed) {
+                showToast('🚀 Notificações ativadas! Você será o primeiro a saber.');
+                localStorage.setItem('sdm_push_optin', 'true');
+            } else {
+                localStorage.setItem('sdm_push_optin', 'dismissed');
+            }
+            setTimeout(() => prompt.classList.add('hidden'), 700);
+        }
+
+        window.addEventListener('load', () => {
+            const optin = localStorage.getItem('sdm_push_optin');
+            if (!optin) {
+                setTimeout(() => {
+                    const prompt = document.getElementById('pushPrompt');
+                    if (!prompt) return;
+                    prompt.classList.remove('hidden');
+                    setTimeout(() => prompt.style.transform = 'translateY(0)', 100);
+                }, 5000);
+            }
+        });
+        window.closePush = closePush;
     </script>
 </body>
 </html>

@@ -149,6 +149,17 @@ router.get('/offers', async (req, res) => {
     }
 });
 
+// Like / Heat
+router.post('/posts/:id/like', async (req, res) => {
+    try {
+        const result = await db.query("UPDATE posts SET likes = likes + 1 WHERE id = $1 RETURNING likes", [req.params.id]);
+        if (result.rows.length === 0) return res.status(404).json({ error: 'Post não encontrado' });
+        res.json({ data: { likes: result.rows[0].likes } });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Click tracking
 router.post('/track', express.text({ type: '*/*', limit: '2kb' }), async (req, res) => {
     let payload = {};

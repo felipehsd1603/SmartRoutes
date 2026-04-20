@@ -464,6 +464,23 @@
         </div>
     </main>
 
+    <!-- Modal Story Generator -->
+    <div id="storyModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-retroGrey/80 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden relative">
+            <button type="button" onclick="closeStory()" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full text-retroGrey font-black">✕</button>
+            <div class="p-8 text-center">
+                <h3 class="font-display uppercase text-2xl mb-2">Seu Story está pronto</h3>
+                <p class="text-xs font-black uppercase tracking-widest text-gray-400 mb-6 font-sans">Formato 9:16 otimizado para Instagram</p>
+                
+                <div class="aspect-[9/16] bg-gray-100 rounded-2xl overflow-hidden mb-6 shadow-xl border border-gray-200 relative">
+                    <canvas id="storyCanvas" width="1080" height="1920" class="w-full h-full object-contain"></canvas>
+                </div>
+                
+                <button type="button" id="downloadStoryBtn" class="w-full bg-trueBlue text-white font-black uppercase tracking-widest py-4 rounded-full shadow-lg hover:bg-retroBlue transition-all">Baixar imagem (.png)</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -721,9 +738,12 @@
                     <td class="py-4 pr-4"><span class="text-[10px] font-black uppercase tracking-widest bg-trueBlue text-white px-2 py-1 rounded">${category}</span></td>
                     <td class="py-4 pr-4 text-xs text-gray-500"><time datetime="${iso}">${date}</time></td>
                     <td class="py-4 text-right whitespace-nowrap">
-                        ${post.slug ? `<a href="/post/${encodeURIComponent(post.slug)}" target="_blank" rel="noopener" class="text-xs font-black uppercase tracking-widest text-gray-500 hover:text-retroGrey mr-3">Ver ↗</a>` : ''}
-                        <button type="button" onclick="startEdit(${post.id})" class="text-xs font-black uppercase tracking-widest text-trueBlue hover:text-retroBlue mr-3">Editar</button>
-                        <button type="button" aria-label="Excluir post: ${title}" onclick="deletePost(${post.id}, ${JSON.stringify(title)})" class="text-xs font-black uppercase tracking-widest text-red-600 hover:text-red-800">Excluir</button>
+                        <div class="flex items-center justify-end gap-3">
+                            <button type="button" onclick="generateStory(${post.id})" title="Gerar Story Instagram" class="text-[10px] font-black uppercase tracking-widest bg-polem text-retroGrey px-3 py-1.5 rounded-full hover:brightness-95">Story 📸</button>
+                            ${post.slug ? `<a href="/post/${encodeURIComponent(post.slug)}" target="_blank" rel="noopener" class="text-xs font-black uppercase tracking-widest text-gray-500 hover:text-retroGrey">Ver ↗</a>` : ''}
+                            <button type="button" onclick="startEdit(${post.id})" class="text-xs font-black uppercase tracking-widest text-trueBlue hover:text-retroBlue">Editar</button>
+                            <button type="button" aria-label="Excluir post: ${title}" onclick="deletePost(${post.id}, ${JSON.stringify(title)})" class="text-xs font-black uppercase tracking-widest text-red-600 hover:text-red-800">Excluir</button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1076,6 +1096,126 @@
                 btn.disabled = false;
             }
         });
+
+        // --- Story Generator Logic ---
+        async function generateStory(postId) {
+            const modal = document.getElementById('storyModal');
+            const canvas = document.getElementById('storyCanvas');
+            const ctx = canvas.getContext('2d');
+            modal.classList.remove('hidden');
+            
+            // Loading state on canvas
+            ctx.fillStyle = '#F5F0E8';
+            ctx.fillRect(0, 0, 1080, 1920);
+            ctx.fillStyle = '#0065FC';
+            ctx.font = '900 40px Archivo Black';
+            ctx.textAlign = 'center';
+            ctx.fillText('GERANDO STORY...', 540, 960);
+
+            try {
+                const res = await fetch(`/admin/posts/${postId}`);
+                const { data } = await res.json();
+                
+                // 1. Background
+                ctx.fillStyle = '#F5F0E8';
+                ctx.fillRect(0, 0, 1080, 1920);
+
+                // 2. Header Gradient Decoration
+                const grad = ctx.createLinearGradient(0,0,0,300);
+                grad.addColorStop(0, '#0065FC');
+                grad.addColorStop(1, '#F5F0E8');
+                ctx.globalAlpha = 0.1;
+                ctx.fillStyle = grad;
+                ctx.fillRect(0,0,1080,400);
+                ctx.globalAlpha = 1.0;
+
+                // 3. Logo
+                ctx.fillStyle = '#0065FC';
+                ctx.beginPath();
+                ctx.arc(540, 160, 60, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'white';
+                ctx.font = '900 44px Archivo Black';
+                ctx.fillText('SDM', 540, 175);
+                ctx.fillStyle = '#0065FC';
+                ctx.font = '900 24px Archivo Black';
+                ctx.fillText('LINKS', 540, 240);
+
+                // 4. Main Image
+                if (data.image_url) {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.src = data.image_url;
+                    await new Promise(r => img.onload = r);
+                    
+                    // Draw image with rounded corners (clipping)
+                    ctx.save();
+                    const iw = 900, ih = 900, ix = 90, iy = 400;
+                    ctx.beginPath();
+                    ctx.roundRect(ix, iy, iw, ih, 40);
+                    ctx.clip();
+                    ctx.drawImage(img, ix, iy, iw, ih);
+                    ctx.restore();
+                }
+
+                // 5. Title & Info
+                ctx.fillStyle = '#2E2E2E';
+                ctx.textAlign = 'center';
+                ctx.font = '900 80px Archivo Black';
+                const title = data.title.toUpperCase();
+                // Word wrap title
+                const words = title.split(' ');
+                let line = '', y = 1400;
+                words.forEach(w => {
+                    const test = line + w + ' ';
+                    if (ctx.measureText(test).width > 900) {
+                        ctx.fillText(line, 540, y);
+                        line = w + ' '; y += 95;
+                    } else { line = test; }
+                });
+                ctx.fillText(line, 540, y);
+
+                // 6. Brand & Price Tag
+                ctx.fillStyle = '#0065FC';
+                ctx.font = '900 40px Archivo Black';
+                ctx.fillText(data.brand.toUpperCase(), 540, y + 100);
+
+                if (data.price_cents) {
+                    const price = `R$ ${(data.price_cents/100).toFixed(2).replace('.',',')}`;
+                    ctx.fillStyle = '#FFC600';
+                    ctx.fillRect(340, y + 160, 400, 120);
+                    ctx.fillStyle = '#2E2E2E';
+                    ctx.font = '900 60px Archivo Black';
+                    ctx.fillText(price, 540, y + 235);
+                }
+
+                // 7. Call To Action Footer
+                ctx.fillStyle = '#0065FC';
+                ctx.font = '900 32px Archivo Black';
+                ctx.fillText('LINK NOS STORIES E NA BIO', 540, 1820);
+                ctx.strokeStyle = '#0065FC';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(90, 1760, 900, 100);
+
+                document.getElementById('downloadStoryBtn').onclick = () => {
+                    const link = document.createElement('a');
+                    link.download = `story-${data.slug || data.id}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                };
+
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao gerar story. Verifique se as imagens permitem CORS.');
+                closeStory();
+            }
+        }
+
+        function closeStory() {
+            document.getElementById('storyModal').classList.add('hidden');
+        }
+        window.closeStory = closeStory;
+        window.generateStory = generateStory;
     </script>
 </body>
 </html>
