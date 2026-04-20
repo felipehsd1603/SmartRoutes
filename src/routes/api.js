@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 
-// Get all posts
+// Get all posts (only published)
 router.get('/posts', async (req, res) => {
     try {
-        const result = await db.query("SELECT * FROM posts ORDER BY published_at DESC");
+        const result = await db.query("SELECT * FROM posts WHERE published_at <= CURRENT_TIMESTAMP ORDER BY published_at DESC");
         res.json({ data: result.rows });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -16,7 +16,7 @@ router.get('/posts', async (req, res) => {
 router.get('/posts/category/:category', async (req, res) => {
     try {
         const category = req.params.category;
-        const result = await db.query("SELECT * FROM posts WHERE category = $1 ORDER BY published_at DESC LIMIT 6", [category]);
+        const result = await db.query("SELECT * FROM posts WHERE category = $1 AND published_at <= CURRENT_TIMESTAMP ORDER BY published_at DESC LIMIT 6", [category]);
         res.json({ data: result.rows });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -84,7 +84,7 @@ router.get('/posts/:slug/related', async (req, res) => {
 // Offers públicas (cards "Ofertas de hoje")
 router.get('/offers', async (req, res) => {
     try {
-        const result = await db.query("SELECT id, title, brand, category, image_url, price_cents, retail_price_cents, coupon, affiliate_url, badge, position FROM offers WHERE is_active=1 ORDER BY position ASC, published_at DESC");
+        const result = await db.query("SELECT id, title, brand, category, image_url, price_cents, retail_price_cents, coupon, affiliate_url, badge, position FROM offers WHERE is_active=1 AND published_at <= CURRENT_TIMESTAMP ORDER BY position ASC, published_at DESC");
         res.json({ data: result.rows });
     } catch (err) {
         res.status(500).json({ error: err.message });
