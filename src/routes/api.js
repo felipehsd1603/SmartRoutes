@@ -96,15 +96,23 @@ router.get('/posts', async (req, res) => {
 
         let sql, params;
         if (filter) {
-            sql = `SELECT id, title, slug, category, brand, model, image_url, price_cents, excerpt, is_pinned, is_sponsored, published_at
-                   FROM posts WHERE published_at <= CURRENT_TIMESTAMP
-                   AND (brand ILIKE $1 OR category ILIKE $1)
-                   ORDER BY is_pinned DESC, published_at DESC LIMIT $2 OFFSET $3`;
+            sql = `SELECT p.id, p.title, p.slug, p.category, p.brand, p.model, p.image_url, p.cover_image_url, p.hero_color,
+                          p.price_cents, p.excerpt, p.is_pinned, p.is_sponsored, p.published_at, p.release_date,
+                          COALESCE(ns.cnt, 0) AS notify_count
+                   FROM posts p
+                   LEFT JOIN (SELECT post_id, COUNT(*) AS cnt FROM notify_subscriptions GROUP BY post_id) ns ON ns.post_id = p.id
+                   WHERE p.published_at <= CURRENT_TIMESTAMP
+                     AND (p.brand ILIKE $1 OR p.category ILIKE $1)
+                   ORDER BY p.is_pinned DESC, p.published_at DESC LIMIT $2 OFFSET $3`;
             params = [filter, limit, offset];
         } else {
-            sql = `SELECT id, title, slug, category, brand, model, image_url, price_cents, excerpt, is_pinned, is_sponsored, published_at
-                   FROM posts WHERE published_at <= CURRENT_TIMESTAMP
-                   ORDER BY is_pinned DESC, published_at DESC LIMIT $1 OFFSET $2`;
+            sql = `SELECT p.id, p.title, p.slug, p.category, p.brand, p.model, p.image_url, p.cover_image_url, p.hero_color,
+                          p.price_cents, p.excerpt, p.is_pinned, p.is_sponsored, p.published_at, p.release_date,
+                          COALESCE(ns.cnt, 0) AS notify_count
+                   FROM posts p
+                   LEFT JOIN (SELECT post_id, COUNT(*) AS cnt FROM notify_subscriptions GROUP BY post_id) ns ON ns.post_id = p.id
+                   WHERE p.published_at <= CURRENT_TIMESTAMP
+                   ORDER BY p.is_pinned DESC, p.published_at DESC LIMIT $1 OFFSET $2`;
             params = [limit, offset];
         }
 

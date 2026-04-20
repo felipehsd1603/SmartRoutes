@@ -269,10 +269,12 @@ router.post('/posts', isAuthenticated, uploadRich, async (req, res) => {
         const slug = await ensureUniqueSlug(slugify(p.title), null);
         const result = await db.query(`INSERT INTO posts (
             title, category, image_url, content, slug, brand, model, sku, color,
-            price_cents, retail_price_cents, release_date, excerpt, author, tags, is_pinned, is_sponsored
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id`,
+            price_cents, retail_price_cents, release_date, excerpt, author, tags, is_pinned, is_sponsored,
+            hero_color, cover_image_url
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19) RETURNING id`,
             [p.title, p.category, p.hero_url, p.content, slug, p.brand, p.model, p.sku, p.color,
-             p.price_cents, p.retail_price_cents, p.release_date, p.excerpt, p.author, p.tags, p.is_pinned, p.is_sponsored]);
+             p.price_cents, p.retail_price_cents, p.release_date, p.excerpt, p.author, p.tags, p.is_pinned, p.is_sponsored,
+             p.hero_color, p.cover_url]);
         
         const postId = result.rows[0].id;
         await replaceChildren(postId, p);
@@ -295,17 +297,19 @@ router.put('/posts/:id', isAuthenticated, uploadRich, async (req, res) => {
         const targetBase = p.title !== existing.title || !existing.slug ? slugify(p.title) : existing.slug;
         const slug = await ensureUniqueSlug(targetBase, id);
 
-        const heroSql = p.hero_url ? ", image_url=$17" : "";
-        const params = [p.title, p.category, p.content, slug, p.brand, p.model, p.sku, p.color,
-                        p.price_cents, p.retail_price_cents, p.release_date, p.excerpt, p.author, p.tags,
-                        p.is_pinned, p.is_sponsored, id];
-        if (p.hero_url) params.splice(16, 0, p.hero_url);
-
+        // COALESCE para image_url/cover_image_url: só atualiza se nova mídia
         await db.query(`UPDATE posts SET
             title=$1, category=$2, content=$3, slug=$4, brand=$5, model=$6, sku=$7, color=$8,
             price_cents=$9, retail_price_cents=$10, release_date=$11, excerpt=$12, author=$13, tags=$14,
-            is_pinned=$15, is_sponsored=$16 ${heroSql}
-            WHERE id=${p.hero_url ? '$18' : '$17'}`, params);
+            is_pinned=$15, is_sponsored=$16,
+            hero_color=$17,
+            image_url = COALESCE($18, image_url),
+            cover_image_url = COALESCE($19, cover_image_url),
+            updated_at = CURRENT_TIMESTAMP
+            WHERE id=$20`,
+            [p.title, p.category, p.content, slug, p.brand, p.model, p.sku, p.color,
+             p.price_cents, p.retail_price_cents, p.release_date, p.excerpt, p.author, p.tags,
+             p.is_pinned, p.is_sponsored, p.hero_color, p.hero_url, p.cover_url, id]);
 
         const shouldReplace = p.gallery_urls.length || p.stores.length || p.related.length ||
                             req.body.stores !== undefined || req.body.related !== undefined;

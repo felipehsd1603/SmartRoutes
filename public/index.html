@@ -396,9 +396,9 @@
             </div>
 
             <div class="hidden lg:flex items-center gap-8 text-sm font-bold uppercase tracking-wide">
+                <a href="/" class="text-retroGrey border-b-2 border-trueBlue pb-1">Feed</a>
+                <a href="/calendario" class="hover:text-trueBlue transition-colors">Calendário</a>
                 <a href="#ofertas" class="hover:text-trueBlue transition-colors">Ofertas</a>
-                <a href="#lancamentos" class="hover:text-trueBlue transition-colors">Lançamentos</a>
-                <a href="#categorias" class="hover:text-trueBlue transition-colors">Categorias</a>
                 <a href="#cupons" class="hover:text-trueBlue transition-colors">Cupons</a>
                 <a href="https://www.nike.com.br/hotsite/sdmlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=nav-hotsite-nike" target="_blank" rel="noopener" data-track="nav-hotsite-nike" class="hover:text-trueBlue transition-colors">Hotsite Nike</a>
             </div>
@@ -822,9 +822,10 @@
                 <div class="flex flex-col justify-center min-w-0 pr-2">
                     <span class="text-[9px] font-black uppercase tracking-widest text-trueBlue mb-1.5">${category}</span>
                     <h3 class="font-black text-sm sm:text-base leading-snug mb-2 line-clamp-2 uppercase group-hover:text-trueBlue transition-colors">${title}</h3>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 flex-wrap">
                         ${price ? `<span class="text-trueBlue font-black text-xs sm:text-sm">${price}</span>` : ''}
                         <span class="text-[10px] text-gray-400 font-medium">${human}</span>
+                        ${Number(post.notify_count) > 0 ? `<span class="inline-flex items-center gap-1 text-[10px] font-black text-starfish">🔔 ${post.notify_count}</span>` : ''}
                         <button type="button" class="btn-fire ${isHot ? 'active' : ''} ml-auto flex items-center gap-1 text-[10px] font-black text-gray-400 hover:text-starfish" onclick="heat.add(${post.id}).then(l=>{if(l){this.classList.add('active'); this.querySelector('span').innerText=l;}}) ">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2c0 0-4.5 4-4.5 9.5a4.5 4.5 0 0 0 9 0C16.5 6 12 2 12 2zM12 18s-3-2.5-3-5 3-5 3-5 3 2.5 3 5-3 5-3 5z"/></svg>
                             <span>${post.likes || 0}</span>
@@ -866,10 +867,11 @@
                     </div>` : ''}
                 </div>
                 <div class="px-2">
-                    <div class="flex items-center gap-3 mb-5">
+                    <div class="flex items-center gap-3 mb-5 flex-wrap">
                         <span class="text-xs font-black uppercase tracking-widest text-trueBlue">${category}</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
                         <span class="text-xs text-gray-400 font-medium">${human}</span>
+                        ${Number(post.notify_count) > 0 ? `<span class="inline-flex items-center gap-1 text-xs font-black text-starfish">🔔 ${post.notify_count} te avisam</span>` : ''}
                         <button type="button" class="btn-fire ${isHot ? 'active' : ''} ml-auto flex items-center gap-2 text-sm font-black text-gray-400 hover:text-starfish" onclick="heat.add(${post.id}).then(l=>{if(l){this.classList.add('active'); this.querySelector('span').innerText=l;}}) ">
                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2c0 0-4.5 4-4.5 9.5a4.5 4.5 0 0 0 9 0C16.5 6 12 2 12 2zM12 18s-3-2.5-3-5 3-5 3-5 3 2.5 3 5-3 5-3 5z"/></svg>
                                <span>${post.likes || 0}</span>

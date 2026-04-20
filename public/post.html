@@ -124,8 +124,15 @@
 
     <main id="main" tabindex="-1">
 
+        <!-- COVER editorial (atleta / celebridade / lifestyle) — só renderiza se cover_image_url -->
+        <section id="coverSection" class="hidden relative overflow-hidden">
+            <div class="aspect-[16/9] md:aspect-[21/9] bg-retroGrey/10">
+                <img id="coverImg" src="" alt="" class="w-full h-full object-cover" onerror="this.closest('#coverSection').classList.add('hidden')">
+            </div>
+        </section>
+
         <!-- HERO: Imagem + Título + Ficha técnica -->
-        <section class="border-b border-retroGrey/10">
+        <section id="heroSection" class="border-b border-retroGrey/10 transition-colors">
             <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-8 lg:py-14 grid lg:grid-cols-[1fr_360px] gap-8 lg:gap-12 items-start">
 
                 <!-- Esquerda: Imagem + Título + CTA -->
@@ -479,12 +486,54 @@
         }
 
         /* ---- Render ---- */
+        // "Updated X ago" — formato humanizado
+        function timeAgo(iso) {
+            if (!iso) return '';
+            const d = new Date(iso.replace(' ','T'));
+            if (isNaN(d)) return '';
+            const diffSec = Math.floor((Date.now() - d.getTime()) / 1000);
+            if (diffSec < 60) return 'AGORA';
+            if (diffSec < 3600) return `${Math.floor(diffSec/60)}MIN ATRÁS`;
+            if (diffSec < 86400) return `${Math.floor(diffSec/3600)}H ATRÁS`;
+            if (diffSec < 172800) return 'HOJE';
+            if (diffSec < 604800) return `${Math.floor(diffSec/86400)}D ATRÁS`;
+            return dateBR(iso).toUpperCase();
+        }
+
+        // Contraste: retorna cor de texto adequada (preto ou branco) para um bg hex
+        function contrastText(hex) {
+            if (!hex) return '#2E2E2E';
+            const h = hex.replace('#','');
+            const full = h.length === 3 ? h.split('').map(c=>c+c).join('') : h;
+            const r = parseInt(full.slice(0,2),16), g = parseInt(full.slice(2,4),16), b = parseInt(full.slice(4,6),16);
+            const luma = (0.299*r + 0.587*g + 0.114*b);
+            return luma > 155 ? '#2E2E2E' : '#FFFFFF';
+        }
+
         function renderPost(p) {
             current = p;
 
             // SEO meta dinâmico (client-side — complementa a injeção server-side)
             document.title = `${p.title} | SDM Links`;
             document.querySelector('meta[name="description"]').content = p.excerpt || `${p.title} — SDM Links`;
+
+            // Cover editorial (se existir)
+            if (p.cover_image_url) {
+                const coverSec = document.getElementById('coverSection');
+                const coverImg = document.getElementById('coverImg');
+                coverImg.src = p.cover_image_url;
+                coverImg.alt = `${p.brand || ''} ${p.model || p.title}`.trim();
+                coverSec.classList.remove('hidden');
+            }
+
+            // Hero color bg (identidade visual do produto)
+            if (p.hero_color && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(p.hero_color)) {
+                const heroSec = document.getElementById('heroSection');
+                heroSec.style.backgroundColor = p.hero_color;
+                heroSec.style.color = contrastText(p.hero_color);
+                // Título e textos herdam do heroSec via color: inherit (default do browser)
+                document.getElementById('postTitle').style.color = 'inherit';
+            }
 
             // Breadcrumb
             const bcCat = document.getElementById('bcCategory');
@@ -559,7 +608,9 @@
 
             // Meta footer
             document.getElementById('metaAuthor').textContent = p.author || 'SDM Editorial';
-            document.getElementById('metaDate').textContent   = dateBR(p.published_at);
+            const pubStr = dateBR(p.published_at);
+            const upd = p.updated_at && p.updated_at !== p.published_at ? ` · ATUALIZADO ${timeAgo(p.updated_at)}` : '';
+            document.getElementById('metaDate').innerHTML = pubStr + (upd ? `<span class="text-trueBlue ml-1 font-black">${esc(upd)}</span>` : '');
             const tags = (p.tags || '').split(',').map(t => t.trim()).filter(Boolean);
             document.getElementById('metaTags').innerHTML = tags.length
                 ? tags.map(t => `<span class="inline-block border border-retroGrey/20 px-2 py-0.5 rounded-full">${esc(t)}</span>`).join('')

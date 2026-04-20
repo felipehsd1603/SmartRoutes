@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário de Lançamentos — SDM Links</title>
+    <script src="/clarity.js" async></script>
+    <script src="/ads.js" defer></script>
+    <meta name="description" content="Calendário de lançamentos de sneakers. Acompanhe Nike, Adidas, Jordan, New Balance e mais. Countdown em tempo real.">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0065FC">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Libre+Caslon+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Archivo', 'sans-serif'],
+                        display: ['"Archivo Black"', 'Archivo', 'sans-serif'],
+                        serif: ['"Libre Caslon Display"', 'serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+                    },
+                    colors: {
+                        retroBlue: '#003F9E',
+                        trueBlue: '#0065FC',
+                        uncBlue: '#00AAFF',
+                        starfish: '#FF6600',
+                        polem: '#FFC600',
+                        infrared: '#FF002A',
+                        retroGrey: '#2E2E2E',
+                        offWhite: '#FFFFFF'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .skip-link { position:absolute;top:-100px;left:1rem;z-index:110;background:#0065FC;color:#fff;padding:.75rem 1.25rem;border-radius:.5rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;font-size:.875rem;transition:top .2s; }
+        .skip-link:focus { top:1rem; }
+        :focus-visible { outline:3px solid #0065FC; outline-offset:3px; border-radius:4px; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-offWhite text-retroGrey font-sans antialiased min-h-screen">
+    <a href="#main" class="skip-link">Pular para o conteúdo</a>
+
+    <header class="border-b border-retroGrey/10 bg-white sticky top-0 z-40">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3" aria-label="SDM Links — home">
+                <img src="/logo.png" alt="SDM Links" class="h-10 sm:h-12 w-auto">
+            </a>
+            <div class="hidden lg:flex items-center gap-8 text-sm font-bold uppercase tracking-wide">
+                <a href="/" class="hover:text-trueBlue transition-colors">Feed</a>
+                <a href="/calendario" class="text-retroGrey border-b-2 border-trueBlue pb-1">Calendário</a>
+                <a href="/#ofertas" class="hover:text-trueBlue transition-colors">Ofertas</a>
+                <a href="/#cupons" class="hover:text-trueBlue transition-colors">Cupons</a>
+            </div>
+            <a href="https://t.me/s/sneakersdomionlinks" target="_blank" rel="noopener" data-track="calendar-nav-telegram"
+                class="hidden sm:inline-flex items-center gap-2 bg-trueBlue text-white text-xs font-bold uppercase tracking-wide px-4 py-2.5 rounded-full hover:bg-retroBlue transition-colors">
+                Telegram
+            </a>
+        </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+        <!-- Hero -->
+        <section class="border-b border-retroGrey/10 bg-gradient-to-br from-retroBlue to-trueBlue text-white">
+            <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-12 lg:py-20">
+                <p class="font-mono text-[11px] uppercase tracking-widest text-white/70 mb-4">SDM Releases</p>
+                <h1 class="font-display text-4xl md:text-6xl lg:text-7xl tracking-tighter leading-[0.9] mb-4">Calendário de<br>Lançamentos</h1>
+                <p class="text-lg text-white/80 max-w-2xl">Acompanhe os próximos drops de Nike, Adidas, Jordan, New Balance e outras marcas. Countdown em tempo real.</p>
+            </div>
+        </section>
+
+        <!-- Filtros de marca -->
+        <section class="border-b border-retroGrey/10 bg-white sticky top-16 sm:top-20 z-30">
+            <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-4 flex gap-2 overflow-x-auto hide-scrollbar" role="group" aria-label="Filtrar por marca">
+                <button type="button" data-brand="" aria-pressed="true" class="brand-chip flex-none bg-retroGrey text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full">Todos</button>
+                <button type="button" data-brand="Nike" aria-pressed="false" class="brand-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Nike</button>
+                <button type="button" data-brand="Adidas" aria-pressed="false" class="brand-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Adidas</button>
+                <button type="button" data-brand="Jordan" aria-pressed="false" class="brand-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Jordan</button>
+                <button type="button" data-brand="New Balance" aria-pressed="false" class="brand-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">New Balance</button>
+                <button type="button" data-brand="Yeezy" aria-pressed="false" class="brand-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Yeezy</button>
+            </div>
+        </section>
+
+        <!-- Grid de drops agrupados por data -->
+        <section class="py-10 lg:py-16">
+            <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+                <div id="calGrid" aria-live="polite" aria-busy="true">
+                    <p class="text-gray-400 text-sm py-8 text-center">Carregando calendário…</p>
+                </div>
+                <div class="mt-10" data-ad-slot-type="feed" aria-label="Espaço publicitário"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-retroGrey text-white py-10">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 text-center font-mono text-xs uppercase tracking-wider text-white/50">
+            SDM Links · Calendário atualizado diariamente
+        </div>
+    </footer>
+
+    <script>
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const money = cents => cents == null ? null : `R$ ${(cents/100).toFixed(2).replace('.',',')}`;
+
+        let allReleases = [];
+        let currentBrand = '';
+        let cdInterval = null;
+
+        function groupByDateKey(dateStr) {
+            const d = new Date(dateStr.replace(' ','T'));
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const diffDays = Math.floor((d - today) / 86400000);
+            if (diffDays < 0) return { key: 'past', label: 'Já lançaram', order: 9999 };
+            if (diffDays === 0) return { key: 'today', label: 'Hoje', order: 0 };
+            if (diffDays === 1) return { key: 'tomorrow', label: 'Amanhã', order: 1 };
+            if (diffDays <= 7) return { key: 'week', label: 'Esta semana', order: 2 };
+            if (diffDays <= 30) return { key: 'month', label: 'Este mês', order: 3 };
+            return { key: `m${d.getFullYear()}${d.getMonth()}`, label: d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase(), order: 4 + d.getFullYear()*12 + d.getMonth() };
+        }
+
+        function countdownText(dateStr) {
+            const target = new Date(dateStr.replace(' ','T'));
+            const diff = target - new Date();
+            if (diff <= 0) return 'DISPONÍVEL';
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            if (d > 1) return `${d}d ${h}h`;
+            if (d === 1) return `1d ${h}h ${m}m`;
+            if (h >= 1) return `${h}h ${m}m ${String(s).padStart(2,'0')}s`;
+            return `${m}m ${String(s).padStart(2,'0')}s`;
+        }
+
+        function card(p) {
+            const dropHour = new Date(p.release_date.replace(' ','T')).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const priceStr = money(p.price_cents);
+            return `
+            <a href="/post/${esc(p.slug || p.id)}" class="group block bg-white border border-retroGrey/10 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                <div class="aspect-square bg-retroGrey/5 overflow-hidden" ${p.hero_color ? `style="background-color:${esc(p.hero_color)}"` : ''}>
+                    ${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.title)}" loading="lazy" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" onerror="this.style.display='none'">` : ''}
+                </div>
+                <div class="p-4">
+                    <p class="font-mono text-[10px] uppercase tracking-widest text-trueBlue">${esc(p.brand || '')}</p>
+                    <h3 class="font-display text-base uppercase tracking-tight leading-tight mt-1 line-clamp-2 min-h-[2.8em]">${esc(p.title)}</h3>
+                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-retroGrey/10">
+                        <div>
+                            <p class="text-[10px] font-mono uppercase tracking-widest text-retroGrey/50">Drop ${dropHour}</p>
+                            <p class="text-sm font-black text-retroGrey" data-countdown="${esc(p.release_date)}">—</p>
+                        </div>
+                        ${priceStr ? `<span class="text-sm font-black text-trueBlue">${priceStr}</span>` : ''}
+                    </div>
+                </div>
+            </a>`;
+        }
+
+        function render() {
+            const filtered = currentBrand
+                ? allReleases.filter(p => String(p.brand || '').toLowerCase() === currentBrand.toLowerCase())
+                : allReleases;
+
+            if (!filtered.length) {
+                document.getElementById('calGrid').innerHTML = `<p class="text-gray-400 text-center py-16 font-mono text-xs uppercase tracking-widest">Nenhum drop ${currentBrand ? 'da ' + currentBrand : ''} previsto por enquanto.</p>`;
+                document.getElementById('calGrid').setAttribute('aria-busy', 'false');
+                return;
+            }
+
+            // Agrupa por data-key
+            const groups = new Map();
+            filtered.forEach(p => {
+                const g = groupByDateKey(p.release_date);
+                if (!groups.has(g.key)) groups.set(g.key, { ...g, items: [] });
+                groups.get(g.key).items.push(p);
+            });
+            const sorted = Array.from(groups.values()).sort((a,b) => a.order - b.order);
+
+            let html = '';
+            sorted.forEach(g => {
+                if (g.key === 'past') return; // esconde passados por padrão no MVP
+                html += `
+                <div class="mb-12 ${g.key === 'today' ? 'relative' : ''}">
+                    <div class="flex items-baseline gap-3 mb-6">
+                        <h2 class="font-display text-2xl lg:text-3xl uppercase tracking-tight ${g.key === 'today' ? 'text-infrared' : 'text-retroGrey'}">${g.label}</h2>
+                        <span class="text-[11px] font-mono uppercase tracking-widest text-retroGrey/40">${g.items.length} drop${g.items.length > 1 ? 's' : ''}</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+                        ${g.items.map(card).join('')}
+                    </div>
+                </div>`;
+            });
+            document.getElementById('calGrid').innerHTML = html;
+            document.getElementById('calGrid').setAttribute('aria-busy', 'false');
+            tickCountdowns();
+        }
+
+        function tickCountdowns() {
+            document.querySelectorAll('[data-countdown]').forEach(el => {
+                el.textContent = countdownText(el.dataset.countdown);
+            });
+        }
+
+        async function load() {
+            try {
+                const res = await fetch('/api/posts/upcoming');
+                const { data } = await res.json();
+                allReleases = (data || []).filter(p => p.release_date);
+                render();
+            } catch {
+                document.getElementById('calGrid').innerHTML = '<p class="text-infrared text-center py-16 text-sm">Erro ao carregar calendário.</p>';
+            }
+        }
+
+        // Chips
+        document.querySelectorAll('.brand-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.brand-chip').forEach(b => {
+                    b.setAttribute('aria-pressed', 'false');
+                    b.classList.remove('bg-retroGrey', 'text-white');
+                    b.classList.add('bg-gray-100');
+                });
+                btn.setAttribute('aria-pressed', 'true');
+                btn.classList.remove('bg-gray-100');
+                btn.classList.add('bg-retroGrey', 'text-white');
+                currentBrand = btn.dataset.brand;
+                render();
+            });
+        });
+
+        load();
+        cdInterval = setInterval(tickCountdowns, 1000);
+
+        // Consent-gated click tracking
+        document.addEventListener('click', e => {
+            const el = e.target.closest('[data-track]');
+            if (!el || localStorage.getItem('sdm-consent') !== 'accepted') return;
+            try {
+                const body = JSON.stringify({ label: el.dataset.track, href: el.href || null });
+                if (navigator.sendBeacon) navigator.sendBeacon('/api/track', new Blob([body], {type:'text/plain'}));
+            } catch {}
+        }, true);
+    </script>
+</body>
+</html>
