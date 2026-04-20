@@ -102,6 +102,11 @@ app.get('/sitemap.xml', async (req, res) => {
     }
 });
 
+// Favicon
+app.get('/favicon.ico', (req, res) => {
+    res.redirect(301, '/icon-192.png');
+});
+
 // Robots.txt
 app.get('/robots.txt', (req, res) => {
     res.setHeader('Content-Type', 'text/plain');

@@ -1,41 +1,67 @@
-const CACHE_NAME = 'sdm-links-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
+const CACHE_NAME = 'sdm-links-v3';
+const STATIC_ASSETS = [
   '/manifest.json',
-  'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Libre+Caslon+Display&display=swap'
+  '/logo.png',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
   );
 });
 
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+});
+
+// Network-first para HTML e API; cache-first para assets estáticos
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Ignora requisições não-GET e externas
+  if (event.request.method !== 'GET' || !url.origin.includes(self.location.origin)) {
+    return;
+  }
+
+  // HTML e API: sempre busca na rede primeiro
+  if (url.pathname === '/' || url.pathname.startsWith('/post/') ||
+      url.pathname.startsWith('/api/') || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Assets estáticos: cache-first
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      return fetch(event.request).then(response => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      });
     })
   );
 });
 
-// Suporte inicial para notificações
 self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : { title: 'Drope Novo!', body: 'Confira os últimos tênis no SDM Links.' };
-  const options = {
+  const data = event.data ? event.data.json() : { title: 'Drop Novo!', body: 'Confira os últimos tênis no SDM Links.' };
+  event.waitUntil(self.registration.showNotification(data.title, {
     body: data.body,
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
-    vibrate: [100, 50, 100],
-    data: {
-      url: data.url || '/'
-    }
-  };
-  event.waitUntil(self.registration.showNotification(data.title, options));
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    data: { url: data.url || '/' }
+  }));
 });
 
 self.addEventListener('notificationclick', (event) => {
