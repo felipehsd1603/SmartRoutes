@@ -652,6 +652,60 @@ router.post('/settings/banner', isAuthenticated, async (req, res) => {
     }
 });
 
+// --- Seed de post exemplo (dev/demo) ---
+router.get('/seed-example-post', isAuthenticated, async (req, res) => {
+    const slug = 'michael-jordan-estreia-nike-phantom-6-low-hot-punch';
+    try {
+        const existing = await db.query("SELECT id, slug FROM posts WHERE slug = $1", [slug]);
+        if (existing.rows.length) {
+            return res.redirect(`/post/${existing.rows[0].slug}`);
+        }
+
+        const releaseDate = new Date(Date.now() + 3 * 86400000).toISOString();
+        const content = `Michael Jordan voltou a ser manchete do mundo sneaker — e desta vez com um colorway que ninguém esperava: "Hot Punch/Green Strike".
+
+Inspirada no tom radioactive dos modelos de futebol, a edição marca uma inflexão na linha Phantom 6 Low, que cruza de vez a fronteira entre performance esportiva e streetwear.
+
+Drop oficial nas lojas parceiras em 72h. Se cadastra no "Me avise" pra ser avisado na hora do drop.`;
+
+        const excerpt = 'Michael Jordan estampa a campanha da Nike Phantom 6 Low "Hot Punch/Green Strike" — drop editorial em 72h.';
+        const coverUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Michael_Jordan_in_2014.jpg/1280px-Michael_Jordan_in_2014.jpg';
+        const heroImageUrl = 'https://placehold.co/1200x900/CCFF00/2E2E2E/png?text=Nike+Phantom+6+Low';
+        const heroColor = '#CCFF00';
+
+        const result = await db.query(`INSERT INTO posts (
+            title, category, image_url, cover_image_url, hero_color, content, slug, brand, model, sku, color,
+            price_cents, retail_price_cents, release_date, excerpt, author, tags, is_pinned, is_sponsored
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19) RETURNING id, slug`, [
+            'Michael Jordan estreia a Nike Phantom 6 Low "Hot Punch/Green Strike"',
+            'Culture Conection',
+            heroImageUrl, coverUrl, heroColor,
+            content, slug,
+            'Nike', 'Phantom 6 Low', 'FM1234-100', 'Hot Punch/Green Strike',
+            89999, 109999,
+            releaseDate, excerpt,
+            'SDM Editorial',
+            'Nike, Jordan, Phantom 6, Hot Punch, Green Strike, Basquete',
+            1, 0
+        ]);
+
+        const { id, slug: newSlug } = result.rows[0];
+
+        // Associa à primeira loja cadastrada (pra testar o overlay "Onde comprar")
+        const storeRes = await db.query("SELECT id FROM stores ORDER BY id ASC LIMIT 1");
+        if (storeRes.rows.length) {
+            await db.query(
+                "INSERT INTO post_stores (post_id, store_id, url, release_date, status) VALUES ($1, $2, $3, $4, $5)",
+                [id, storeRes.rows[0].id, 'https://www.nike.com.br/phantom-6-low', releaseDate, 'dropping_soon']
+            );
+        }
+
+        res.redirect(`/post/${newSlug}`);
+    } catch (err) {
+        res.status(500).send(`Erro ao criar post exemplo: ${err.message}`);
+    }
+});
+
 // --- Settings / Ads ---
 router.get('/settings/ads', isAuthenticated, async (req, res) => {
     try {
