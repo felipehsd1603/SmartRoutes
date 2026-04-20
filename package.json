@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/felipehsd1603/SmartRoutes#readme",
   "dependencies": {
+    "@supabase/supabase-js": "^2.104.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",

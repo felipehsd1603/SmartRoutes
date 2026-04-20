@@ -4,22 +4,41 @@ const path = require('path');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
 const db = require('../database/db');
+const { createClient } = require('@supabase/supabase-js');
 
-// Multer setup for image uploads
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../../public/uploads/'))
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + Math.random().toString(36).slice(2, 8) + path.extname(file.originalname))
-    }
-});
-const upload = multer({ storage: storage });
+// Supabase client initialization
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+// Memory storage for Multer (since we'll stream to Supabase)
+const upload = multer({ storage: multer.memoryStorage() });
 const uploadRich = upload.fields([
     { name: 'image', maxCount: 1 },
     { name: 'gallery', maxCount: 20 },
     { name: 'related_images', maxCount: 10 }
 ]);
+
+// --- Supabase Storage Helper ---
+async function uploadToSupabase(file) {
+    if (!file) return null;
+    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${path.extname(file.originalname)}`;
+    const { data, error } = await supabase.storage
+        .from('images')
+        .upload(fileName, file.buffer, {
+            contentType: file.mimetype,
+            upsert: true
+        });
+
+    if (error) {
+        console.error('Supabase Upload Error:', error);
+        throw error;
+    }
+
+    // Return the public URL
+    return `${process.env.SUPABASE_URL}/storage/v1/object/public/images/${fileName}`;
+}
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req, res, next) => {
@@ -64,11 +83,30 @@ function priceToCents(v) {
     return Number.isFinite(n) ? Math.round(n * 100) : null;
 }
 
-function collectRichPayload(req) {
+async function collectRichPayload(req) {
     const b = req.body || {};
     const heroFile = req.files?.image?.[0];
     const galleryFiles = req.files?.gallery || [];
     const relatedFiles = req.files?.related_images || [];
+
+    // Upload hero image to Supabase
+    let heroUrl = b.image_url || null;
+    if (heroFile) {
+        heroUrl = await uploadToSupabase(heroFile);
+    }
+
+    // Upload gallery images to Supabase
+    const galleryUrls = [];
+    for (const f of galleryFiles) {
+        const url = await uploadToSupabase(f);
+        if (url) galleryUrls.push(url);
+    }
+
+    // Upload related images to Supabase
+    const uploadedRelatedUrls = [];
+    for (const f of relatedFiles) {
+        uploadedRelatedUrls.push(await uploadToSupabase(f));
+    }
 
     return {
         title: String(b.title || '').trim(),
@@ -84,13 +122,14 @@ function collectRichPayload(req) {
         excerpt: b.excerpt || null,
         author: b.author || null,
         tags: b.tags || null,
+        published_at: b.published_at || null, 
         is_pinned: b.is_pinned === 'true' || b.is_pinned === '1' || b.is_pinned === true ? 1 : 0,
         is_sponsored: b.is_sponsored === 'true' || b.is_sponsored === '1' || b.is_sponsored === true ? 1 : 0,
-        hero_url: heroFile ? `/uploads/${heroFile.filename}` : (b.image_url || null),
-        gallery_urls: galleryFiles.map(f => `/uploads/${f.filename}`),
+        hero_url: heroUrl,
+        gallery_urls: galleryUrls,
         stores: parseJSONField(b.stores),
         related: parseJSONField(b.related),
-        related_files: relatedFiles
+        related_uploaded_urls: uploadedRelatedUrls
     };
 }
 
@@ -113,8 +152,8 @@ async function replaceChildren(postId, payload) {
     for (const [i, r] of payload.related.entries()) {
         let imageUrl = r.image_url || null;
         const idx = intOrNull(r.image_index);
-        if (idx != null && payload.related_files[idx]) {
-            imageUrl = `/uploads/${payload.related_files[idx].filename}`;
+        if (idx != null && payload.related_uploaded_urls[idx]) {
+            imageUrl = payload.related_uploaded_urls[idx];
         }
         if (!imageUrl) continue;
         await db.query("INSERT INTO related_products (post_id, name, image_url, store_url, position) VALUES ($1, $2, $3, $4, $5)", 
@@ -210,7 +249,7 @@ router.get('/posts/:id', isAuthenticated, async (req, res) => {
 
 router.post('/posts', isAuthenticated, uploadRich, async (req, res) => {
     try {
-        const p = collectRichPayload(req);
+        const p = await collectRichPayload(req);
         if (!p.title || !p.category) return res.status(400).json({ error: 'title e category obrigatórios' });
 
         const slug = await ensureUniqueSlug(slugify(p.title), null);
@@ -232,7 +271,7 @@ router.post('/posts', isAuthenticated, uploadRich, async (req, res) => {
 router.put('/posts/:id', isAuthenticated, uploadRich, async (req, res) => {
     try {
         const id = req.params.id;
-        const p = collectRichPayload(req);
+        const p = await collectRichPayload(req);
         if (!p.title || !p.category) return res.status(400).json({ error: 'title e category obrigatórios' });
 
         const existingRes = await db.query("SELECT id, slug, title FROM posts WHERE id=$1", [id]);
@@ -312,9 +351,15 @@ router.get('/clicks/stats', isAuthenticated, async (req, res) => {
 });
 
 // --- Offers ---
-function collectOfferPayload(req) {
+async function collectOfferPayload(req) {
     const b = req.body || {};
     const file = req.file;
+
+    let imageUrl = b.image_url || null;
+    if (file) {
+        imageUrl = await uploadToSupabase(file);
+    }
+
     return {
         title: String(b.title || '').trim(),
         brand: String(b.brand || '').trim(),
@@ -326,7 +371,8 @@ function collectOfferPayload(req) {
         badge: b.badge ? String(b.badge).slice(0, 24) : null,
         position: intOrNull(b.position) ?? 0,
         is_active: b.is_active === 'false' || b.is_active === '0' ? 0 : 1,
-        image_url: file ? `/uploads/${file.filename}` : null
+        published_at: b.published_at || null,
+        image_url: imageUrl
     };
 }
 
@@ -341,12 +387,12 @@ router.get('/offers', isAuthenticated, async (req, res) => {
 
 router.post('/offers', isAuthenticated, upload.single('image'), async (req, res) => {
     try {
-        const p = collectOfferPayload(req);
+        const p = await collectOfferPayload(req);
         const result = await db.query(`INSERT INTO offers
-            (title, brand, category, image_url, price_cents, retail_price_cents, coupon, affiliate_url, badge, position, is_active)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
+            (title, brand, category, image_url, price_cents, retail_price_cents, coupon, affiliate_url, badge, position, is_active, published_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, COALESCE($12, CURRENT_TIMESTAMP)) RETURNING id`,
             [p.title, p.brand, p.category, p.image_url, p.price_cents, p.retail_price_cents,
-             p.coupon, p.affiliate_url, p.badge, p.position, p.is_active]);
+             p.coupon, p.affiliate_url, p.badge, p.position, p.is_active, p.published_at]);
         res.json({ success: true, id: result.rows[0].id });
     } catch (err) {
         res.status(500).json({ error: err.message });
