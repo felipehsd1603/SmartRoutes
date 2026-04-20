@@ -408,5 +408,33 @@ router.delete('/offers/:id', isAuthenticated, async (req, res) => {
     }
 });
 
-module.exports = router;
+// --- Settings / Banner ---
+router.get('/settings/banner', isAuthenticated, async (req, res) => {
+    try {
+        const result = await db.query("SELECT key, value FROM settings WHERE key LIKE 'banner_%'");
+        const config = {};
+        for (const row of result.rows) config[row.key] = row.value;
+        res.json({ data: config });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
+router.post('/settings/banner', isAuthenticated, async (req, res) => {
+    try {
+        const fields = ['banner_active', 'banner_text', 'banner_telegram_url', 'banner_whatsapp_url', 'banner_bg_color'];
+        for (const key of fields) {
+            if (req.body[key] !== undefined) {
+                await db.query(
+                    "INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2",
+                    [key, String(req.body[key])]
+                );
+            }
+        }
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+module.exports = router;

@@ -173,26 +173,201 @@
             max-width: 720px; margin-left: auto; margin-right: auto;
         }
         .cookie-banner.show { display: flex; flex-wrap: wrap; }
+
+        /* PWA Install Prompt */
+        #pwaPrompt {
+            position: fixed;
+            bottom: -200px;
+            left: 0; right: 0;
+            z-index: 85;
+            padding: 0 1rem 1rem;
+            transition: bottom .5s cubic-bezier(.16,1,.3,1);
+            pointer-events: none;
+        }
+        #pwaPrompt.show { bottom: 0; pointer-events: all; }
+        #pwaPromptInner {
+            background: #fff;
+            border-radius: 1.25rem;
+            box-shadow: 0 -4px 60px rgba(0,0,0,.15), 0 20px 60px rgba(0,0,0,.1);
+            border: 1px solid rgba(0,0,0,.06);
+            padding: 1.25rem;
+            max-width: 460px;
+            margin: 0 auto;
+        }
+        .pwa-step {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .5rem 0;
+            font-size: .8125rem;
+            color: #555;
+            border-top: 1px solid #f0f0f0;
+        }
+        .pwa-step-num {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: #0065FC;
+            color: #fff;
+            font-size: .7rem;
+            font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body class="bg-white text-retroGrey font-sans antialiased overflow-x-hidden">
 
     <a href="#main" class="skip-link">Pular para o conteúdo</a>
 
-    <header>
-    <!-- Top announcement bar (decorativo, conteúdo repetido no footer) -->
-    <div class="bg-trueBlue text-white text-xs font-bold tracking-widest uppercase overflow-hidden" aria-hidden="true">
-        <div class="flex whitespace-nowrap marquee py-2">
-            <span class="mx-8">O maior canal de sneakers do Brasil</span><span class="mx-8">·</span>
-            <span class="mx-8">Telegram 265K</span><span class="mx-8">·</span>
-            <span class="mx-8">Instagram 186K</span><span class="mx-8">·</span>
-            <span class="mx-8">Cupons exclusivos Nike, Adidas, NB</span><span class="mx-8">·</span>
-            <span class="mx-8">O maior canal de sneakers do Brasil</span><span class="mx-8">·</span>
-            <span class="mx-8">Telegram 265K</span><span class="mx-8">·</span>
-            <span class="mx-8">Instagram 186K</span><span class="mx-8">·</span>
-            <span class="mx-8">Cupons exclusivos Nike, Adidas, NB</span><span class="mx-8">·</span>
+    <!-- PWA Install Prompt -->
+    <div id="pwaPrompt" role="dialog" aria-label="Instalar aplicativo SDM Links">
+        <div id="pwaPromptInner">
+            <div class="flex items-start justify-between gap-4 mb-3">
+                <div class="flex items-center gap-3">
+                    <img src="/logo.png" alt="SDM Links" class="w-12 h-12 rounded-xl object-contain bg-trueBlue p-1.5">
+                    <div>
+                        <p class="font-black text-retroGrey text-sm">Instale o App SDM Links</p>
+                        <p class="text-retroGrey/60 text-xs">Drops e promoções na sua tela</p>
+                    </div>
+                </div>
+                <button id="pwaPromptClose" aria-label="Fechar" class="text-retroGrey/40 hover:text-retroGrey transition-colors p-1 -mt-1 -mr-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Android: botão nativo -->
+            <button id="pwaInstallBtn" class="hidden w-full bg-trueBlue text-white font-black uppercase tracking-widest text-sm py-3.5 rounded-xl hover:bg-retroBlue transition-colors mb-3">
+                📲 Adicionar à tela de início
+            </button>
+
+            <!-- iOS: instruções -->
+            <div id="pwaIosSteps" class="hidden">
+                <div class="pwa-step">
+                    <span class="pwa-step-num">1</span>
+                    <span>Toque no botão <strong>Compartilhar</strong> 
+                        <svg class="w-4 h-4 inline-block text-trueBlue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        no Safari
+                    </span>
+                </div>
+                <div class="pwa-step">
+                    <span class="pwa-step-num">2</span>
+                    <span>Role e toque em <strong>"Adicionar à Tela de Início"</strong></span>
+                </div>
+                <div class="pwa-step">
+                    <span class="pwa-step-num">3</span>
+                    <span>Toque em <strong>Adicionar</strong> ✅</span>
+                </div>
+            </div>
+
+            <!-- Fallback genérico -->
+            <div id="pwaGenericSteps" class="hidden">
+                <p class="text-xs text-retroGrey/60 text-center py-2">
+                    No seu navegador, toque no menu <strong>⋮</strong> e selecione <strong>"Adicionar à tela de início"</strong>
+                </p>
+            </div>
         </div>
     </div>
+
+    <script>
+    (function() {
+        // Don't show if already installed or dismissed
+        if (localStorage.getItem('sdm-pwa-dismissed')) return;
+        if (window.matchMedia('(display-mode: standalone)').matches) return;
+        if (!('serviceWorker' in navigator)) return;
+
+        let deferredPrompt = null;
+        const prompt = document.getElementById('pwaPrompt');
+        const installBtn = document.getElementById('pwaInstallBtn');
+        const iosSteps = document.getElementById('pwaIosSteps');
+        const genericSteps = document.getElementById('pwaGenericSteps');
+        const closeBtn = document.getElementById('pwaPromptClose');
+
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        const isAndroid = /android/i.test(navigator.userAgent);
+        const isMobile = isIOS || isAndroid;
+
+        function showPrompt() {
+            if (isIOS) { iosSteps.classList.remove('hidden'); }
+            else if (deferredPrompt) { installBtn.classList.remove('hidden'); }
+            else if (isMobile) { genericSteps.classList.remove('hidden'); }
+            else return; // desktop: skip
+
+            setTimeout(() => prompt.classList.add('show'), 3000);
+        }
+
+        function dismiss() {
+            prompt.classList.remove('show');
+            localStorage.setItem('sdm-pwa-dismissed', '1');
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showPrompt();
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            dismiss();
+        });
+
+        closeBtn.addEventListener('click', dismiss);
+
+        // Show iOS prompt after delay
+        if (isIOS) showPrompt();
+    })();
+    </script>
+
+    <header>
+    <!-- Faixa de Anúncio Dinâmica (controlada pelo Admin) -->
+    <div id="announcementBanner" class="hidden text-white text-xs font-bold tracking-widest uppercase overflow-hidden">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-2.5 flex items-center justify-between gap-4">
+            <div class="flex-1 overflow-hidden">
+                <div id="bannerMarquee" class="flex whitespace-nowrap marquee"></div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <a id="bannerTelegramBtn" href="#" target="_blank" rel="noopener"
+                   class="hidden items-center gap-1.5 bg-white/20 hover:bg-white/30 transition-colors px-3 py-1 rounded-full text-[10px]">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+                    Telegram
+                </a>
+                <a id="bannerWhatsappBtn" href="#" target="_blank" rel="noopener"
+                   class="hidden items-center gap-1.5 bg-white/20 hover:bg-white/30 transition-colors px-3 py-1 rounded-full text-[10px]">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Load announcement banner
+        fetch('/api/banner').then(r => r.json()).then(({ data }) => {
+            if (data.banner_active !== 'true') return;
+            const banner = document.getElementById('announcementBanner');
+            banner.style.backgroundColor = data.banner_bg_color || '#0065FC';
+            banner.classList.remove('hidden');
+
+            const text = data.banner_text || '';
+            const marquee = document.getElementById('bannerMarquee');
+            marquee.innerHTML = `<span class="mx-6">${text}</span><span class="mx-4">·</span><span class="mx-6">${text}</span><span class="mx-4">·</span><span class="mx-6">${text}</span>`;
+
+            if (data.banner_telegram_url) {
+                const btn = document.getElementById('bannerTelegramBtn');
+                btn.href = data.banner_telegram_url;
+                btn.classList.remove('hidden');
+                btn.classList.add('inline-flex');
+            }
+            if (data.banner_whatsapp_url) {
+                const btn = document.getElementById('bannerWhatsappBtn');
+                btn.href = data.banner_whatsapp_url;
+                btn.classList.remove('hidden');
+                btn.classList.add('inline-flex');
+            }
+        }).catch(() => {});
+    </script>
 
     <!-- Navegação principal -->
     <nav class="border-b border-gray-200 sticky top-0 bg-white z-50" aria-label="Navegação principal">

@@ -2,6 +2,20 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 
+// Get banner config (public)
+router.get('/banner', async (req, res) => {
+    try {
+        const result = await db.query("SELECT key, value FROM settings WHERE key LIKE 'banner_%'");
+        const config = {};
+        for (const row of result.rows) {
+            config[row.key] = row.value;
+        }
+        res.json({ data: config });
+    } catch (err) {
+        res.json({ data: { banner_active: 'false' } });
+    }
+});
+
 // Get all posts (only published)
 router.get('/posts', async (req, res) => {
     try {

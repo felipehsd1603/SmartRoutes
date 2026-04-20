@@ -127,6 +127,22 @@ async function initializePostgres() {
             published_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         )`);
 
+        await client.query(`CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )`);
+
+        // Default banner config
+        await client.query(`
+            INSERT INTO settings (key, value) VALUES
+            ('banner_active', 'false'),
+            ('banner_text', '🔔 Receba drops e promoções em tempo real! Junte-se ao nosso Telegram e WhatsApp.'),
+            ('banner_telegram_url', 'https://t.me/s/sneakersdomionlinks'),
+            ('banner_whatsapp_url', 'https://wa.me/5511999999999'),
+            ('banner_bg_color', '#0065FC')
+            ON CONFLICT (key) DO NOTHING
+        `);
+
         await client.query(`CREATE TABLE IF NOT EXISTS clicks (
             id SERIAL PRIMARY KEY,
             label TEXT NOT NULL,
