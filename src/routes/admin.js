@@ -135,19 +135,34 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
+        console.log(`Tentativa de login para o usuário: ${username}`);
+        
         const result = await db.query("SELECT * FROM admins WHERE username = $1", [username]);
         const row = result.rows[0];
 
-        if (!row) return res.status(401).json({ error: "Invalid credentials" });
+        if (!row) {
+            console.warn(`Usuário ${username} não encontrado no banco.`);
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
 
         const match = await bcrypt.compare(password, row.password);
         if (match) {
+            console.log(`Login bem-sucedido para: ${username}`);
             req.session.userId = row.id;
-            res.json({ success: true });
+            // Garantir que a sessão seja salva antes de responder
+            req.session.save((err) => {
+                if (err) {
+                    console.error('Erro ao salvar sessão:', err);
+                    return res.status(500).json({ error: 'Erro de sessão' });
+                }
+                res.json({ success: true });
+            });
         } else {
+            console.warn(`Senha incorreta para o usuário: ${username}`);
             res.status(401).json({ error: "Invalid credentials" });
         }
     } catch (err) {
+        console.error('Erro no processo de login:', err);
         res.status(500).json({ error: err.message });
     }
 });
