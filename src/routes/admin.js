@@ -16,6 +16,7 @@ const supabase = createClient(
 const upload = multer({ storage: multer.memoryStorage() });
 const uploadRich = upload.fields([
     { name: 'image', maxCount: 1 },
+    { name: 'cover', maxCount: 1 },
     { name: 'gallery', maxCount: 20 },
     { name: 'related_images', maxCount: 10 }
 ]);
@@ -86,6 +87,7 @@ function priceToCents(v) {
 async function collectRichPayload(req) {
     const b = req.body || {};
     const heroFile = req.files?.image?.[0];
+    const coverFile = req.files?.cover?.[0];
     const galleryFiles = req.files?.gallery || [];
     const relatedFiles = req.files?.related_images || [];
 
@@ -93,6 +95,12 @@ async function collectRichPayload(req) {
     let heroUrl = b.image_url || null;
     if (heroFile) {
         heroUrl = await uploadToSupabase(heroFile);
+    }
+
+    // Upload cover image (editorial, full-bleed) to Supabase
+    let coverUrl = b.cover_image_url || null;
+    if (coverFile) {
+        coverUrl = await uploadToSupabase(coverFile);
     }
 
     // Upload gallery images to Supabase
@@ -108,6 +116,10 @@ async function collectRichPayload(req) {
         uploadedRelatedUrls.push(await uploadToSupabase(f));
     }
 
+    // Normaliza hero_color: aceita #RGB, #RRGGBB, ou vazio
+    let heroColor = (b.hero_color || '').trim();
+    if (heroColor && !/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(heroColor)) heroColor = null;
+
     return {
         title: String(b.title || '').trim(),
         category: String(b.category || '').trim(),
@@ -122,10 +134,12 @@ async function collectRichPayload(req) {
         excerpt: b.excerpt || null,
         author: b.author || null,
         tags: b.tags || null,
-        published_at: b.published_at || null, 
+        published_at: b.published_at || null,
         is_pinned: b.is_pinned === 'true' || b.is_pinned === '1' || b.is_pinned === true ? 1 : 0,
         is_sponsored: b.is_sponsored === 'true' || b.is_sponsored === '1' || b.is_sponsored === true ? 1 : 0,
         hero_url: heroUrl,
+        cover_url: coverUrl,
+        hero_color: heroColor || null,
         gallery_urls: galleryUrls,
         stores: parseJSONField(b.stores),
         related: parseJSONField(b.related),
@@ -434,6 +448,171 @@ router.patch('/offers/:id/toggle', isAuthenticated, async (req, res) => {
     try {
         await db.query("UPDATE offers SET is_active = CASE WHEN is_active=1 THEN 0 ELSE 1 END WHERE id=$1", [req.params.id]);
         const result = await db.query("SELECT is_active FROM offers WHERE id=$1", [req.params.id]);
+        res.json({ success: true, is_active: result.rows[0]?.is_active });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// --- Coupons ---
+function collectCouponPayload(req) {
+    const b = req.body || {};
+    return {
+        code: String(b.code || '').trim().toUpperCase(),
+        brand: b.brand ? String(b.brand).trim() : null,
+        discount_label: b.discount_label ? String(b.discount_label).trim() : null,
+        url: b.url ? String(b.url).trim() : null,
+        variant: b.variant ? String(b.variant).trim() : 'primary',
+        position: intOrNull(b.position) ?? 0,
+        is_active: b.is_active === 'false' || b.is_active === '0' ? 0 : 1,
+        published_at: b.published_at || null
+    };
+}
+
+router.get('/coupons', isAuthenticated, async (req, res) => {
+    try {
+        const result = await db.query("SELECT * FROM coupons ORDER BY position ASC, published_at DESC");
+        res.json({ data: result.rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.get('/coupons/:id', isAuthenticated, async (req, res) => {
+    try {
+        const result = await db.query("SELECT * FROM coupons WHERE id = $1", [req.params.id]);
+        if (result.rows.length === 0) return res.status(404).json({ error: 'Cupom não encontrado' });
+        res.json({ data: result.rows[0] });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.post('/coupons', isAuthenticated, async (req, res) => {
+    try {
+        const p = collectCouponPayload(req);
+        if (!p.code) return res.status(400).json({ error: 'code obrigatório' });
+        const result = await db.query(`INSERT INTO coupons
+            (code, brand, discount_label, url, variant, position, is_active, published_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, COALESCE($8, CURRENT_TIMESTAMP)) RETURNING id`,
+            [p.code, p.brand, p.discount_label, p.url, p.variant, p.position, p.is_active, p.published_at]);
+        res.json({ success: true, id: result.rows[0].id });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.put('/coupons/:id', isAuthenticated, async (req, res) => {
+    try {
+        const p = collectCouponPayload(req);
+        if (!p.code) return res.status(400).json({ error: 'code obrigatório' });
+        await db.query(`UPDATE coupons SET
+            code=$1, brand=$2, discount_label=$3, url=$4, variant=$5,
+            position=$6, is_active=$7
+            WHERE id=$8`,
+            [p.code, p.brand, p.discount_label, p.url, p.variant, p.position, p.is_active, req.params.id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.delete('/coupons/:id', isAuthenticated, async (req, res) => {
+    try {
+        await db.query("DELETE FROM coupons WHERE id=$1", [req.params.id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.patch('/coupons/:id/toggle', isAuthenticated, async (req, res) => {
+    try {
+        await db.query("UPDATE coupons SET is_active = CASE WHEN is_active=1 THEN 0 ELSE 1 END WHERE id=$1", [req.params.id]);
+        const result = await db.query("SELECT is_active FROM coupons WHERE id=$1", [req.params.id]);
+        res.json({ success: true, is_active: result.rows[0]?.is_active });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// --- Partnerships ---
+function collectPartnershipPayload(req) {
+    const b = req.body || {};
+    return {
+        title: String(b.title || '').trim(),
+        subtitle: b.subtitle ? String(b.subtitle).trim() : null,
+        badge: b.badge ? String(b.badge).trim() : null,
+        highlight: b.highlight ? String(b.highlight).trim() : null,
+        cta_label: b.cta_label ? String(b.cta_label).trim() : null,
+        cta_url: b.cta_url ? String(b.cta_url).trim() : null,
+        position: intOrNull(b.position) ?? 0,
+        is_active: b.is_active === 'false' || b.is_active === '0' ? 0 : 1,
+        published_at: b.published_at || null
+    };
+}
+
+router.get('/partnerships', isAuthenticated, async (req, res) => {
+    try {
+        const result = await db.query("SELECT * FROM partnerships ORDER BY position ASC, published_at DESC");
+        res.json({ data: result.rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.get('/partnerships/:id', isAuthenticated, async (req, res) => {
+    try {
+        const result = await db.query("SELECT * FROM partnerships WHERE id = $1", [req.params.id]);
+        if (result.rows.length === 0) return res.status(404).json({ error: 'Parceria não encontrada' });
+        res.json({ data: result.rows[0] });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.post('/partnerships', isAuthenticated, async (req, res) => {
+    try {
+        const p = collectPartnershipPayload(req);
+        if (!p.title) return res.status(400).json({ error: 'title obrigatório' });
+        const result = await db.query(`INSERT INTO partnerships
+            (title, subtitle, badge, highlight, cta_label, cta_url, position, is_active, published_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, COALESCE($9, CURRENT_TIMESTAMP)) RETURNING id`,
+            [p.title, p.subtitle, p.badge, p.highlight, p.cta_label, p.cta_url, p.position, p.is_active, p.published_at]);
+        res.json({ success: true, id: result.rows[0].id });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.put('/partnerships/:id', isAuthenticated, async (req, res) => {
+    try {
+        const p = collectPartnershipPayload(req);
+        if (!p.title) return res.status(400).json({ error: 'title obrigatório' });
+        await db.query(`UPDATE partnerships SET
+            title=$1, subtitle=$2, badge=$3, highlight=$4, cta_label=$5, cta_url=$6,
+            position=$7, is_active=$8
+            WHERE id=$9`,
+            [p.title, p.subtitle, p.badge, p.highlight, p.cta_label, p.cta_url, p.position, p.is_active, req.params.id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.delete('/partnerships/:id', isAuthenticated, async (req, res) => {
+    try {
+        await db.query("DELETE FROM partnerships WHERE id=$1", [req.params.id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.patch('/partnerships/:id/toggle', isAuthenticated, async (req, res) => {
+    try {
+        await db.query("UPDATE partnerships SET is_active = CASE WHEN is_active=1 THEN 0 ELSE 1 END WHERE id=$1", [req.params.id]);
+        const result = await db.query("SELECT is_active FROM partnerships WHERE id=$1", [req.params.id]);
         res.json({ success: true, is_active: result.rows[0]?.is_active });
     } catch (err) {
         res.status(500).json({ error: err.message });

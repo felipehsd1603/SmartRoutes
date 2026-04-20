@@ -451,22 +451,9 @@
             </div>
         </div>
 
-        <!-- Live offers ticker -->
-        <div class="relative z-10 bg-retroGrey/30 backdrop-blur border-t border-white/10 overflow-hidden" aria-hidden="true">
-            <div class="flex whitespace-nowrap marquee-slow py-2.5 text-xs font-bold uppercase tracking-widest">
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>AF1 Oil Green <span class="text-polem">R$ 449,99</span></span>
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>JA 1 Smoke Grey <span class="text-polem">R$ 535,99</span></span>
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>Air Max Solo <span class="text-polem">R$ 389,99</span></span>
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>NB 530 Wolf Grey <span class="text-polem">cupom SDMLINKS</span></span>
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>Cortez White/Black <span class="text-polem">cupom CASUAL30</span></span>
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>AF1 GS Black/Gold <span class="text-polem">cupom NIKE20</span></span>
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>AF1 Oil Green <span class="text-polem">R$ 449,99</span></span>
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>JA 1 Smoke Grey <span class="text-polem">R$ 535,99</span></span>
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>Air Max Solo <span class="text-polem">R$ 389,99</span></span>
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>NB 530 Wolf Grey <span class="text-polem">cupom SDMLINKS</span></span>
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>Cortez White/Black <span class="text-polem">cupom CASUAL30</span></span>
-                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>AF1 GS Black/Gold <span class="text-polem">cupom NIKE20</span></span>
-            </div>
+        <!-- Live offers ticker (dinâmico via /api/offers) -->
+        <div id="heroTicker" class="relative z-10 bg-retroGrey/30 backdrop-blur border-t border-white/10 overflow-hidden hidden" aria-hidden="true">
+            <div id="heroTickerTrack" class="flex whitespace-nowrap marquee-slow py-2.5 text-xs font-bold uppercase tracking-widest"></div>
         </div>
     </section>
 
@@ -523,19 +510,8 @@
         </div>
     </section>
 
-    <!-- Banner Nike parceria -->
-    <section class="bg-retroGrey text-white py-12 lg:py-16">
-        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 flex flex-col lg:flex-row items-center justify-between gap-6">
-            <div>
-                <span class="inline-block bg-polem text-retroGrey text-xs font-black uppercase tracking-widest px-3 py-1 mb-3">Parceria oficial</span>
-                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display uppercase tracking-tighter leading-none mb-2">Hotsite Nike × SDM</h2>
-                <p class="text-gray-400 text-sm lg:text-base">Produtos exclusivos com cupom <span class="text-polem font-black">NIKE20</span> · descontos de 5% a 41%</p>
-            </div>
-            <a href="https://www.nike.com.br/hotsite/sdmlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=banner-hotsite-nike" target="_blank" rel="noopener" data-track="banner-hotsite-nike" class="inline-flex items-center gap-2 bg-trueBlue hover:bg-retroBlue text-white font-black uppercase tracking-wide text-sm px-8 py-4 rounded-full transition-colors whitespace-nowrap">
-                Acessar hotsite →
-            </a>
-        </div>
-    </section>
+    <!-- Banners de parceria (dinâmico via /api/partnerships) -->
+    <div id="partnershipsContainer"></div>
 
     <!-- Lançamentos -->
     <section id="lancamentos" class="py-12 lg:py-20 bg-offWhite">
@@ -548,66 +524,8 @@
                 <a href="#" class="hidden sm:inline-block text-sm font-bold uppercase tracking-wide hover:text-trueBlue">Ver todos →</a>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 reveal">
-                <article aria-labelledby="launch-afkobe" class="group bg-white rounded-2xl overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow">
-                    <div class="product-bg sm:w-2/5 aspect-square sm:aspect-auto flex items-center justify-center text-2xl font-black uppercase text-gray-400 tracking-tighter text-center p-6" aria-hidden="true">AF1 × Kobe<br>Lower Merion</div>
-                    <div class="p-6 flex-1 flex flex-col justify-between">
-                        <div>
-                            <div class="flex gap-2 mb-3">
-                                <span class="bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Novo</span>
-                                <span class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Homenagem</span>
-                            </div>
-                            <h3 id="launch-afkobe" class="font-black text-xl lg:text-2xl leading-tight mb-2 uppercase">AF1 × Kobe 'Lower Merion High'</h3>
-                            <p class="text-base text-gray-600 mb-4 font-serif leading-snug">Homenagem ao legado de Kobe Bryant. Duas versões inspiradas na época de colégio. Grade 36 ao 48BR.</p>
-                        </div>
-                        <a href="#" class="inline-flex items-center gap-2 text-trueBlue font-black uppercase tracking-wide text-sm hover:gap-3 transition-all">Ver detalhes →</a>
-                    </div>
-                </article>
-
-                <article aria-labelledby="launch-mercurial" class="group bg-white rounded-2xl overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow">
-                    <div class="product-bg sm:w-2/5 aspect-square sm:aspect-auto flex items-center justify-center text-2xl font-black uppercase text-gray-400 tracking-tighter text-center p-6" aria-hidden="true">Mercurial<br>Superfly CR7</div>
-                    <div class="p-6 flex-1 flex flex-col justify-between">
-                        <div>
-                            <div class="flex gap-2 mb-3">
-                                <span class="bg-infrared text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Limitado</span>
-                                <span class="bg-retroGrey text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Nike App</span>
-                            </div>
-                            <h3 id="launch-mercurial" class="font-black text-xl lg:text-2xl leading-tight mb-2 uppercase">Mercurial Superfly 2009 'CR7'</h3>
-                            <p class="text-base text-gray-600 mb-4 font-serif leading-snug">Colaboração Cristiano Ronaldo × Nike. Estoque extremamente limitado. Grade 37 ao 45BR.</p>
-                        </div>
-                        <a href="#" class="inline-flex items-center gap-2 text-trueBlue font-black uppercase tracking-wide text-sm hover:gap-3 transition-all">Ver detalhes →</a>
-                    </div>
-                </article>
-
-                <article aria-labelledby="launch-adizero" class="group bg-white rounded-2xl overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow">
-                    <div class="product-bg sm:w-2/5 aspect-square sm:aspect-auto flex items-center justify-center text-2xl font-black uppercase text-gray-400 tracking-tighter text-center p-6" aria-hidden="true">Adizero<br>Evo SL</div>
-                    <div class="p-6 flex-1 flex flex-col justify-between">
-                        <div>
-                            <div class="flex gap-2 mb-3">
-                                <span class="bg-starfish text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Copa 2026</span>
-                                <span class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">8 cores</span>
-                            </div>
-                            <h3 id="launch-adizero" class="font-black text-xl lg:text-2xl leading-tight mb-2 uppercase">Adizero Evo SL · Copa do Mundo</h3>
-                            <p class="text-base text-gray-600 mb-4 font-serif leading-snug">Edição especial Copa do Mundo em 8 cores. Grade 34 ao 46BR na adidas.</p>
-                        </div>
-                        <a href="#" class="inline-flex items-center gap-2 text-trueBlue font-black uppercase tracking-wide text-sm hover:gap-3 transition-all">Ver detalhes →</a>
-                    </div>
-                </article>
-
-                <article aria-labelledby="launch-dunk" class="group bg-white rounded-2xl overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow">
-                    <div class="product-bg sm:w-2/5 aspect-square sm:aspect-auto flex items-center justify-center text-2xl font-black uppercase text-gray-400 tracking-tighter text-center p-6" aria-hidden="true">Dunk Low<br>Rainbow Swoosh</div>
-                    <div class="p-6 flex-1 flex flex-col justify-between">
-                        <div>
-                            <div class="flex gap-2 mb-3">
-                                <span class="bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Edição especial</span>
-                                <span class="bg-retroGrey text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">GS</span>
-                            </div>
-                            <h3 id="launch-dunk" class="font-black text-xl lg:text-2xl leading-tight mb-2 uppercase">Dunk Low 'Rainbow Swoosh'</h3>
-                            <p class="text-base text-gray-600 mb-4 font-serif leading-snug">Edição especial colorida. Grade 34 ao 38BR na Nike. Estoque limitado.</p>
-                        </div>
-                        <a href="#" class="inline-flex items-center gap-2 text-trueBlue font-black uppercase tracking-wide text-sm hover:gap-3 transition-all">Ver detalhes →</a>
-                    </div>
-                </article>
+            <div id="upcomingGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6 reveal" aria-live="polite" aria-busy="true">
+                <p class="text-gray-500 col-span-full text-sm">Carregando lançamentos…</p>
             </div>
         </div>
     </section>
@@ -620,35 +538,8 @@
                 <h2 class="text-4xl sm:text-5xl lg:text-6xl font-display uppercase tracking-tighter leading-none">Usa agora, economiza hoje</h2>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4 reveal">
-                <button type="button" data-coupon="NIKE20" data-track="coupon" class="text-left bg-trueBlue text-white p-6 rounded-2xl flex flex-col justify-between min-h-[160px] hover:scale-[1.02] transition-transform" aria-label="Copiar cupom NIKE20 da Nike">
-                    <p class="text-xs font-bold uppercase tracking-widest opacity-80">Nike</p>
-                    <div>
-                        <p class="text-2xl lg:text-3xl font-black mb-1">NIKE20</p>
-                        <p class="text-xs opacity-90">Toque para copiar · 30% cashback</p>
-                    </div>
-                </button>
-                <button type="button" data-coupon="SDMLINKS" data-track="coupon" class="text-left bg-retroGrey text-white p-6 rounded-2xl flex flex-col justify-between min-h-[160px] hover:scale-[1.02] transition-transform" aria-label="Copiar cupom SDMLINKS da New Balance">
-                    <p class="text-xs font-bold uppercase tracking-widest opacity-60">New Balance</p>
-                    <div>
-                        <p class="text-2xl lg:text-3xl font-black mb-1 text-polem">SDMLINKS</p>
-                        <p class="text-xs opacity-90">Toque para copiar · 20% OFF</p>
-                    </div>
-                </button>
-                <button type="button" data-coupon="CASUAL30" data-track="coupon" class="text-left bg-polem text-retroGrey p-6 rounded-2xl flex flex-col justify-between min-h-[160px] hover:scale-[1.02] transition-transform" aria-label="Copiar cupom CASUAL30 para casuais Nike">
-                    <p class="text-xs font-bold uppercase tracking-widest opacity-80">Casual</p>
-                    <div>
-                        <p class="text-2xl lg:text-3xl font-black mb-1">CASUAL30</p>
-                        <p class="text-xs">Toque para copiar · 30% OFF</p>
-                    </div>
-                </button>
-                <a href="https://t.me/s/sneakersdomionlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=cupom-secreto" target="_blank" rel="noopener" data-track="coupon-secret" class="border-2 border-retroGrey p-6 rounded-2xl flex flex-col justify-between min-h-[160px] hover:bg-retroGrey hover:text-white transition-colors">
-                    <p class="text-xs font-bold uppercase tracking-widest">Adidas</p>
-                    <div>
-                        <p class="text-2xl lg:text-3xl font-black mb-1 text-trueBlue">SECRETO</p>
-                        <p class="text-xs text-gray-600 group-hover:text-white/80">Abrir no Telegram<span class="sr-only"> (abre em nova aba)</span> →</p>
-                    </div>
-                </a>
+            <div id="couponsGrid" class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4 reveal" aria-live="polite" aria-busy="true">
+                <p class="text-gray-500 col-span-full text-sm">Carregando cupons…</p>
             </div>
         </div>
     </section>
@@ -1176,7 +1067,156 @@
             }
         }
 
+        // --- Cupons dinâmicos ---
+        const COUPON_VARIANTS = {
+            primary: { wrap: 'bg-trueBlue text-white', brand: 'opacity-80', code: '', desc: 'opacity-90' },
+            dark:    { wrap: 'bg-retroGrey text-white', brand: 'opacity-60', code: 'text-polem', desc: 'opacity-90' },
+            accent:  { wrap: 'bg-polem text-retroGrey', brand: 'opacity-80', code: '', desc: '' },
+            outline: { wrap: 'border-2 border-retroGrey text-retroGrey hover:bg-retroGrey hover:text-white transition-colors', brand: '', code: 'text-trueBlue', desc: 'text-gray-600' }
+        };
+
+        async function loadCoupons() {
+            const grid = document.getElementById('couponsGrid');
+            if (!grid) return;
+            try {
+                const res = await fetch('/api/coupons');
+                const { data } = await res.json();
+                if (!data || !data.length) {
+                    grid.innerHTML = '<p class="text-gray-500 col-span-full py-8 text-center">Nenhum cupom ativo agora.</p>';
+                    grid.setAttribute('aria-busy', 'false');
+                    return;
+                }
+                grid.innerHTML = data.map(c => {
+                    const v = COUPON_VARIANTS[c.variant] || COUPON_VARIANTS.primary;
+                    const brandLabel = escapeHtml(c.brand || '—');
+                    const descLabel = c.url ? 'Abrir parceiro →' : 'Toque para copiar';
+                    const desc = c.discount_label ? `${descLabel} · ${escapeHtml(c.discount_label)}` : descLabel;
+                    if (c.url) {
+                        return `<a href="${escapeHtml(c.url)}" target="_blank" rel="noopener" data-track="coupon-link" class="${v.wrap} p-6 rounded-2xl flex flex-col justify-between min-h-[160px] hover:scale-[1.02] transition-transform">
+                            <p class="text-xs font-bold uppercase tracking-widest ${v.brand}">${brandLabel}</p>
+                            <div>
+                                <p class="text-2xl lg:text-3xl font-black mb-1 ${v.code}">${escapeHtml(c.code)}</p>
+                                <p class="text-xs ${v.desc}">${desc}</p>
+                            </div>
+                        </a>`;
+                    }
+                    return `<button type="button" data-coupon="${escapeHtml(c.code)}" data-track="coupon" class="${v.wrap} text-left p-6 rounded-2xl flex flex-col justify-between min-h-[160px] hover:scale-[1.02] transition-transform" aria-label="Copiar cupom ${escapeHtml(c.code)}">
+                        <p class="text-xs font-bold uppercase tracking-widest ${v.brand}">${brandLabel}</p>
+                        <div>
+                            <p class="text-2xl lg:text-3xl font-black mb-1 ${v.code}">${escapeHtml(c.code)}</p>
+                            <p class="text-xs ${v.desc}">${desc}</p>
+                        </div>
+                    </button>`;
+                }).join('');
+                grid.setAttribute('aria-busy', 'false');
+            } catch (e) {
+                console.error('Error loading coupons:', e);
+                grid.innerHTML = '<p class="text-red-500 col-span-full">Erro ao carregar cupons.</p>';
+            }
+        }
+
+        // --- Parcerias dinâmicas ---
+        async function loadPartnerships() {
+            const container = document.getElementById('partnershipsContainer');
+            if (!container) return;
+            try {
+                const res = await fetch('/api/partnerships');
+                const { data } = await res.json();
+                if (!data || !data.length) { container.innerHTML = ''; return; }
+                container.innerHTML = data.map(p => `
+                    <section class="bg-retroGrey text-white py-12 lg:py-16">
+                        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 flex flex-col lg:flex-row items-center justify-between gap-6">
+                            <div>
+                                ${p.badge ? `<span class="inline-block bg-polem text-retroGrey text-xs font-black uppercase tracking-widest px-3 py-1 mb-3">${escapeHtml(p.badge)}</span>` : ''}
+                                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display uppercase tracking-tighter leading-none mb-2">${escapeHtml(p.title)}</h2>
+                                ${p.subtitle ? `<p class="text-gray-400 text-sm lg:text-base">${escapeHtml(p.subtitle)}${p.highlight ? ` <span class="text-polem font-black">${escapeHtml(p.highlight)}</span>` : ''}</p>` : ''}
+                            </div>
+                            ${p.cta_url ? `<a href="${escapeHtml(p.cta_url)}" target="_blank" rel="noopener" data-track="partnership-${p.id}" class="inline-flex items-center gap-2 bg-trueBlue hover:bg-retroBlue text-white font-black uppercase tracking-wide text-sm px-8 py-4 rounded-full transition-colors whitespace-nowrap">${escapeHtml(p.cta_label || 'Acessar →')}</a>` : ''}
+                        </div>
+                    </section>
+                `).join('');
+            } catch (e) {
+                console.error('Error loading partnerships:', e);
+                container.innerHTML = '';
+            }
+        }
+
+        // --- Próximos lançamentos dinâmicos ---
+        async function loadUpcoming() {
+            const grid = document.getElementById('upcomingGrid');
+            if (!grid) return;
+            try {
+                const res = await fetch('/api/posts/upcoming');
+                const { data } = await res.json();
+                const now = Date.now();
+                const upcoming = (data || []).filter(p => p.release_date && new Date(p.release_date).getTime() >= now).slice(0, 6);
+                if (!upcoming.length) {
+                    grid.innerHTML = '<p class="text-gray-500 col-span-full py-8 text-center bg-white rounded-2xl border border-dashed border-gray-200">Nenhum lançamento agendado. Volta logo!</p>';
+                    grid.setAttribute('aria-busy', 'false');
+                    return;
+                }
+                grid.innerHTML = upcoming.map(p => {
+                    const date = new Date(p.release_date);
+                    const dateLabel = date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+                    const href = p.slug ? `/post/${escapeHtml(p.slug)}` : '#';
+                    return `
+                    <article class="group bg-white rounded-2xl overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow">
+                        <div class="product-bg sm:w-2/5 aspect-square sm:aspect-auto relative overflow-hidden">
+                            ${p.image_url
+                                ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title)}" loading="lazy" class="w-full h-full object-cover">`
+                                : `<div class="absolute inset-0 flex items-center justify-center text-2xl font-black uppercase text-gray-400 tracking-tighter text-center p-6">${escapeHtml(p.title)}</div>`
+                            }
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex gap-2 mb-3 flex-wrap">
+                                    <span class="bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">${dateLabel}</span>
+                                    ${p.brand ? `<span class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">${escapeHtml(p.brand)}</span>` : ''}
+                                </div>
+                                <h3 class="font-black text-xl lg:text-2xl leading-tight mb-2 uppercase">${escapeHtml(p.title)}</h3>
+                                ${p.model ? `<p class="text-base text-gray-600 mb-4 font-serif leading-snug">${escapeHtml(p.model)}</p>` : ''}
+                            </div>
+                            <a href="${href}" data-track="upcoming-click" class="inline-flex items-center gap-2 text-trueBlue font-black uppercase tracking-wide text-sm hover:gap-3 transition-all">Ver detalhes →</a>
+                        </div>
+                    </article>`;
+                }).join('');
+                grid.setAttribute('aria-busy', 'false');
+            } catch (e) {
+                console.error('Error loading upcoming:', e);
+                grid.innerHTML = '<p class="text-red-500 col-span-full">Erro ao carregar lançamentos.</p>';
+            }
+        }
+
+        // --- Hero ticker dinâmico (via /api/offers) ---
+        async function loadHeroTicker() {
+            const wrap = document.getElementById('heroTicker');
+            const track = document.getElementById('heroTickerTrack');
+            if (!wrap || !track) return;
+            try {
+                const res = await fetch('/api/offers');
+                const { data } = await res.json();
+                const items = (data || []).slice(0, 6);
+                if (!items.length) return;
+                const toSpan = (o) => {
+                    const right = o.coupon
+                        ? `cupom ${escapeHtml(o.coupon)}`
+                        : (o.price_cents ? money(o.price_cents) : '');
+                    const title = (o.title || '').replace(/·.*$/, '').trim();
+                    return `<span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>${escapeHtml(title)} ${right ? `<span class="text-polem">${right}</span>` : ''}</span>`;
+                };
+                // repete 2x para garantir loop contínuo do marquee
+                track.innerHTML = [...items, ...items].map(toSpan).join('');
+                wrap.classList.remove('hidden');
+            } catch (e) {
+                console.error('Error loading hero ticker:', e);
+            }
+        }
+
         loadOffers();
+        loadCoupons();
+        loadPartnerships();
+        loadUpcoming();
+        loadHeroTicker();
         loadPosts(true);
 
         // --- Push Logic ---

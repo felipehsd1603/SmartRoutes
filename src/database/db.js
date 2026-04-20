@@ -206,6 +206,11 @@ async function initializePostgres() {
         // Migration: Add likes column if not exists
         await client.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0");
 
+        // Migration: editorial fields (hero color, cover image, updated_at)
+        await client.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS hero_color TEXT");
+        await client.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS cover_image_url TEXT");
+        await client.query("ALTER TABLE posts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP");
+
         const offersCount = await client.query("SELECT COUNT(*) FROM offers");
         if (parseInt(offersCount.rows[0].count) === 0) {
             const initialOffers = [
