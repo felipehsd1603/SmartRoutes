@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const path = require('path');
 const multer = require('multer');
@@ -174,13 +174,13 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
-        console.log(`Tentativa de login para o usuário: ${username}`);
+        console.log(`Tentativa de login para o usuÃ¡rio: ${username}`);
         
         const result = await db.query("SELECT * FROM admins WHERE username = $1", [username]);
         const row = result.rows[0];
 
         if (!row) {
-            console.warn(`Usuário ${username} não encontrado no banco.`);
+            console.warn(`UsuÃ¡rio ${username} nÃ£o encontrado no banco.`);
             return res.status(401).json({ error: "Invalid credentials" });
         }
 
@@ -188,16 +188,16 @@ router.post('/login', async (req, res) => {
         if (match) {
             console.log(`Login bem-sucedido para: ${username}`);
             req.session.userId = row.id;
-            // Garantir que a sessão seja salva antes de responder
+            // Garantir que a sessÃ£o seja salva antes de responder
             req.session.save((err) => {
                 if (err) {
-                    console.error('Erro ao salvar sessão:', err);
-                    return res.status(500).json({ error: 'Erro de sessão' });
+                    console.error('Erro ao salvar sessÃ£o:', err);
+                    return res.status(500).json({ error: 'Erro de sessÃ£o' });
                 }
                 res.json({ success: true });
             });
         } else {
-            console.warn(`Senha incorreta para o usuário: ${username}`);
+            console.warn(`Senha incorreta para o usuÃ¡rio: ${username}`);
             res.status(401).json({ error: "Invalid credentials" });
         }
     } catch (err) {
@@ -227,7 +227,7 @@ router.get('/posts/:id', isAuthenticated, async (req, res) => {
         const id = req.params.id;
         const postResult = await db.query("SELECT * FROM posts WHERE id=$1", [id]);
         const post = postResult.rows[0];
-        if (!post) return res.status(404).json({ error: 'Post não encontrado' });
+        if (!post) return res.status(404).json({ error: 'Post nÃ£o encontrado' });
 
         const [images, stores, related] = await Promise.all([
             db.query("SELECT id,url,alt,position FROM post_images WHERE post_id=$1 ORDER BY position", [id]),
@@ -250,7 +250,7 @@ router.get('/posts/:id', isAuthenticated, async (req, res) => {
 router.post('/posts', isAuthenticated, uploadRich, async (req, res) => {
     try {
         const p = await collectRichPayload(req);
-        if (!p.title || !p.category) return res.status(400).json({ error: 'title e category obrigatórios' });
+        if (!p.title || !p.category) return res.status(400).json({ error: 'title e category obrigatÃ³rios' });
 
         const slug = await ensureUniqueSlug(slugify(p.title), null);
         const result = await db.query(`INSERT INTO posts (
@@ -272,11 +272,11 @@ router.put('/posts/:id', isAuthenticated, uploadRich, async (req, res) => {
     try {
         const id = req.params.id;
         const p = await collectRichPayload(req);
-        if (!p.title || !p.category) return res.status(400).json({ error: 'title e category obrigatórios' });
+        if (!p.title || !p.category) return res.status(400).json({ error: 'title e category obrigatÃ³rios' });
 
         const existingRes = await db.query("SELECT id, slug, title FROM posts WHERE id=$1", [id]);
         const existing = existingRes.rows[0];
-        if (!existing) return res.status(404).json({ error: 'Post não encontrado' });
+        if (!existing) return res.status(404).json({ error: 'Post nÃ£o encontrado' });
 
         const targetBase = p.title !== existing.title || !existing.slug ? slugify(p.title) : existing.slug;
         const slug = await ensureUniqueSlug(targetBase, id);
@@ -408,6 +408,32 @@ router.delete('/offers/:id', isAuthenticated, async (req, res) => {
     }
 });
 
+
+router.put('/offers/:id', isAuthenticated, upload.single('image'), async (req, res) => {
+    try {
+        const p = await collectOfferPayload(req);
+        await db.query(`UPDATE offers SET
+            title=// --- Settings / Banner ---, brand=$2, category=$3, image_url=COALESCE(NULLIF($4,''), image_url),
+            price_cents=$5, retail_price_cents=$6, coupon=$7, affiliate_url=$8,
+            badge=$9, position=$10, is_active=$11
+            WHERE id=$12`,
+            [p.title, p.brand, p.category, p.image_url, p.price_cents, p.retail_price_cents,
+             p.coupon, p.affiliate_url, p.badge, p.position, p.is_active, req.params.id]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.patch('/offers/:id/toggle', isAuthenticated, async (req, res) => {
+    try {
+        await db.query("UPDATE offers SET is_active = CASE WHEN is_active=1 THEN 0 ELSE 1 END WHERE id=// --- Settings / Banner ---", [req.params.id]);
+        const result = await db.query("SELECT is_active FROM offers WHERE id=// --- Settings / Banner ---", [req.params.id]);
+        res.json({ success: true, is_active: result.rows[0]?.is_active });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 // --- Settings / Banner ---
 router.get('/settings/banner', isAuthenticated, async (req, res) => {
     try {
@@ -438,3 +464,4 @@ router.post('/settings/banner', isAuthenticated, async (req, res) => {
 });
 
 module.exports = router;
+

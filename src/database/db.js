@@ -160,6 +160,23 @@ async function initializePostgres() {
             }
         }
 
+        const offersCount = await client.query("SELECT COUNT(*) FROM offers");
+        if (parseInt(offersCount.rows[0].count) === 0) {
+            const initialOffers = [
+                ["Air Force 1 Low 'Oil Green' · -44%", "Nike", "Lifestyle", 44999, 79999, null, "https://www.nike.com.br/", "-44%", 1],
+                ["Nike Cortez 'White Black' · -33%", "Nike", "Lifestyle", 43224, 64999, "CASUAL30", "https://www.nike.com.br/", "-33%", 2],
+                ["New Balance 530 'Wolf Grey' · -20%", "New Balance", "Lifestyle", 59849, 74999, "SDMLINKS", "https://www.newbalance.com.br/", "-20%", 3],
+                ["Air Force 1 Low GS 'Black Gold' · -40%", "Nike", "Lifestyle", 41799, 69999, "NIKE20", "https://www.nike.com.br/", "-40%", 4],
+                ["Nike JA 1 'Smoke Grey' · -55%", "Nike", "Basquete", 53599, 119999, "NIKE20", "https://www.nike.com.br/", "-55%", 5],
+                ["Nike Air Max Solo · -51%", "Nike", "Lifestyle", 38999, 79999, null, "https://www.nike.com.br/", "-51%", 6]
+            ];
+            for (const o of initialOffers) {
+                await client.query(`INSERT INTO offers 
+                    (title, brand, category, price_cents, retail_price_cents, coupon, affiliate_url, badge, position, is_active)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 1)`, o);
+            }
+        }
+
         await client.query('COMMIT');
         console.log('Banco de dados PostgreSQL (Supabase) inicializado com sucesso.');
     } catch (e) {
