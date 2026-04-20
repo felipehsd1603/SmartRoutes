@@ -29,6 +29,21 @@ app.get('/post/:slug', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'post.html'));
 });
 
+// Microsoft Clarity — served dynamically so the ID comes from env var
+app.get('/clarity.js', (req, res) => {
+    const clarityId = process.env.CLARITY_ID || '';
+    res.setHeader('Content-Type', 'application/javascript');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    if (!clarityId) return res.send('// Clarity not configured');
+    res.send(`
+(function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window,document,"clarity","script","${clarityId}");
+    `.trim());
+});
+
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
