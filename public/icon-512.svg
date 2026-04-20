@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="SDM Links">
+  <!-- Background quadrado arredondado -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#0065FC"/>
+
+  <!-- Letra S -->
+  <path d="M 90 170
+    C 90 150, 105 135, 128 130
+    L 195 130
+    C 218 130, 230 143, 230 163
+    C 230 183, 218 196, 195 200
+    L 140 210
+    C 117 214, 90 225, 90 256
+    C 90 287, 112 305, 140 305
+    L 195 305
+    C 223 305, 230 318, 230 338
+    C 230 358, 218 373, 195 378
+    L 128 378
+    C 105 378, 90 363, 90 343"
+    stroke="#F5F0E8" stroke-width="28" stroke-linecap="round" fill="none"/>
+
+  <!-- Letra D -->
+  <path d="M 265 135 L 315 135
+    C 375 135, 405 178, 405 256
+    C 405 334, 375 375, 315 375
+    L 265 375 Z"
+    stroke="#F5F0E8" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <line x1="265" y1="135" x2="265" y2="375" stroke="#F5F0E8" stroke-width="28" stroke-linecap="round"/>
+
+  <!-- Elo de corrente conectando S e D (detalhe de sneaker culture) -->
+  <circle cx="248" cy="200" r="12" fill="none" stroke="#F5F0E8" stroke-width="9"/>
+  <circle cx="248" cy="310" r="12" fill="none" stroke="#F5F0E8" stroke-width="9"/>
+  <line x1="248" y1="212" x2="248" y2="298" stroke="#F5F0E8" stroke-width="6"/>
+</svg>

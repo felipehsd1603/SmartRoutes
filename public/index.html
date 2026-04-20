@@ -453,21 +453,34 @@
         </div>
     </section>
 
-    <!-- Categorias chips -->
     <section id="categorias" class="border-b border-gray-200" aria-labelledby="categorias-heading">
         <h2 id="categorias-heading" class="sr-only">Filtrar por categoria</h2>
-        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-6">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-4">
+            <!-- Busca instantânea -->
+            <div class="relative mb-4" id="searchWrap">
+                <div class="flex items-center gap-3 border-2 border-gray-200 focus-within:border-trueBlue rounded-full px-4 py-2.5 bg-white transition-colors">
+                    <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input type="search" id="searchInput" placeholder="Buscar tênis, marca, modelo..." autocomplete="off"
+                        class="flex-1 text-sm font-medium bg-transparent outline-none placeholder-gray-400" aria-label="Buscar posts" aria-controls="searchResults" aria-expanded="false">
+                    <span id="searchSpinner" class="hidden w-4 h-4 border-2 border-trueBlue border-t-transparent rounded-full animate-spin shrink-0"></span>
+                </div>
+                <!-- Dropdown de resultados -->
+                <div id="searchResults" role="listbox" aria-label="Resultados da busca"
+                    class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden">
+                </div>
+            </div>
+            <!-- Filtros -->
             <div class="flex gap-2 overflow-x-auto hide-scrollbar" role="group" aria-label="Filtrar por marca ou estilo">
-                <button type="button" aria-pressed="true" class="flex-none bg-retroGrey text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full">Todos</button>
-                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Nike</button>
-                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Adidas</button>
-                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">New Balance</button>
-                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Jordan</button>
-                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Lifestyle</button>
-                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Treino</button>
-                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Futebol</button>
-                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Skateboarding</button>
-                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Basquete</button>
+                <button type="button" data-filter="" aria-pressed="true" class="filter-chip flex-none bg-retroGrey text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Todos</button>
+                <button type="button" data-filter="Nike" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Nike</button>
+                <button type="button" data-filter="Adidas" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Adidas</button>
+                <button type="button" data-filter="New Balance" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">New Balance</button>
+                <button type="button" data-filter="Jordan" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Jordan</button>
+                <button type="button" data-filter="Lifestyle" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Lifestyle</button>
+                <button type="button" data-filter="Treino" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Treino</button>
+                <button type="button" data-filter="Futebol" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Futebol</button>
+                <button type="button" data-filter="Skateboarding" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Skateboarding</button>
+                <button type="button" data-filter="Basquete" aria-pressed="false" class="filter-chip flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-2.5 rounded-full transition-colors">Basquete</button>
             </div>
         </div>
     </section>
@@ -747,6 +760,10 @@
             <div id="postsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" aria-live="polite" aria-busy="true">
                 <p class="text-gray-500 col-span-full text-sm">Carregando posts…</p>
             </div>
+            <!-- Sentinel for infinite scroll -->
+            <div id="feedSentinel" class="hidden flex justify-center py-8">
+                <div class="w-7 h-7 border-2 border-trueBlue border-t-transparent rounded-full animate-spin"></div>
+            </div>
         </div>
     </section>
 
@@ -901,42 +918,160 @@
         document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
         const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const money = cents => cents != null ? `R$ ${(cents/100).toFixed(2).replace('.',',')}` : null;
 
-        async function loadPosts() {
+        // ——— Feed de posts com filtros + scroll infinito ———
+        let feedOffset = 0;
+        let feedTotal = Infinity;
+        let feedLoading = false;
+        let feedFilter = '';  // brand or category filter
+
+        function postCard(post, i) {
+            const title = escapeHtml(post.title);
+            const category = escapeHtml(post.category || '');
+            const brand = escapeHtml(post.brand || '');
+            const price = money(post.price_cents);
+            const iso = new Date(post.published_at).toISOString();
+            const human = new Date(post.published_at).toLocaleDateString('pt-BR');
+            const headingId = `fp-${feedOffset}-${i}`;
+            return `
+            <article aria-labelledby="${headingId}" class="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-shadow group cursor-pointer" onclick="location.href='/post/${encodeURIComponent(post.slug || post.id)}'">
+                <div class="aspect-video overflow-hidden bg-gray-100">
+                    ${post.image_url
+                        ? `<img src="${escapeHtml(post.image_url)}" alt="${category}: ${title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">`
+                        : `<div class="w-full h-full flex items-center justify-center text-gray-300 font-black text-2xl uppercase">${brand || 'SDM'}</div>`
+                    }
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-trueBlue">${category}</span>
+                        ${post.is_pinned ? '<span class="text-[10px] font-black uppercase tracking-widest bg-polem text-retroGrey px-2 py-0.5 rounded-full">📌 Destaque</span>' : ''}
+                    </div>
+                    <h3 id="${headingId}" class="font-black text-lg leading-tight uppercase mb-2">${title}</h3>
+                    <div class="flex items-center justify-between">
+                        ${price ? `<span class="text-trueBlue font-black text-base">${price}</span>` : '<span></span>'}
+                        <time datetime="${iso}" class="text-xs text-gray-400">${human}</time>
+                    </div>
+                </div>
+            </article>`;
+        }
+
+        async function loadPosts(reset = false) {
+            if (feedLoading) return;
+            if (!reset && feedOffset >= feedTotal) return;
+
+            feedLoading = true;
             const grid = document.getElementById('postsGrid');
+            const sentinel = document.getElementById('feedSentinel');
+
+            if (reset) {
+                feedOffset = 0;
+                feedTotal = Infinity;
+                grid.innerHTML = '<div class="col-span-full flex justify-center py-12"><div class="w-8 h-8 border-2 border-trueBlue border-t-transparent rounded-full animate-spin"></div></div>';
+                grid.setAttribute('aria-busy', 'true');
+            }
+
             try {
-                const res = await fetch('/api/posts');
-                const { data } = await res.json();
-                if (!data || data.length === 0) {
-                    grid.innerHTML = '<p class="text-gray-500 col-span-full text-sm">Nenhum post publicado ainda.</p>';
-                    grid.setAttribute('aria-busy', 'false');
-                    return;
+                let url = `/api/posts?limit=12&offset=${feedOffset}`;
+                if (feedFilter) url += `&brand=${encodeURIComponent(feedFilter)}`;
+
+                const res = await fetch(url);
+                const json = await res.json();
+                const data = json.data || [];
+                feedTotal = json.total ?? data.length;
+
+                if (reset) grid.innerHTML = '';
+
+                if (data.length === 0 && reset) {
+                    grid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12 font-mono text-sm">Nenhum post encontrado para esse filtro.</p>';
+                } else {
+                    data.forEach((post, i) => {
+                        grid.insertAdjacentHTML('beforeend', postCard(post, i));
+                    });
+                    feedOffset += data.length;
                 }
-                grid.innerHTML = data.slice(0, 6).map((post, i) => {
-                    const title = escapeHtml(post.title);
-                    const category = escapeHtml(post.category);
-                    const iso = new Date(post.published_at).toISOString();
-                    const human = new Date(post.published_at).toLocaleDateString('pt-BR');
-                    const headingId = `feed-post-${i}`;
-                    return `
-                    <article aria-labelledby="${headingId}" class="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-shadow group">
-                        <div class="aspect-video overflow-hidden bg-gray-100">
-                            <img src="${escapeHtml(post.image_url)}" alt="${category}: ${title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
-                        </div>
-                        <div class="p-5">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-trueBlue mb-2">${category}</p>
-                            <h3 id="${headingId}" class="font-black text-lg leading-tight uppercase mb-3">${title}</h3>
-                            <p class="text-xs text-gray-500"><time datetime="${iso}">${human}</time></p>
-                        </div>
-                    </article>`;
-                }).join('');
-            } catch (err) {
-                grid.innerHTML = '<p class="text-gray-500 col-span-full text-sm" role="alert">Erro ao carregar posts.</p>';
+
+                // Show/hide load more sentinel
+                if (sentinel) sentinel.classList.toggle('hidden', feedOffset >= feedTotal);
+            } catch {
+                if (reset) grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-12 text-sm">Erro ao carregar posts.</p>';
             } finally {
+                feedLoading = false;
                 grid.setAttribute('aria-busy', 'false');
             }
         }
-        loadPosts();
+
+        // Infinite scroll sentinel
+        const sentinel = document.getElementById('feedSentinel');
+        if (sentinel) {
+            const scrollObserver = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) loadPosts();
+            }, { rootMargin: '200px' });
+            scrollObserver.observe(sentinel);
+        }
+
+        // Filter chips
+        document.querySelectorAll('.filter-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-chip').forEach(b => {
+                    b.classList.remove('bg-retroGrey', 'text-white');
+                    b.classList.add('bg-gray-100');
+                    b.setAttribute('aria-pressed', 'false');
+                });
+                btn.classList.add('bg-retroGrey', 'text-white');
+                btn.classList.remove('bg-gray-100');
+                btn.setAttribute('aria-pressed', 'true');
+                feedFilter = btn.dataset.filter || '';
+                loadPosts(true);
+                document.getElementById('postsGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // ——— Busca instantânea ———
+        let searchTimer;
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const searchSpinner = document.getElementById('searchSpinner');
+
+        function closeSearch() {
+            searchResults.classList.add('hidden');
+            searchInput.setAttribute('aria-expanded', 'false');
+        }
+
+        searchInput?.addEventListener('input', () => {
+            clearTimeout(searchTimer);
+            const q = searchInput.value.trim();
+            if (!q || q.length < 2) { closeSearch(); return; }
+
+            searchSpinner.classList.remove('hidden');
+            searchTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+                    const { data } = await res.json();
+                    if (!data || !data.length) {
+                        searchResults.innerHTML = '<p class="px-4 py-6 text-sm text-gray-400 text-center">Nenhum resultado para "' + escapeHtml(q) + '"</p>';
+                    } else {
+                        searchResults.innerHTML = data.map(p => `
+                            <a href="/post/${encodeURIComponent(p.slug || p.id)}" role="option" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0">
+                                ${p.image_url ? `<img src="${escapeHtml(p.image_url)}" alt="" class="w-10 h-10 rounded-lg object-cover shrink-0">` : '<div class="w-10 h-10 rounded-lg bg-trueBlue/10 shrink-0"></div>'}
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-bold text-sm truncate">${escapeHtml(p.title)}</p>
+                                    <p class="text-[10px] text-gray-400 uppercase tracking-widest">${escapeHtml(p.brand || '')} · ${escapeHtml(p.category || '')}</p>
+                                </div>
+                                ${p.price_cents ? `<span class="text-trueBlue font-black text-sm shrink-0">${money(p.price_cents)}</span>` : ''}
+                            </a>`).join('');
+                    }
+                    searchResults.classList.remove('hidden');
+                    searchInput.setAttribute('aria-expanded', 'true');
+                } catch {}
+                finally { searchSpinner.classList.add('hidden'); }
+            }, 280);
+        });
+
+        searchInput?.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); });
+        document.addEventListener('click', e => { if (!e.target.closest('#searchWrap')) closeSearch(); });
+
+        loadPosts(true);
     </script>
 </body>
 </html>

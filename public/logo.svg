@@ -1,4 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 160" role="img" aria-label="SDM Links">
-    <text x="10" y="130" font-family="'Archivo Black', Archivo, 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="160" letter-spacing="-10" fill="#0065FC">SDM</text>
-    <text x="300" y="96" font-family="'Libre Caslon Display', 'Times New Roman', Georgia, serif" font-style="italic" font-size="30" fill="#0065FC">Links</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" role="img" aria-label="SDM Links">
+  <!-- SDM em display bold azul -->
+  <text x="4" y="68"
+    font-family="'Archivo Black', 'Arial Black', sans-serif"
+    font-weight="900"
+    font-size="72"
+    letter-spacing="-4"
+    fill="#0065FC">SDM</text>
+  <!-- Links em serif italic menor -->
+  <text x="228" y="52"
+    font-family="'Libre Caslon Display', Georgia, serif"
+    font-style="italic"
+    font-size="26"
+    fill="#0065FC"
+    opacity="0.85">Links</text>
 </svg>

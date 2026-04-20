@@ -16,10 +16,54 @@ router.get('/banner', async (req, res) => {
     }
 });
 
-// Get all posts (only published)
+// Get posts with pagination (for infinite scroll)
 router.get('/posts', async (req, res) => {
     try {
-        const result = await db.query("SELECT * FROM posts WHERE published_at <= CURRENT_TIMESTAMP ORDER BY published_at DESC");
+        const limit = Math.min(parseInt(req.query.limit) || 12, 48);
+        const offset = Math.max(parseInt(req.query.offset) || 0, 0);
+        const filter = req.query.brand || req.query.filter || null;
+
+        let sql, params;
+        if (filter) {
+            sql = `SELECT id, title, slug, category, brand, model, image_url, price_cents, excerpt, is_pinned, is_sponsored, published_at
+                   FROM posts WHERE published_at <= CURRENT_TIMESTAMP
+                   AND (brand ILIKE $1 OR category ILIKE $1)
+                   ORDER BY is_pinned DESC, published_at DESC LIMIT $2 OFFSET $3`;
+            params = [filter, limit, offset];
+        } else {
+            sql = `SELECT id, title, slug, category, brand, model, image_url, price_cents, excerpt, is_pinned, is_sponsored, published_at
+                   FROM posts WHERE published_at <= CURRENT_TIMESTAMP
+                   ORDER BY is_pinned DESC, published_at DESC LIMIT $1 OFFSET $2`;
+            params = [limit, offset];
+        }
+
+        const result = await db.query(sql, params);
+        const countSql = filter
+            ? "SELECT COUNT(*) FROM posts WHERE published_at <= CURRENT_TIMESTAMP AND (brand ILIKE $1 OR category ILIKE $1)"
+            : "SELECT COUNT(*) FROM posts WHERE published_at <= CURRENT_TIMESTAMP";
+        const total = await db.query(countSql, filter ? [filter] : []);
+        res.json({ data: result.rows, total: parseInt(total.rows[0].count), offset, limit });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Instant search
+router.get('/search', async (req, res) => {
+    try {
+        const q = String(req.query.q || '').trim();
+        if (!q || q.length < 2) return res.json({ data: [] });
+
+        const term = `%${q}%`;
+        const result = await db.query(
+            `SELECT id, title, slug, category, brand, model, image_url, price_cents, excerpt
+             FROM posts
+             WHERE published_at <= CURRENT_TIMESTAMP
+               AND (title ILIKE $1 OR brand ILIKE $1 OR model ILIKE $1 OR tags ILIKE $1 OR category ILIKE $1)
+             ORDER BY is_pinned DESC, published_at DESC
+             LIMIT 8`,
+            [term]
+        );
         res.json({ data: result.rows });
     } catch (err) {
         res.status(500).json({ error: err.message });
