@@ -20,37 +20,35 @@
     <script type="application/ld+json">__OG_JSONLD__</script>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0065FC">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Libre+Caslon+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script>
-        window.tailwind = {
-            config: {
-                theme: {
-                    extend: {
-                        fontFamily: {
-                            sans: ['Archivo', 'sans-serif'],
-                            display: ['"Archivo Black"', 'Archivo', 'sans-serif'],
-                            serif: ['"Libre Caslon Display"', 'serif'],
-                            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
-                        },
-                        colors: {
-                            retroBlue: '#003F9E',
-                            trueBlue: '#0065FC',
-                            uncBlue: '#00AAFF',
-                            starfish: '#FF6600',
-                            polem: '#FFC600',
-                            infrared: '#FF002A',
-                            darkMocha: '#4C3A30',
-                            retroGrey: '#2E2E2E',
-                            offWhite: '#FFFFFF'
-                        }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Archivo', 'sans-serif'],
+                        display: ['"Archivo Black"', 'Archivo', 'sans-serif'],
+                        serif: ['"Libre Caslon Display"', 'serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+                    },
+                    colors: {
+                        retroBlue: '#003F9E',
+                        trueBlue: '#0065FC',
+                        uncBlue: '#00AAFF',
+                        starfish: '#FF6600',
+                        polem: '#FFC600',
+                        infrared: '#FF002A',
+                        darkMocha: '#4C3A30',
+                        retroGrey: '#2E2E2E',
+                        offWhite: '#FFFFFF'
                     }
                 }
             }
         }
     </script>
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Libre+Caslon+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
         :focus-visible { outline:3px solid #0065FC; outline-offset:3px; border-radius:4px; }
