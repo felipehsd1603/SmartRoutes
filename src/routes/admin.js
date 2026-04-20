@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const path = require('path');
 const multer = require('multer');
@@ -317,11 +317,7 @@ router.delete('/posts/:id', isAuthenticated, async (req, res) => {
 router.get('/clicks/stats', isAuthenticated, async (req, res) => {
     try {
         const range = String(req.query.range || '7d');
-        const windows = { '24h': "-1 day", '7d': "-7 days", '30d': "-30 days", 'all': null };
-        const since = windows[range];
-        const where = since ? "WHERE created_at >= CURRENT_TIMESTAMP + interval '$1'" : "";
         
-        // Postgres syntax for intervals is different, but for simplicity let's use a simpler approach
         const last24h = await db.query("SELECT COUNT(*) FROM clicks WHERE created_at >= NOW() - INTERVAL '1 day'");
         const last7d = await db.query("SELECT COUNT(*) FROM clicks WHERE created_at >= NOW() - INTERVAL '7 days'");
         const last30d = await db.query("SELECT COUNT(*) FROM clicks WHERE created_at >= NOW() - INTERVAL '30 days'");
@@ -385,6 +381,16 @@ router.get('/offers', isAuthenticated, async (req, res) => {
     }
 });
 
+router.get('/offers/:id', isAuthenticated, async (req, res) => {
+    try {
+        const result = await db.query("SELECT * FROM offers WHERE id = $1", [req.params.id]);
+        if (result.rows.length === 0) return res.status(404).json({ error: 'Oferta não encontrada' });
+        res.json({ data: result.rows[0] });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 router.post('/offers', isAuthenticated, upload.single('image'), async (req, res) => {
     try {
         const p = await collectOfferPayload(req);
@@ -408,12 +414,11 @@ router.delete('/offers/:id', isAuthenticated, async (req, res) => {
     }
 });
 
-
 router.put('/offers/:id', isAuthenticated, upload.single('image'), async (req, res) => {
     try {
         const p = await collectOfferPayload(req);
         await db.query(`UPDATE offers SET
-            title=// --- Settings / Banner ---, brand=$2, category=$3, image_url=COALESCE(NULLIF($4,''), image_url),
+            title=$1, brand=$2, category=$3, image_url=COALESCE(NULLIF($4,''), image_url),
             price_cents=$5, retail_price_cents=$6, coupon=$7, affiliate_url=$8,
             badge=$9, position=$10, is_active=$11
             WHERE id=$12`,
@@ -427,13 +432,14 @@ router.put('/offers/:id', isAuthenticated, upload.single('image'), async (req, r
 
 router.patch('/offers/:id/toggle', isAuthenticated, async (req, res) => {
     try {
-        await db.query("UPDATE offers SET is_active = CASE WHEN is_active=1 THEN 0 ELSE 1 END WHERE id=// --- Settings / Banner ---", [req.params.id]);
-        const result = await db.query("SELECT is_active FROM offers WHERE id=// --- Settings / Banner ---", [req.params.id]);
+        await db.query("UPDATE offers SET is_active = CASE WHEN is_active=1 THEN 0 ELSE 1 END WHERE id=$1", [req.params.id]);
+        const result = await db.query("SELECT is_active FROM offers WHERE id=$1", [req.params.id]);
         res.json({ success: true, is_active: result.rows[0]?.is_active });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
+
 // --- Settings / Banner ---
 router.get('/settings/banner', isAuthenticated, async (req, res) => {
     try {
@@ -464,4 +470,3 @@ router.post('/settings/banner', isAuthenticated, async (req, res) => {
 });
 
 module.exports = router;
-

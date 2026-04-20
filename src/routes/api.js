@@ -2,6 +2,20 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 
+// Rate limiter simples para /track
+const trackRateMap = new Map();
+function checkTrackRate(ip) {
+    const now = Date.now();
+    const entry = trackRateMap.get(ip);
+    if (!entry || now > entry.resetAt) {
+        trackRateMap.set(ip, { count: 1, resetAt: now + 60000 });
+        return true;
+    }
+    if (entry.count >= 60) return false;
+    entry.count++;
+    return true;
+}
+
 // Get banner config (public)
 router.get('/banner', async (req, res) => {
     try {
@@ -13,6 +27,25 @@ router.get('/banner', async (req, res) => {
         res.json({ data: config });
     } catch (err) {
         res.json({ data: { banner_active: 'false' } });
+    }
+});
+
+// Upcoming releases para o calendário (deve ficar ANTES de /posts/:slug)
+router.get('/posts/upcoming', async (req, res) => {
+    try {
+        res.set('Cache-Control', 'public, max-age=60');
+        const result = await db.query(`
+            SELECT id, slug, title, brand, model, image_url, price_cents, release_date, published_at
+            FROM posts
+            WHERE release_date IS NOT NULL
+            ORDER BY
+                CASE WHEN release_date >= CURRENT_TIMESTAMP THEN 0 ELSE 1 END,
+                release_date ASC
+            LIMIT 60
+        `);
+        res.json({ data: result.rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -42,6 +75,7 @@ router.get('/posts', async (req, res) => {
             ? "SELECT COUNT(*) FROM posts WHERE published_at <= CURRENT_TIMESTAMP AND (brand ILIKE $1 OR category ILIKE $1)"
             : "SELECT COUNT(*) FROM posts WHERE published_at <= CURRENT_TIMESTAMP";
         const total = await db.query(countSql, filter ? [filter] : []);
+        res.set('Cache-Control', 'public, max-age=30');
         res.json({ data: result.rows, total: parseInt(total.rows[0].count), offset, limit });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -143,6 +177,7 @@ router.get('/posts/:slug/related', async (req, res) => {
 router.get('/offers', async (req, res) => {
     try {
         const result = await db.query("SELECT id, title, brand, category, image_url, price_cents, retail_price_cents, coupon, affiliate_url, badge, position FROM offers WHERE is_active=1 AND published_at <= CURRENT_TIMESTAMP ORDER BY position ASC, published_at DESC");
+        res.set('Cache-Control', 'public, max-age=60');
         res.json({ data: result.rows });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -162,6 +197,9 @@ router.post('/posts/:id/like', async (req, res) => {
 
 // Click tracking
 router.post('/track', express.text({ type: '*/*', limit: '2kb' }), async (req, res) => {
+    const ip = req.ip || req.socket?.remoteAddress || '';
+    if (!checkTrackRate(ip)) return res.status(429).end();
+
     let payload = {};
     try {
         payload = typeof req.body === 'string' && req.body ? JSON.parse(req.body) : (req.body || {});

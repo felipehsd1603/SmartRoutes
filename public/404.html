@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — SDM Links</title>
+    <meta name="robots" content="noindex">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=Archivo+Black&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Archivo', 'sans-serif'],
+                        display: ['"Archivo Black"', 'Archivo', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+                    },
+                    colors: {
+                        retroBlue: '#003F9E',
+                        trueBlue: '#0065FC',
+                        polem: '#FFC600',
+                        infrared: '#FF002A',
+                        retroGrey: '#2E2E2E',
+                        offWhite: '#FFFFFF'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-offWhite text-retroGrey font-sans antialiased min-h-screen flex flex-col">
+
+    <header class="border-b border-retroGrey/10">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-4">
+            <a href="/" aria-label="SDM Links — página inicial">
+                <img src="/logo.png" alt="SDM Links" class="h-8 w-auto">
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center px-4 py-20">
+        <div class="text-center max-w-md">
+            <p class="font-mono text-[10px] uppercase tracking-widest text-trueBlue mb-4">Erro 404</p>
+            <h1 class="font-display text-[6rem] leading-none tracking-tighter text-retroGrey mb-2">404</h1>
+            <p class="text-lg text-retroGrey/60 mb-8">Essa página não existe ou foi removida.</p>
+            <a href="/"
+               class="inline-flex items-center gap-2 bg-retroGrey text-white font-black uppercase tracking-widest text-sm px-8 py-4 rounded-full hover:bg-trueBlue transition-colors">
+                ← Voltar para home
+            </a>
+        </div>
+    </main>
+
+    <footer class="border-t border-retroGrey/10 py-6">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 text-center font-mono text-[11px] uppercase tracking-wider text-retroGrey/40">
+            SDM Links · Curadoria de sneakers
+        </div>
+    </footer>
+
+</body>
+</html>

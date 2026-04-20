@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — SDM Links Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
@@ -626,7 +626,19 @@
                     const msg = await res.json().catch(() => ({ error: 'erro desconhecido' }));
                     throw new Error(msg.error || 'fail');
                 }
+                const data = await res.json().catch(() => ({}));
                 status.textContent = id ? 'Post atualizado.' : 'Post publicado.';
+                if (data.slug) {
+                    const link = document.createElement('a');
+                    link.href = `/post/${data.slug}`;
+                    link.target = '_blank';
+                    link.rel = 'noopener';
+                    link.textContent = `Ver post ↗`;
+                    link.className = 'ml-2 text-trueBlue font-black hover:underline';
+                    status.classList.remove('sr-only');
+                    status.appendChild(link);
+                    setTimeout(() => status.classList.add('sr-only'), 8000);
+                }
                 resetForm();
                 loadPosts();
             } catch (err) {
@@ -732,8 +744,12 @@
                 const title = escapeHtml(post.title);
                 const category = escapeHtml(post.category);
                 const tr = document.createElement('tr');
+                const imgTag = post.image_url 
+                    ? `<img src="${escapeHtml(post.image_url)}" alt="" loading="lazy" class="h-12 w-12 object-cover rounded-lg">`
+                    : `<div class="h-12 w-12 bg-gray-100 flex items-center justify-center text-[10px] font-black text-gray-300 rounded-lg">FOTO</div>`;
+
                 tr.innerHTML = `
-                    <td class="py-4 pr-4"><img src="${escapeHtml(post.image_url)}" alt="Imagem do post: ${title}" loading="lazy" class="h-12 w-12 object-cover rounded-lg"></td>
+                    <td class="py-4 pr-4">${imgTag}</td>
                     <td class="py-4 pr-4 text-sm font-bold truncate max-w-xs">${title}</td>
                     <td class="py-4 pr-4"><span class="text-[10px] font-black uppercase tracking-widest bg-trueBlue text-white px-2 py-1 rounded">${category}</span></td>
                     <td class="py-4 pr-4 text-xs text-gray-500"><time datetime="${iso}">${date}</time></td>
