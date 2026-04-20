@@ -8,6 +8,7 @@ const apiRoutes = require('./src/routes/api');
 const adminRoutes = require('./src/routes/admin');
 
 const app = express();
+app.set('trust proxy', 1); // Necessário para sessões seguras no Render
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
