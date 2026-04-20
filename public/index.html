@@ -634,19 +634,33 @@
         </div>
     </section>
 
-    <!-- Posts do admin (dinâmico) -->
-    <section id="posts" class="py-12 lg:py-20 bg-offWhite">
+    <!-- Posts do admin (dinâmico - Editorial Layout) -->
+    <section id="posts" class="py-12 lg:py-20 bg-offWhite border-t border-gray-100">
         <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
-            <div class="mb-8 lg:mb-12 reveal">
-                <span class="inline-block bg-retroGrey text-white text-xs font-black uppercase tracking-widest px-3 py-1 mb-3">Feed SDM</span>
-                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-display uppercase tracking-tighter leading-none">Últimas do canal</h2>
-            </div>
-            <div id="postsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" aria-live="polite" aria-busy="true">
-                <p class="text-gray-500 col-span-full text-sm">Carregando posts…</p>
-            </div>
-            <!-- Sentinel for infinite scroll -->
-            <div id="feedSentinel" class="hidden flex justify-center py-8">
-                <div class="w-7 h-7 border-2 border-trueBlue border-t-transparent rounded-full animate-spin"></div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+                <!-- Coluna Esquerda: Destaque -->
+                <div class="lg:col-span-7 xl:col-span-8">
+                    <div id="highlightPost" class="reveal lg:sticky lg:top-28">
+                        <div class="animate-pulse bg-gray-200 aspect-video rounded-3xl mb-6"></div>
+                        <div class="h-8 bg-gray-100 rounded w-1/3 mb-4"></div>
+                        <div class="h-12 bg-gray-100 rounded w-3/4"></div>
+                    </div>
+                </div>
+
+                <!-- Coluna Direita: Feed -->
+                <div class="lg:col-span-5 xl:col-span-4">
+                    <div class="mb-10 reveal">
+                        <span class="inline-block bg-retroGrey text-white text-xs font-black uppercase tracking-widest px-3 py-1 mb-3">Feed SDM</span>
+                        <h2 class="text-3xl sm:text-4xl font-display uppercase tracking-tighter leading-none">Linha do tempo</h2>
+                    </div>
+                    <div id="postsGrid" class="flex flex-col gap-8" aria-live="polite" aria-busy="true">
+                        <p class="text-gray-400 text-sm">Carregando feed…</p>
+                    </div>
+                    <!-- Sentinel for infinite scroll -->
+                    <div id="feedSentinel" class="hidden flex justify-center py-10">
+                        <div class="w-7 h-7 border-2 border-trueBlue border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -815,26 +829,65 @@
             const category = escapeHtml(post.category || '');
             const brand = escapeHtml(post.brand || '');
             const price = money(post.price_cents);
-            const iso = new Date(post.published_at).toISOString();
             const human = new Date(post.published_at).toLocaleDateString('pt-BR');
-            const headingId = `fp-${feedOffset}-${i}`;
+            
             return `
-            <article aria-labelledby="${headingId}" class="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-shadow group cursor-pointer" onclick="location.href='/post/${encodeURIComponent(post.slug || post.id)}'">
-                <div class="aspect-video overflow-hidden bg-gray-100">
-                    ${post.image_url
-                        ? `<img src="${escapeHtml(post.image_url)}" alt="${category}: ${title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">`
-                        : `<div class="w-full h-full flex items-center justify-center text-gray-300 font-black text-2xl uppercase">${brand || 'SDM'}</div>`
+            <article class="flex gap-5 group cursor-pointer reveal" onclick="location.href='/post/${encodeURIComponent(post.slug || post.id)}'">
+                <div class="w-28 h-28 sm:w-36 sm:h-36 shrink-0 rounded-2xl overflow-hidden bg-gray-100 border border-gray-100">
+                    ${post.image_url 
+                        ? `<img src="${escapeHtml(post.image_url)}" alt="${title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">`
+                        : `<div class="w-full h-full flex items-center justify-center text-gray-300 font-black text-xs uppercase">${brand || 'SDM'}</div>`
                     }
                 </div>
-                <div class="p-5">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="text-[10px] font-black uppercase tracking-widest text-trueBlue">${category}</span>
-                        ${post.is_pinned ? '<span class="text-[10px] font-black uppercase tracking-widest bg-polem text-retroGrey px-2 py-0.5 rounded-full">📌 Destaque</span>' : ''}
+                <div class="flex flex-col justify-center min-w-0 pr-2">
+                    <span class="text-[9px] font-black uppercase tracking-widest text-trueBlue mb-1.5">${category}</span>
+                    <h3 class="font-black text-sm sm:text-base leading-snug mb-2 line-clamp-2 uppercase group-hover:text-trueBlue transition-colors">${title}</h3>
+                    <div class="flex items-center gap-3">
+                        ${price ? `<span class="text-trueBlue font-black text-xs sm:text-sm">${price}</span>` : ''}
+                        <span class="text-[10px] text-gray-400 font-medium">${human}</span>
                     </div>
-                    <h3 id="${headingId}" class="font-black text-lg leading-tight uppercase mb-2">${title}</h3>
-                    <div class="flex items-center justify-between">
-                        ${price ? `<span class="text-trueBlue font-black text-base">${price}</span>` : '<span></span>'}
-                        <time datetime="${iso}" class="text-xs text-gray-400">${human}</time>
+                </div>
+            </article>`;
+        }
+
+        function highlightCard(post) {
+            const title = escapeHtml(post.title);
+            const category = escapeHtml(post.category || '');
+            const brand = escapeHtml(post.brand || '');
+            const price = money(post.price_cents);
+            const excerpt = escapeHtml(post.excerpt || '');
+            const iso = new Date(post.published_at).toISOString();
+            const human = new Date(post.published_at).toLocaleDateString('pt-BR');
+
+            return `
+            <article class="group cursor-pointer" onclick="location.href='/post/${encodeURIComponent(post.slug || post.id)}'">
+                <div class="aspect-video rounded-[2rem] overflow-hidden bg-gray-100 mb-8 border border-gray-100 shadow-2xl relative">
+                     ${post.image_url 
+                        ? `<img src="${escapeHtml(post.image_url)}" alt="${title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">`
+                        : `<div class="w-full h-full flex items-center justify-center text-gray-300 font-black text-6xl uppercase">${brand || 'SDM'}</div>`
+                    }
+                    <div class="absolute top-6 left-6 flex gap-2">
+                        <span class="bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">Em destaque</span>
+                        ${post.is_pinned ? '<span class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">📌 Fixado</span>' : ''}
+                    </div>
+                </div>
+                <div class="px-2">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="text-xs font-black uppercase tracking-widest text-trueBlue">${category}</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                        <time datetime="${iso}" class="text-xs text-gray-400 font-medium">${human}</time>
+                    </div>
+                    <h2 class="text-4xl sm:text-5xl lg:text-4xl xl:text-5xl font-display uppercase tracking-tighter leading-[0.95] mb-5 group-hover:text-trueBlue transition-colors">${title}</h2>
+                    <p class="text-base sm:text-lg text-gray-500 font-serif leading-relaxed line-clamp-3 mb-8">${excerpt}</p>
+                    <div class="flex items-center gap-6">
+                        ${price ? `
+                        <div>
+                           <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Preço sugerido</p>
+                           <span class="text-2xl font-black text-trueBlue">${price}</span>
+                        </div>` : ''}
+                        <div class="ml-auto">
+                            <span class="inline-flex items-center gap-2 text-retroGrey font-black uppercase tracking-widest text-xs border-b-2 border-retroGrey pb-1 group-hover:gap-4 transition-all">Explorar lançamento →</span>
+                        </div>
                     </div>
                 </div>
             </article>`;
@@ -846,12 +899,14 @@
 
             feedLoading = true;
             const grid = document.getElementById('postsGrid');
+            const highlight = document.getElementById('highlightPost');
             const sentinel = document.getElementById('feedSentinel');
 
             if (reset) {
                 feedOffset = 0;
                 feedTotal = Infinity;
-                grid.innerHTML = '<div class="col-span-full flex justify-center py-12"><div class="w-8 h-8 border-2 border-trueBlue border-t-transparent rounded-full animate-spin"></div></div>';
+                grid.innerHTML = '<div class="flex justify-center py-10"><div class="w-8 h-8 border-2 border-trueBlue border-t-transparent rounded-full animate-spin"></div></div>';
+                highlight.innerHTML = '<div class="animate-pulse bg-gray-200 aspect-video rounded-3xl mb-8"></div><div class="h-8 bg-gray-100 rounded w-1/3 mb-4"></div><div class="h-12 bg-gray-100 rounded w-3/4"></div>';
                 grid.setAttribute('aria-busy', 'true');
             }
 
@@ -864,21 +919,33 @@
                 const data = json.data || [];
                 feedTotal = json.total ?? data.length;
 
-                if (reset) grid.innerHTML = '';
-
-                if (data.length === 0 && reset) {
-                    grid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12 font-mono text-sm">Nenhum post encontrado para esse filtro.</p>';
+                if (reset) {
+                    grid.innerHTML = '';
+                    if (data.length > 0) {
+                        highlight.innerHTML = highlightCard(data[0]);
+                        // Small items for the rest of the array
+                        data.slice(1).forEach((post, i) => {
+                            grid.insertAdjacentHTML('beforeend', postCard(post, i));
+                        });
+                    } else {
+                        highlight.innerHTML = '<p class="text-gray-400">Nenhum destaque encontrado.</p>';
+                        grid.innerHTML = '<p class="text-center text-gray-400 py-12 font-mono text-sm">Nenhum post encontrado para esse filtro.</p>';
+                    }
+                    feedOffset += data.length;
+                    // Trigger reveal for newly added cards
+                    document.querySelectorAll('#posts .reveal').forEach(el => io.observe(el));
                 } else {
                     data.forEach((post, i) => {
                         grid.insertAdjacentHTML('beforeend', postCard(post, i));
                     });
                     feedOffset += data.length;
+                    document.querySelectorAll('#posts .reveal').forEach(el => io.observe(el));
                 }
 
-                // Show/hide load more sentinel
                 if (sentinel) sentinel.classList.toggle('hidden', feedOffset >= feedTotal);
-            } catch {
-                if (reset) grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-12 text-sm">Erro ao carregar posts.</p>';
+            } catch (err) {
+                console.error(err);
+                if (reset) grid.innerHTML = '<p class="text-center text-red-400 py-12 text-sm">Erro ao carregar posts.</p>';
             } finally {
                 feedLoading = false;
                 grid.setAttribute('aria-busy', 'false');
