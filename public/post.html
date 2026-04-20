@@ -125,10 +125,8 @@
     <main id="main" tabindex="-1">
 
         <!-- COVER editorial (atleta / celebridade / lifestyle) — só renderiza se cover_image_url -->
-        <section id="coverSection" class="hidden relative overflow-hidden">
-            <div class="aspect-[16/9] md:aspect-[21/9] bg-retroGrey/10">
-                <img id="coverImg" src="" alt="" class="w-full h-full object-cover" onerror="this.closest('#coverSection').classList.add('hidden')">
-            </div>
+        <section id="coverSection" class="hidden relative overflow-hidden bg-retroGrey">
+            <div id="coverBg" class="min-h-[45vh] md:min-h-[65vh] bg-cover bg-no-repeat"></div>
         </section>
 
         <!-- HERO: Imagem + Título + Ficha técnica -->
@@ -517,13 +515,24 @@
             document.title = `${p.title} | SDM Links`;
             document.querySelector('meta[name="description"]').content = p.excerpt || `${p.title} — SDM Links`;
 
-            // Cover editorial (se existir)
+            // Cover editorial (se existir) — detecta orientação e posiciona a imagem
             if (p.cover_image_url) {
                 const coverSec = document.getElementById('coverSection');
-                const coverImg = document.getElementById('coverImg');
-                coverImg.src = p.cover_image_url;
-                coverImg.alt = `${p.brand || ''} ${p.model || p.title}`.trim();
-                coverSec.classList.remove('hidden');
+                const coverBg = document.getElementById('coverBg');
+                const probe = new Image();
+                probe.onload = () => {
+                    const portrait = probe.naturalHeight > probe.naturalWidth;
+                    coverBg.style.backgroundImage = `url("${p.cover_image_url}")`;
+                    coverBg.style.backgroundPosition = portrait ? 'center 15%' : 'center center';
+                    // Em portrait, contain evita perder corpo do atleta; com hero_color de fundo fica editorial
+                    if (portrait) {
+                        coverBg.style.backgroundSize = 'contain';
+                        if (p.hero_color) coverSec.style.backgroundColor = p.hero_color;
+                    }
+                    coverSec.classList.remove('hidden');
+                };
+                probe.onerror = () => console.warn('Cover não carregou:', p.cover_image_url);
+                probe.src = p.cover_image_url;
             }
 
             // Hero color bg (identidade visual do produto)
