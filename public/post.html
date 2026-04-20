@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SDM Links</title>
     <meta name="description" content="Detalhe de lançamento — SDM Links">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0065FC">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,106 +39,232 @@
     <style>
         .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
         :focus-visible { outline:3px solid #0065FC; outline-offset:3px; border-radius:4px; }
-        .bg-retroGrey :focus-visible, .bg-darkMocha :focus-visible, .bg-trueBlue :focus-visible { outline-color:#FFC600; }
-        .overlay { position:fixed; inset:0; background:rgba(10,10,10,.85); z-index:100; display:none; align-items:flex-end; justify-content:center; }
+        
+        /* Overlay / Pop-up */
+        .overlay { position:fixed; inset:0; background:rgba(10,10,10,.7); backdrop-filter:blur(4px); z-index:100; display:none; align-items:flex-end; justify-content:center; animation:fadeIn .2s ease; }
         .overlay.show { display:flex; }
-        .overlay-panel { background:#fff; width:100%; max-width:1000px; max-height:92vh; overflow:auto; border-radius:1rem 1rem 0 0; }
-        @media (min-width: 768px) { .overlay { align-items:center; } .overlay-panel { border-radius:1rem; } }
+        .overlay-panel { background:#fff; width:100%; max-width:640px; max-height:92vh; overflow-y:auto; border-radius:1.5rem 1.5rem 0 0; animation:slideUp .3s cubic-bezier(.16,1,.3,1); }
+        @media (min-width: 768px) { .overlay { align-items:center; } .overlay-panel { border-radius:1.5rem; } }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes slideUp { from { transform:translateY(40px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
+        /* Status badge */
+        .badge-available { background:#dcfce7; color:#166534; }
+        .badge-soon { background:#fef9c3; color:#854d0e; }
+        .badge-released { background:#f3f4f6; color:#374151; }
+
+        /* Countdown */
+        .countdown-block { background:#0065FC; color:#fff; }
+        .countdown-num { font-family: 'Archivo Black', sans-serif; font-size:2rem; line-height:1; }
+
+        /* Gallery zoom */
+        .gallery-img { cursor:zoom-in; transition:transform .4s ease; }
+        .gallery-img:hover { transform:scale(1.02); }
+
         .skip-link { position:absolute;top:-100px;left:1rem;z-index:110;background:#0065FC;color:#fff;padding:.75rem 1.25rem;border-radius:.5rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;font-size:.875rem;transition:top .2s; }
         .skip-link:focus { top:1rem; }
+
+        /* Buy button pulse */
+        @keyframes pulse-ring { 0%{box-shadow:0 0 0 0 rgba(0,101,252,.4)} 70%{box-shadow:0 0 0 10px rgba(0,101,252,0)} 100%{box-shadow:0 0 0 0 rgba(0,101,252,0)} }
+        .btn-buy-pulse { animation: pulse-ring 2s infinite; }
     </style>
 </head>
 <body class="bg-offWhite text-retroGrey font-sans antialiased">
     <a href="#main" class="skip-link">Pular para o conteúdo</a>
 
-    <!-- Top bar monospace (ficha rápida) -->
-    <header id="topbar" class="border-b border-retroGrey/10 bg-offWhite sticky top-0 z-40">
-        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-3 flex items-center gap-4 text-[11px] font-mono uppercase tracking-wider">
+    <!-- Header fixo com logo oficial -->
+    <header id="topbar" class="border-b border-retroGrey/10 bg-white/95 backdrop-blur-sm sticky top-0 z-40">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-3 flex items-center gap-4">
             <a href="/" aria-label="SDM Links — página inicial" class="shrink-0">
-                <span class="font-display text-xl text-trueBlue tracking-tighter">SDM</span><span class="font-serif italic text-sm text-trueBlue ml-1">Links</span>
+                <img src="/logo.png" alt="SDM Links" class="h-8 sm:h-10 w-auto">
             </a>
-            <div id="topbarMeta" class="flex-1 flex items-center gap-4 overflow-x-auto whitespace-nowrap text-retroGrey/70">
-                <span id="topbarTitle">—</span>
-                <span class="hidden md:inline">·</span>
-                <span id="topbarStatus" class="hidden md:inline">—</span>
-                <span class="hidden md:inline">·</span>
-                <span id="topbarPrice" class="hidden md:inline">—</span>
+            <div id="topbarMeta" class="flex-1 flex items-center gap-3 overflow-x-auto whitespace-nowrap text-[11px] font-mono uppercase tracking-wider text-retroGrey/60">
+                <span id="topbarTitle" class="text-retroGrey font-bold"></span>
+                <span id="topbarPrice" class="hidden md:inline text-trueBlue font-black"></span>
             </div>
-            <button type="button" id="rateBtn" class="hidden md:inline-flex items-center border border-retroGrey/20 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded hover:bg-retroGrey/5">Rate release</button>
-            <button type="button" id="topBuyBtn" class="inline-flex items-center bg-retroGrey text-offWhite text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded hover:bg-trueBlue transition-colors">+ Buy now</button>
+            <button type="button" id="topBuyBtn"
+                class="inline-flex items-center gap-2 bg-trueBlue text-white text-[11px] font-black uppercase tracking-widest px-4 py-2.5 rounded-full hover:bg-retroBlue transition-colors whitespace-nowrap">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                Comprar
+            </button>
         </div>
     </header>
 
     <main id="main" tabindex="-1">
-        <!-- Hero com ficha técnica + imagem principal -->
+
+        <!-- HERO: Imagem + Título + Ficha técnica -->
         <section class="border-b border-retroGrey/10">
-            <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-8 lg:py-12 grid lg:grid-cols-[260px_1fr] gap-6 lg:gap-10">
-                <aside class="order-2 lg:order-1">
-                    <dl id="specList" class="font-mono text-[11px] leading-6 uppercase tracking-wider text-retroGrey/80"></dl>
-                </aside>
-                <div class="order-1 lg:order-2">
-                    <div id="heroImg" class="aspect-[4/3] bg-retroGrey/5 rounded-xl overflow-hidden flex items-center justify-center">
+            <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-8 lg:py-14 grid lg:grid-cols-[1fr_360px] gap-8 lg:gap-12 items-start">
+
+                <!-- Esquerda: Imagem + Título + CTA -->
+                <div>
+                    <div id="heroImg" class="aspect-[4/3] bg-retroGrey/5 rounded-2xl overflow-hidden flex items-center justify-center mb-6">
                         <span class="text-retroGrey/30 font-mono text-xs">Carregando…</span>
                     </div>
-                    <h1 id="postTitle" class="font-display text-4xl md:text-6xl lg:text-7xl leading-[0.95] tracking-tight mt-6">—</h1>
+                    <div id="postCategory" class="inline-block font-mono text-[10px] uppercase tracking-widest text-trueBlue bg-trueBlue/10 px-3 py-1 rounded-full mb-4"></div>
+                    <h1 id="postTitle" class="font-display text-4xl md:text-6xl lg:text-7xl leading-[0.95] tracking-tight mb-6">—</h1>
+
+                    <!-- Bloco de ação imediata -->
+                    <div class="flex flex-wrap items-center gap-4 mb-6">
+                        <div>
+                            <p class="font-mono text-[10px] uppercase tracking-widest text-retroGrey/50 mb-0.5">Preço</p>
+                            <p id="heroPriceCents" class="font-display text-3xl text-trueBlue tracking-tight">—</p>
+                        </div>
+                        <div id="heroReleaseWrap" class="hidden">
+                            <p class="font-mono text-[10px] uppercase tracking-widest text-retroGrey/50 mb-0.5">Lançamento</p>
+                            <p id="heroRelease" class="font-display text-xl tracking-tight">—</p>
+                        </div>
+                    </div>
+
+                    <!-- Botão Comprar Principal -->
+                    <button type="button" id="mainBuyBtn"
+                        class="btn-buy-pulse inline-flex items-center gap-3 bg-trueBlue text-white font-black uppercase tracking-widest text-sm px-8 py-4 rounded-full hover:bg-retroBlue transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Ver onde comprar
+                    </button>
                 </div>
+
+                <!-- Direita: Ficha técnica -->
+                <aside class="lg:sticky lg:top-20">
+                    <div class="border border-retroGrey/10 rounded-2xl p-6">
+                        <p class="font-mono text-[10px] uppercase tracking-widest text-retroGrey/50 mb-4">Ficha Técnica</p>
+                        <dl id="specList" class="font-mono text-[12px] leading-7 text-retroGrey/80 divide-y divide-retroGrey/8"></dl>
+                    </div>
+
+                    <!-- Countdown (se tiver data futura) -->
+                    <div id="countdownBlock" class="hidden mt-4 countdown-block rounded-2xl p-6">
+                        <p class="font-mono text-[10px] uppercase tracking-widest text-white/70 mb-4">Lança em</p>
+                        <div class="flex items-end gap-4">
+                            <div class="text-center">
+                                <p class="countdown-num" id="cdDays">00</p>
+                                <p class="text-[10px] uppercase tracking-widest text-white/60 mt-1">dias</p>
+                            </div>
+                            <p class="countdown-num pb-1 text-white/40">:</p>
+                            <div class="text-center">
+                                <p class="countdown-num" id="cdHours">00</p>
+                                <p class="text-[10px] uppercase tracking-widest text-white/60 mt-1">hrs</p>
+                            </div>
+                            <p class="countdown-num pb-1 text-white/40">:</p>
+                            <div class="text-center">
+                                <p class="countdown-num" id="cdMins">00</p>
+                                <p class="text-[10px] uppercase tracking-widest text-white/60 mt-1">min</p>
+                            </div>
+                            <p class="countdown-num pb-1 text-white/40">:</p>
+                            <div class="text-center">
+                                <p class="countdown-num" id="cdSecs">00</p>
+                                <p class="text-[10px] uppercase tracking-widest text-white/60 mt-1">seg</p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </section>
 
-        <!-- Excerpt -->
+        <!-- Excerpt (texto introdutório) -->
         <section class="border-b border-retroGrey/10">
             <div class="max-w-[820px] mx-auto px-4 lg:px-8 py-10 lg:py-14">
-                <p id="postExcerpt" class="text-lg lg:text-xl leading-relaxed text-retroGrey"></p>
+                <p id="postExcerpt" class="text-xl lg:text-2xl leading-relaxed text-retroGrey font-medium"></p>
             </div>
         </section>
 
         <!-- Galeria HD -->
         <section id="gallerySection" class="border-b border-retroGrey/10 hidden">
             <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-10 lg:py-14">
-                <div id="gallery" class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6"></div>
+                <p class="font-mono text-[10px] uppercase tracking-widest text-retroGrey/50 mb-6">Galeria</p>
+                <div id="gallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6"></div>
             </div>
         </section>
 
         <!-- Conteúdo principal -->
         <section class="border-b border-retroGrey/10">
             <div class="max-w-[820px] mx-auto px-4 lg:px-8 py-10 lg:py-14">
-                <article id="postContent" class="prose max-w-none text-base lg:text-lg leading-relaxed whitespace-pre-wrap"></article>
+                <article id="postContent" class="prose max-w-none text-base lg:text-lg leading-relaxed whitespace-pre-wrap text-retroGrey/90"></article>
+            </div>
+        </section>
+
+        <!-- CTA Comprar (fundo azul) após o conteúdo -->
+        <section id="buyCtaSection" class="bg-trueBlue hidden">
+            <div class="max-w-[820px] mx-auto px-4 lg:px-8 py-12 text-center">
+                <p class="font-mono text-[10px] uppercase tracking-widest text-white/60 mb-3">Pronto para comprar?</p>
+                <h2 id="buyCtaTitle" class="font-display text-4xl text-white tracking-tight mb-6">—</h2>
+                <button type="button" id="ctaBuyBtn"
+                    class="inline-flex items-center gap-3 bg-white text-trueBlue font-black uppercase tracking-widest text-sm px-8 py-4 rounded-full hover:bg-polem transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    Ver onde comprar
+                </button>
             </div>
         </section>
 
         <!-- Footer meta -->
         <section class="border-b border-retroGrey/10">
             <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-6 flex flex-wrap items-center gap-x-8 gap-y-2 font-mono text-[11px] uppercase tracking-wider text-retroGrey/60">
-                <span>Author: <strong id="metaAuthor" class="text-retroGrey font-mono">—</strong></span>
-                <span>Date: <strong id="metaDate" class="text-retroGrey font-mono">—</strong></span>
-                <span>Tags: <span id="metaTags" class="inline-flex flex-wrap gap-1.5 ml-1"></span></span>
+                <span>Autor: <strong id="metaAuthor" class="text-retroGrey">—</strong></span>
+                <span>Data: <strong id="metaDate" class="text-retroGrey">—</strong></span>
+                <span class="flex items-center gap-2">Tags: <span id="metaTags" class="inline-flex flex-wrap gap-1.5"></span></span>
             </div>
         </section>
 
-        <!-- Related -->
-        <section id="relatedSection" class="py-12 lg:py-20 hidden">
+        <!-- Produtos Relacionados -->
+        <section id="relatedSection" class="py-16 lg:py-24 hidden">
             <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
-                <h2 class="font-display text-4xl md:text-6xl lg:text-7xl tracking-tight mb-8">Related Releases</h2>
+                <p class="font-mono text-[10px] uppercase tracking-widest text-retroGrey/50 mb-3">Veja também</p>
+                <h2 class="font-display text-4xl md:text-6xl tracking-tight mb-10">Lançamentos relacionados</h2>
                 <div id="relatedGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6"></div>
+            </div>
+        </section>
+
+        <!-- Bloco de canais (CTA Telegram/WhatsApp) -->
+        <section class="bg-retroGrey text-white py-16">
+            <div class="max-w-[640px] mx-auto px-4 text-center">
+                <span class="inline-flex items-center gap-2 bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full mb-5">
+                    <span class="w-2 h-2 rounded-full bg-infrared animate-ping inline-block"></span>
+                    Alertas em tempo real
+                </span>
+                <h2 class="font-display text-4xl md:text-5xl tracking-tight mb-4">Não perca<br>nenhum drop.</h2>
+                <p class="text-white/60 mb-8 text-lg">Receba lançamentos, restocks e promoções direto no seu celular.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="https://t.me/s/sneakersdomionlinks" target="_blank" rel="noopener" data-track="post-telegram-cta"
+                        class="flex items-center justify-center gap-3 bg-trueBlue text-white font-black uppercase tracking-wider px-8 py-4 rounded-full hover:bg-retroBlue transition-colors">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+                        Telegram
+                    </a>
+                    <a href="https://wa.me/5511999999999" target="_blank" rel="noopener" data-track="post-whatsapp-cta"
+                        class="flex items-center justify-center gap-3 bg-white/10 text-white font-black uppercase tracking-wider px-8 py-4 rounded-full hover:bg-white/20 transition-colors border border-white/20">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        WhatsApp
+                    </a>
+                </div>
             </div>
         </section>
     </main>
 
-    <!-- Pop-up "Onde comprar" -->
+    <!-- =================== POP-UP "Onde Comprar" =================== -->
     <div id="buyOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="buyTitle" aria-hidden="true">
         <div class="overlay-panel" role="document">
+            <!-- Header do overlay -->
             <div class="flex items-start justify-between p-6 lg:p-8 border-b border-retroGrey/10">
                 <div>
-                    <p class="font-mono text-[10px] uppercase tracking-widest text-retroGrey/60 mb-1">Onde comprar</p>
+                    <p class="font-mono text-[10px] uppercase tracking-widest text-retroGrey/50 mb-1">Onde comprar</p>
                     <h2 id="buyTitle" class="font-display text-2xl lg:text-3xl tracking-tight">—</h2>
+                    <p id="buyPrice" class="text-trueBlue font-black text-xl mt-1">—</p>
                 </div>
-                <button type="button" id="buyClose" aria-label="Fechar" class="w-10 h-10 rounded-full bg-retroGrey text-offWhite font-black hover:bg-infrared transition-colors">×</button>
+                <button type="button" id="buyClose" aria-label="Fechar"
+                    class="w-10 h-10 rounded-full bg-retroGrey/10 text-retroGrey font-black text-xl hover:bg-infrared hover:text-white transition-colors flex items-center justify-center">×</button>
             </div>
+
+            <!-- Lista de lojas -->
             <div class="p-6 lg:p-8">
-                <div id="buyStores" class="divide-y divide-retroGrey/10"></div>
-                <p class="mt-8 text-[11px] font-mono uppercase tracking-wider text-retroGrey/60 leading-relaxed border-t border-retroGrey/10 pt-6">
-                    <strong class="text-retroGrey">Aviso:</strong> o SDM Links <strong>não realiza vendas</strong>. Apenas direcionamos para lojas parceiras. Ao clicar em "Buy online" você será redirecionado para o site externo da loja. Podemos receber comissão por compras feitas por nossos links.
-                </p>
+                <div id="buyStores" class="space-y-3"></div>
+
+                <!-- Disclaimer -->
+                <div class="mt-6 p-4 bg-retroGrey/5 rounded-xl border border-retroGrey/10">
+                    <div class="flex gap-3">
+                        <svg class="w-5 h-5 text-retroGrey/40 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p class="text-[12px] text-retroGrey/60 leading-relaxed">
+                            <strong class="text-retroGrey">O SDM Links não realiza vendas.</strong> Somos um canal de curadoria e apenas direcionamos para lojas parceiras. Ao clicar em "Ir à loja" você será redirecionado para o site externo. Podemos receber comissão por compras feitas via nossos links.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -144,92 +272,172 @@
     <script>
         const slug = location.pathname.replace(/^\/post\//, '').replace(/\/$/, '');
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-        const money = cents => cents == null ? '—' : `R$ ${(cents/100).toFixed(2).replace('.', ',')}`;
+        const money = cents => cents == null ? null : `R$ ${(cents/100).toFixed(2).replace('.',',')}`;
         const dateBR = iso => iso ? new Date(iso.replace(' ','T')).toLocaleDateString('pt-BR') : '—';
 
-        const STATUS_LABELS = {
-            available_now: 'Available now',
-            coming_soon: 'Coming soon',
-            released: 'Released',
-            dropping_soon: 'Dropping soon'
+        const STATUS_MAP = {
+            available_now: { label: 'Disponível agora', cls: 'badge-available' },
+            coming_soon:   { label: 'Em breve',          cls: 'badge-soon' },
+            released:      { label: 'Lançado',           cls: 'badge-released' },
+            dropping_soon: { label: 'Lançando em breve', cls: 'badge-soon' }
         };
 
         let current = null;
+        let cdInterval = null;
 
+        /* ---- Countdown ---- */
+        function startCountdown(dateStr) {
+            if (!dateStr) return;
+            const target = new Date(dateStr.replace(' ','T'));
+            if (isNaN(target) || target <= new Date()) return;
+
+            document.getElementById('countdownBlock').classList.remove('hidden');
+
+            function tick() {
+                const diff = target - new Date();
+                if (diff <= 0) { clearInterval(cdInterval); return; }
+                const days  = Math.floor(diff / 86400000);
+                const hours = Math.floor((diff % 86400000) / 3600000);
+                const mins  = Math.floor((diff % 3600000) / 60000);
+                const secs  = Math.floor((diff % 60000) / 1000);
+                document.getElementById('cdDays').textContent  = String(days).padStart(2,'0');
+                document.getElementById('cdHours').textContent = String(hours).padStart(2,'0');
+                document.getElementById('cdMins').textContent  = String(mins).padStart(2,'0');
+                document.getElementById('cdSecs').textContent  = String(secs).padStart(2,'0');
+            }
+            tick();
+            cdInterval = setInterval(tick, 1000);
+        }
+
+        /* ---- Render ---- */
         function renderPost(p) {
             current = p;
             document.title = `${p.title} — SDM Links`;
+
+            // SEO meta dinâmico
+            document.querySelector('meta[name="description"]').content = p.excerpt || `${p.title} — SDM Links`;
+
+            // Header
             document.getElementById('postTitle').textContent = p.title;
             document.getElementById('postExcerpt').textContent = p.excerpt || '';
             document.getElementById('postContent').textContent = p.content || '';
-            document.getElementById('topbarTitle').textContent = `${p.brand || ''} ${p.model || p.title}`.trim();
-            document.getElementById('topbarPrice').textContent = money(p.price_cents);
-            document.getElementById('topbarStatus').textContent = p.release_date ? `Release ${dateBR(p.release_date)}` : 'Dropped';
+
+            const catEl = document.getElementById('postCategory');
+            if (p.category) { catEl.textContent = p.category; } else { catEl.classList.add('hidden'); }
+
+            // Topbar
+            document.getElementById('topbarTitle').textContent = `${p.brand||''} ${p.model||p.title}`.trim();
+            const priceStr = money(p.price_cents);
+            if (priceStr) document.getElementById('topbarPrice').textContent = priceStr;
+
+            // CTA hero
+            const heroPriceEl = document.getElementById('heroPriceCents');
+            heroPriceEl.textContent = priceStr || 'Preço não informado';
+
+            if (p.release_date) {
+                document.getElementById('heroReleaseWrap').classList.remove('hidden');
+                document.getElementById('heroRelease').textContent = dateBR(p.release_date);
+            }
+
+            // CTA section after content
+            const ctaSection = document.getElementById('buyCtaSection');
+            ctaSection.classList.remove('hidden');
+            document.getElementById('buyCtaTitle').textContent = `${p.brand||''} ${p.model||p.title}`.trim();
 
             // Spec list
             const specs = [
-                ['Release', dateBR(p.release_date)],
-                ['Heat', p.is_pinned ? '99.9°' : '—'],
-                ['Brand', p.brand || '—'],
-                ['Model', p.model || '—'],
-                ['SKU', p.sku || '—'],
-                ['Color', p.color || '—'],
-                ['Retail', money(p.retail_price_cents)]
+                ['Lançamento', dateBR(p.release_date)],
+                ['Marca',  p.brand  || '—'],
+                ['Modelo', p.model  || '—'],
+                ['SKU',    p.sku    || '—'],
+                ['Cor',    p.color  || '—'],
+                ['Preço',  priceStr || '—'],
+                ['Preço original', money(p.retail_price_cents) || '—'],
             ];
             document.getElementById('specList').innerHTML = specs.map(([k,v]) => `
-                <div class="grid grid-cols-[80px_1fr] gap-4 py-0.5">
-                    <dt class="text-retroGrey/50">${k}</dt>
-                    <dd class="text-retroGrey">${esc(v)}</dd>
+                <div class="grid grid-cols-[100px_1fr] gap-4 py-1.5">
+                    <dt class="text-retroGrey/40 uppercase text-[10px] tracking-widest">${k}</dt>
+                    <dd class="text-retroGrey text-[12px] font-medium">${esc(v)}</dd>
                 </div>`).join('');
 
-            // Hero
+            // Hero image
             if (p.image_url) {
-                document.getElementById('heroImg').innerHTML = `<img src="${esc(p.image_url)}" alt="${esc(p.title)}" class="w-full h-full object-contain">`;
+                document.getElementById('heroImg').innerHTML =
+                    `<img src="${esc(p.image_url)}" alt="${esc(p.title)}" class="w-full h-full object-contain">`;
             }
 
-            // Meta
+            // Meta footer
             document.getElementById('metaAuthor').textContent = p.author || 'SDM Editorial';
-            document.getElementById('metaDate').textContent = dateBR(p.published_at);
+            document.getElementById('metaDate').textContent   = dateBR(p.published_at);
             const tags = (p.tags || '').split(',').map(t => t.trim()).filter(Boolean);
             document.getElementById('metaTags').innerHTML = tags.length
                 ? tags.map(t => `<span class="inline-block border border-retroGrey/20 px-2 py-0.5 rounded-full">${esc(t)}</span>`).join('')
                 : '<span class="text-retroGrey/40">—</span>';
 
-            // Galeria
+            // Gallery
             if (p.images && p.images.length) {
                 document.getElementById('gallerySection').classList.remove('hidden');
                 document.getElementById('gallery').innerHTML = p.images.map(img => `
                     <figure class="aspect-square bg-retroGrey/5 rounded-xl overflow-hidden">
-                        <img src="${esc(img.url)}" alt="${esc(img.alt || p.title)}" loading="lazy" class="w-full h-full object-cover">
+                        <img src="${esc(img.url)}" alt="${esc(img.alt || p.title)}" loading="lazy"
+                             class="gallery-img w-full h-full object-cover">
                     </figure>`).join('');
             }
+
+            // Countdown
+            if (p.release_date) startCountdown(p.release_date);
         }
 
+        /* ---- Pop-up Onde Comprar ---- */
         function openBuy() {
             if (!current) return;
             const ov = document.getElementById('buyOverlay');
-            document.getElementById('buyTitle').textContent = `${current.brand || ''} ${current.model || current.title}`.trim();
+
+            document.getElementById('buyTitle').textContent =
+                `${current.brand||''} ${current.model||current.title}`.trim();
+
+            const priceStr = money(current.price_cents);
+            document.getElementById('buyPrice').textContent = priceStr || '';
 
             const stores = current.stores || [];
             const container = document.getElementById('buyStores');
+
             if (!stores.length) {
-                container.innerHTML = '<p class="py-8 text-center text-sm text-retroGrey/60 font-mono uppercase tracking-wider">Sem lojas cadastradas ainda.</p>';
+                container.innerHTML = `
+                    <div class="text-center py-10">
+                        <svg class="w-12 h-12 text-retroGrey/20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <p class="font-mono text-[12px] uppercase tracking-wider text-retroGrey/50">Lojas ainda não cadastradas.</p>
+                        <p class="text-sm text-retroGrey/40 mt-1">Fique de olho nos nossos canais!</p>
+                    </div>`;
             } else {
                 container.innerHTML = stores.map(s => {
-                    const statusLabel = STATUS_LABELS[s.status] || s.status || '—';
-                    const date = s.release_date ? dateBR(s.release_date) : statusLabel;
+                    const st = STATUS_MAP[s.status] || { label: s.status || '—', cls: 'badge-released' };
+                    const dateStr = s.release_date ? dateBR(s.release_date) : null;
                     return `
-                    <div class="flex items-center justify-between gap-4 py-4">
-                        <div class="flex-1 min-w-0">
-                            <p class="font-display text-lg truncate">${esc(s.store_name)}</p>
-                            <p class="text-[11px] font-mono uppercase tracking-wider text-retroGrey/60 mt-0.5">${esc(date)}</p>
+                    <div class="flex items-center gap-4 p-4 bg-retroGrey/3 rounded-xl border border-retroGrey/8 hover:border-trueBlue/30 transition-colors">
+                        <div class="w-10 h-10 rounded-full bg-retroGrey/10 flex items-center justify-center shrink-0 font-display text-sm font-black text-retroGrey/60">
+                            ${esc(s.store_name?.charAt(0) || '?')}
                         </div>
-                        <a href="${esc(s.url)}" target="_blank" rel="noopener sponsored" data-track="buy-${esc(s.store_name).toLowerCase().replace(/\s+/g,'-')}" class="inline-flex items-center gap-2 bg-retroGrey text-offWhite text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded hover:bg-trueBlue transition-colors whitespace-nowrap">+ Buy online</a>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-bold text-retroGrey truncate">${esc(s.store_name)}</p>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full ${st.cls}">${st.label}</span>
+                                ${dateStr ? `<span class="text-[11px] text-retroGrey/50">· ${dateStr}</span>` : ''}
+                            </div>
+                        </div>
+                        <a href="${esc(s.url)}" target="_blank" rel="noopener sponsored"
+                           data-track="buy-${esc(s.store_name||'').toLowerCase().replace(/\s+/g,'-')}"
+                           class="shrink-0 inline-flex items-center gap-2 bg-trueBlue text-white text-[11px] font-black uppercase tracking-widest px-4 py-2.5 rounded-full hover:bg-retroBlue transition-colors">
+                            Ir à loja
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
                     </div>`;
                 }).join('');
             }
+
             ov.classList.add('show');
             ov.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
             document.getElementById('buyClose').focus();
         }
 
@@ -237,28 +445,30 @@
             const ov = document.getElementById('buyOverlay');
             ov.classList.remove('show');
             ov.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
         }
 
-        document.getElementById('topBuyBtn').addEventListener('click', openBuy);
+        // Bind all buy buttons
+        ['topBuyBtn','mainBuyBtn','ctaBuyBtn'].forEach(id =>
+            document.getElementById(id)?.addEventListener('click', openBuy));
         document.getElementById('buyClose').addEventListener('click', closeBuy);
-        document.getElementById('buyOverlay').addEventListener('click', (e) => {
+        document.getElementById('buyOverlay').addEventListener('click', e => {
             if (e.target.id === 'buyOverlay') closeBuy();
         });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeBuy(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBuy(); });
 
-        // Tracking (opt-in via consent; mesmo padrão do index)
-        document.addEventListener('click', (e) => {
+        /* ---- Click tracking ---- */
+        document.addEventListener('click', e => {
             const el = e.target.closest('[data-track]');
             if (!el) return;
             if (localStorage.getItem('sdm-consent') !== 'accepted') return;
             try {
                 const body = JSON.stringify({ label: el.dataset.track, href: el.href || null });
-                if (navigator.sendBeacon) {
-                    navigator.sendBeacon('/api/track', new Blob([body], { type: 'text/plain' }));
-                }
+                if (navigator.sendBeacon) navigator.sendBeacon('/api/track', new Blob([body], {type:'text/plain'}));
             } catch {}
         }, true);
 
+        /* ---- Produtos relacionados ---- */
         async function loadRelated() {
             try {
                 const res = await fetch(`/api/posts/${encodeURIComponent(slug)}/related`);
@@ -269,15 +479,16 @@
                 document.getElementById('relatedGrid').innerHTML = data.map(r => `
                     <a href="/post/${esc(r.slug)}" class="group block">
                         <div class="aspect-square bg-retroGrey/5 rounded-xl overflow-hidden mb-3">
-                            ${r.image_url ? `<img src="${esc(r.image_url)}" alt="${esc(r.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">` : ''}
+                            ${r.image_url ? `<img src="${esc(r.image_url)}" alt="${esc(r.title)}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">` : ''}
                         </div>
-                        <p class="text-[10px] font-mono uppercase tracking-widest text-retroGrey/60">${esc(r.brand || '')} ${esc(r.model || '')}</p>
+                        <p class="text-[10px] font-mono uppercase tracking-widest text-trueBlue">${esc(r.brand||'')} ${esc(r.model||'')}</p>
                         <p class="font-display text-base leading-tight mt-1">${esc(r.title)}</p>
-                    </a>
-                `).join('');
+                        <p class="text-[12px] text-retroGrey/60 mt-1">${r.price_cents ? money(r.price_cents) : ''}</p>
+                    </a>`).join('');
             } catch {}
         }
 
+        /* ---- Load principal ---- */
         async function loadPost() {
             try {
                 const res = await fetch(`/api/posts/${encodeURIComponent(slug)}`);
@@ -288,7 +499,7 @@
                 const { data } = await res.json();
                 renderPost(data);
                 loadRelated();
-            } catch (e) {
+            } catch {
                 document.getElementById('postTitle').textContent = 'Erro ao carregar';
             }
         }
