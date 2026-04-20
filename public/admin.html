@@ -211,7 +211,7 @@
                     <div>
                         <label for="hero_color" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Cor do hero <span class="text-gray-400 normal-case tracking-normal font-normal">(cor dominante do produto, tipo "Hot Punch/Green")</span></label>
                         <div class="flex items-center gap-3">
-                            <input type="color" id="hero_color_picker" value="#FFFFFF" class="w-14 h-12 rounded-xl border-2 border-gray-200 cursor-pointer p-1">
+                            <input type="color" id="hero_color_picker" value="#FFFFFF" aria-label="Seletor visual de cor do hero" class="w-14 h-12 rounded-xl border-2 border-gray-200 cursor-pointer p-1">
                             <input type="text" name="hero_color" id="hero_color" value="" placeholder="#RRGGBB (vazio = sem cor)" class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-trueBlue text-sm font-mono">
                             <button type="button" id="clearHeroColor" class="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-retroGrey">Limpar</button>
                         </div>
@@ -628,7 +628,7 @@
                         <label for="banner_bg_color" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Cor de fundo</label>
                         <div class="flex items-center gap-4">
                             <input type="color" id="banner_bg_color" value="#0065FC" class="w-14 h-12 rounded-xl border-2 border-gray-200 cursor-pointer p-1">
-                            <input type="text" id="banner_bg_color_hex" value="#0065FC" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-trueBlue text-sm font-mono w-36" placeholder="#0065FC">
+                            <input type="text" id="banner_bg_color_hex" value="#0065FC" aria-label="Código hexadecimal da cor de fundo" class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-trueBlue text-sm font-mono w-36" placeholder="#0065FC">
                             <div id="bannerPreviewBar" class="flex-1 h-12 rounded-xl flex items-center justify-center text-white text-[10px] font-black uppercase tracking-widest">Preview</div>
                         </div>
                     </div>
@@ -708,8 +708,27 @@
         </div>
     </div>
 
+    <!-- Toast acessível (substitui alert) -->
+    <div id="adminToast" role="status" aria-live="polite" aria-atomic="true" class="fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-[150%] transition-transform duration-300 bg-retroGrey text-white px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest shadow-2xl z-[200] max-w-[90vw]"></div>
+
     <script>
         const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        // Toast acessível — usado no lugar de alert()
+        let adminToastTimer;
+        function notify(msg, type = 'error', dur = 3500) {
+            const t = document.getElementById('adminToast');
+            t.textContent = msg;
+            t.className = `fixed bottom-6 left-1/2 -translate-x-1/2 transition-transform duration-300 px-6 py-3 rounded-full text-sm font-black uppercase tracking-widest shadow-2xl z-[200] max-w-[90vw] ${type === 'error' ? 'bg-infrared text-white' : type === 'success' ? 'bg-trueBlue text-white' : 'bg-retroGrey text-white'}`;
+            t.style.transform = 'translate(-50%, 0)';
+            t.setAttribute('role', type === 'error' ? 'alert' : 'status');
+            t.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
+            clearTimeout(adminToastTimer);
+            adminToastTimer = setTimeout(() => {
+                t.style.transform = 'translate(-50%, 150%)';
+            }, dur);
+            if (window.a11y) window.a11y.announce(msg, type === 'error' ? 'assertive' : 'polite');
+        }
 
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await fetch('/admin/logout', { method: 'POST' });
@@ -737,16 +756,16 @@
             const row = document.createElement('div');
             row.className = 'grid grid-cols-12 gap-2 items-start bg-gray-50 rounded-lg p-2';
             row.innerHTML = `
-                <select class="store-id col-span-4 px-2 py-2 border border-gray-200 rounded text-xs bg-white" required>${storeOptions(data.store_id)}</select>
-                <input type="url" class="store-url col-span-4 px-2 py-2 border border-gray-200 rounded text-xs" placeholder="https://loja.com/produto" value="${escapeHtml(data.url || '')}" required>
-                <select class="store-status col-span-3 px-2 py-2 border border-gray-200 rounded text-xs bg-white">
+                <select class="store-id col-span-4 px-2 py-2 border border-gray-200 rounded text-xs bg-white" required aria-label="Loja">${storeOptions(data.store_id)}</select>
+                <input type="url" class="store-url col-span-4 px-2 py-2 border border-gray-200 rounded text-xs" placeholder="https://loja.com/produto" value="${escapeHtml(data.url || '')}" required aria-label="URL da loja">
+                <select class="store-status col-span-3 px-2 py-2 border border-gray-200 rounded text-xs bg-white" aria-label="Status de disponibilidade">
                     <option value="available_now" ${data.status==='available_now'?'selected':''}>Available now</option>
                     <option value="coming_soon" ${data.status==='coming_soon'?'selected':''}>Coming soon</option>
                     <option value="dropping_soon" ${data.status==='dropping_soon'?'selected':''}>Dropping soon</option>
                     <option value="released" ${data.status==='released'?'selected':''}>Released</option>
                 </select>
                 <button type="button" class="remove-btn col-span-1 text-red-600 font-black text-lg leading-none" aria-label="Remover loja">×</button>
-                <input type="datetime-local" class="store-date col-span-12 px-2 py-2 border border-gray-200 rounded text-xs" value="${data.release_date ? String(data.release_date).replace(' ','T').slice(0,16) : ''}" placeholder="Data opcional">
+                <input type="datetime-local" class="store-date col-span-12 px-2 py-2 border border-gray-200 rounded text-xs" value="${data.release_date ? String(data.release_date).replace(' ','T').slice(0,16) : ''}" placeholder="Data opcional" aria-label="Data de lançamento (opcional)">
             `;
             row.querySelector('.remove-btn').addEventListener('click', () => row.remove());
             list.appendChild(row);
@@ -762,11 +781,11 @@
                 : '';
             row.innerHTML = `
                 <div class="grid grid-cols-12 gap-2 items-center">
-                    <input type="text" class="related-name col-span-6 px-2 py-2 border border-gray-200 rounded text-xs" placeholder="Nome" value="${escapeHtml(data.name || '')}">
-                    <input type="url" class="related-url col-span-5 px-2 py-2 border border-gray-200 rounded text-xs" placeholder="URL loja" value="${escapeHtml(data.store_url || '')}">
+                    <input type="text" class="related-name col-span-6 px-2 py-2 border border-gray-200 rounded text-xs" placeholder="Nome" value="${escapeHtml(data.name || '')}" aria-label="Nome do produto relacionado">
+                    <input type="url" class="related-url col-span-5 px-2 py-2 border border-gray-200 rounded text-xs" placeholder="URL loja" value="${escapeHtml(data.store_url || '')}" aria-label="URL da loja do produto relacionado">
                     <button type="button" class="remove-btn col-span-1 text-red-600 font-black text-lg leading-none" aria-label="Remover relacionado">×</button>
                 </div>
-                <input type="file" class="related-file" accept="image/*" data-index="${idx}">
+                <input type="file" class="related-file" accept="image/*" data-index="${idx}" aria-label="Imagem do produto relacionado">
                 <input type="hidden" class="related-image-url" value="${escapeHtml(data.image_url || '')}">
                 ${currentImg}
             `;
@@ -874,7 +893,7 @@
                 loadPosts();
             } catch (err) {
                 status.textContent = 'Erro: ' + err.message;
-                alert('Erro ao salvar: ' + err.message);
+                notify('Erro ao salvar: ' + err.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = document.getElementById('post_id').value ? 'Salvar alterações' : 'Publicar post';
@@ -974,7 +993,7 @@
                 document.getElementById('title').focus();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch {
-                alert('Erro ao carregar post para edição.');
+                notify('Erro ao carregar post para edição.');
             }
         }
         window.startEdit = startEdit;
@@ -983,7 +1002,7 @@
             if (!confirm(`Excluir o post "${title}"?`)) return;
             const res = await fetch(`/admin/posts/${id}`, { method: 'DELETE' });
             if (res.ok) loadPosts();
-            else alert('Erro ao excluir.');
+            else notify('Erro ao excluir.');
         }
 
         async function loadPosts() {
@@ -1253,7 +1272,7 @@
                 document.getElementById('offer_image').required = false;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch {
-                alert('Erro ao carregar oferta.');
+                notify('Erro ao carregar oferta.');
             }
         }
 
@@ -1261,7 +1280,7 @@
             if (!confirm(`Excluir a oferta "${title}"?`)) return;
             const res = await fetch(`/admin/offers/${id}`, { method: 'DELETE' });
             if (res.ok) loadOffers();
-            else alert('Erro ao excluir.');
+            else notify('Erro ao excluir.');
         }
 
         document.getElementById('offerForm').addEventListener('submit', async (e) => {
@@ -1281,7 +1300,7 @@
             if (img) fd.append('image', img);
 
             if (!id && !img) {
-                alert('Imagem é obrigatória em ofertas novas.');
+                notify('Imagem é obrigatória em ofertas novas.');
                 return;
             }
 
@@ -1300,7 +1319,7 @@
                 resetOfferForm();
                 loadOffers();
             } catch (err) {
-                alert('Erro ao salvar: ' + err.message);
+                notify('Erro ao salvar: ' + err.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = document.getElementById('offer_id').value ? 'Salvar alterações' : 'Publicar oferta';
@@ -1414,7 +1433,7 @@
                 resetCouponForm();
                 loadCoupons();
             } catch {
-                alert('Erro ao salvar cupom.');
+                notify('Erro ao salvar cupom.');
             } finally {
                 couponSubmitBtn.disabled = false;
                 couponSubmitBtn.textContent = id ? 'Salvar alterações' : 'Publicar cupom';
@@ -1528,7 +1547,7 @@
                 resetPartnershipForm();
                 loadPartnerships();
             } catch {
-                alert('Erro ao salvar parceria.');
+                notify('Erro ao salvar parceria.');
             } finally {
                 partnershipSubmitBtn.disabled = false;
                 partnershipSubmitBtn.textContent = id ? 'Salvar alterações' : 'Publicar parceria';
@@ -1602,7 +1621,7 @@
                 setTimeout(() => { btn.textContent = 'Salvar configurações'; statusEl.textContent = ''; }, 2000);
                 updateBannerPreview(payload.banner_bg_color, payload.banner_active === 'true');
             } catch {
-                alert('Erro ao salvar. Tente novamente.');
+                notify('Erro ao salvar. Tente novamente.');
             } finally {
                 btn.disabled = false;
             }
@@ -1643,7 +1662,7 @@
                 btn.textContent = '✓ Salvo!';
                 setTimeout(() => btn.textContent = 'Salvar anúncios', 2000);
             } catch {
-                alert('Erro ao salvar anúncios.');
+                notify('Erro ao salvar anúncios.');
             } finally {
                 btn.disabled = false;
             }
@@ -1758,7 +1777,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert('Erro ao gerar story. Verifique se as imagens permitem CORS.');
+                notify('Erro ao gerar story. Verifique se as imagens permitem CORS.');
                 closeStory();
             }
         }

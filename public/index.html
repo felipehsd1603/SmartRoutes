@@ -638,13 +638,13 @@
     </footer>
 
     <!-- Push Notification Prompt (Modern Floating) -->
-    <div id="pushPrompt" class="fixed bottom-6 left-6 z-[60] transform translate-y-[150%] transition-transform duration-700 max-w-[320px] bg-white rounded-3xl shadow-2xl p-5 border border-gray-100 flex gap-4 hidden lg:flex">
+    <div id="pushPrompt" role="dialog" aria-labelledby="pushPromptTitle" aria-describedby="pushPromptDesc" aria-hidden="true" class="fixed bottom-6 left-6 z-[60] transform translate-y-[150%] transition-transform duration-700 max-w-[320px] bg-white rounded-3xl shadow-2xl p-5 border border-gray-100 flex gap-4 hidden lg:flex">
         <div class="w-14 h-14 shrink-0 bg-trueBlue/10 flex items-center justify-center rounded-2xl">
-            <svg class="w-7 h-7 text-trueBlue animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <svg class="w-7 h-7 text-trueBlue animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
         </div>
         <div class="min-w-0">
-            <h4 class="text-xs font-black uppercase tracking-widest text-retroGrey mb-1">Push de Ofertas 🚀</h4>
-            <p class="text-[11px] text-gray-500 font-medium mb-3 leading-tight">Quer receber cupons relâmpago antes de todo mundo?</p>
+            <h2 id="pushPromptTitle" class="text-xs font-black uppercase tracking-widest text-retroGrey mb-1">Push de Ofertas 🚀</h2>
+            <p id="pushPromptDesc" class="text-[11px] text-gray-500 font-medium mb-3 leading-tight">Quer receber cupons relâmpago antes de todo mundo?</p>
             <div class="flex gap-2">
                 <button type="button" onclick="closePush(true)" class="bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full hover:bg-retroBlue transition-colors">Sim, aceito</button>
                 <button type="button" onclick="closePush()" class="text-gray-400 text-[10px] font-black uppercase tracking-widest px-2 hover:text-retroGrey">Agora não</button>
