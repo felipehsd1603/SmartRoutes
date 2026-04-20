@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sdm-links-v5';
+const CACHE_NAME = 'sdm-links-v6';
 const STATIC_ASSETS = [
   '/manifest.json',
   '/logo.png',
@@ -28,6 +28,11 @@ self.addEventListener('fetch', (event) => {
   // Ignora requisições não-GET e externas
   if (event.request.method !== 'GET' || !url.origin.includes(self.location.origin)) {
     return;
+  }
+
+  // Rotas admin: network-only (nunca cachear — sessão/autenticação dinâmica)
+  if (url.pathname.startsWith('/admin')) {
+    return; // deixa o browser fazer fetch direto sem passar pelo SW
   }
 
   // HTML e API: sempre busca na rede primeiro
