@@ -1,150 +1,948 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - SDM Smeaker</title>
+    <title>Dashboard — SDM Links Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { primary: '#000000', secondary: '#ffffff', accent: '#ff0000' },
-                    fontFamily: { sans: ['Inter', 'sans-serif'], oswald: ['Oswald', 'sans-serif'] }
+                    fontFamily: {
+                        sans: ['Archivo', 'sans-serif'],
+                        display: ['"Archivo Black"', 'Archivo', 'sans-serif'],
+                        serif: ['"Libre Caslon Display"', 'serif']
+                    },
+                    colors: {
+                        retroBlue: '#003F9E',
+                        trueBlue: '#0065FC',
+                        uncBlue: '#00AAFF',
+                        starfish: '#FF6600',
+                        polem: '#FFC600',
+                        infrared: '#FF002A',
+                        darkMocha: '#4C3A30',
+                        retroGrey: '#2E2E2E',
+                        offWhite: '#FFFFFF'
+                    }
                 }
             }
         }
     </script>
+    <style>
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+        .skip-link {
+            position: absolute; top: -100px; left: 1rem; z-index: 100;
+            background: #0065FC; color: #fff; padding: .75rem 1.25rem;
+            border-radius: .5rem; font-weight: 900; text-transform: uppercase;
+            letter-spacing: .1em; font-size: .875rem;
+            transition: top .2s ease;
+        }
+        .skip-link:focus { top: 1rem; }
+        :focus-visible {
+            outline: 3px solid #0065FC;
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+        .bg-retroGrey :focus-visible { outline-color: #FFC600; }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <nav class="bg-black text-white p-4 flex justify-between items-center">
-        <h1 class="font-oswald text-xl font-bold uppercase">SDM Smeaker Admin</h1>
-        <div>
-            <a href="/" target="_blank" class="mr-4 text-sm hover:text-gray-300">View Site</a>
-            <button id="logoutBtn" class="text-sm bg-red-600 px-3 py-1 rounded hover:bg-red-700 transition-colors">Logout</button>
+<body class="bg-offWhite font-sans min-h-screen">
+    <a href="#main" class="skip-link">Pular para o conteúdo</a>
+
+    <nav class="bg-retroGrey text-white sticky top-0 z-50" aria-label="Navegação administrativa">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 h-16 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <svg viewBox="0 0 200 200" class="w-9 h-9" role="img" aria-hidden="true" focusable="false">
+                    <circle cx="100" cy="100" r="100" fill="#0065FC"/>
+                    <text x="100" y="132" text-anchor="middle" font-family="'Archivo Black', Archivo, sans-serif" font-weight="900" font-size="78" fill="white" letter-spacing="-4">SDM</text>
+                </svg>
+                <span class="font-black uppercase tracking-tight"><span class="font-serif italic lowercase tracking-normal text-xl">Links</span> · Admin</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="/" target="_blank" rel="noopener" class="text-xs font-black uppercase tracking-widest text-gray-300 hover:text-white">Ver site<span class="sr-only"> (abre em nova aba)</span> ↗</a>
+                <button id="logoutBtn" type="button" aria-label="Sair da área administrativa" class="text-xs font-black uppercase tracking-widest bg-trueBlue hover:bg-retroBlue px-4 py-2 rounded-full transition-colors">Sair</button>
+            </div>
         </div>
     </nav>
 
-    <div class="container mx-auto p-8 max-w-5xl">
-        <div class="flex gap-8">
-            <!-- Form to Add Post -->
-            <div class="w-1/3 bg-white p-6 rounded shadow-md h-fit">
-                <h2 class="text-xl font-oswald font-bold mb-4">Add New Post</h2>
-                <form id="postForm" enctype="multipart/form-data">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Title</label>
-                        <input type="text" name="title" id="title" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm" required>
+    <main id="main" tabindex="-1" class="max-w-[1400px] mx-auto px-4 lg:px-8 py-8 lg:py-12">
+        <div class="mb-8">
+            <span class="inline-block bg-polem text-retroGrey text-xs font-black uppercase tracking-widest px-3 py-1 mb-3">Dashboard</span>
+            <h1 class="text-3xl lg:text-5xl font-display uppercase tracking-tighter leading-none">Gerenciar conteúdo</h1>
+        </div>
+
+        <div class="flex gap-1 mb-6 border-b border-gray-200" role="tablist" aria-label="Seções do admin">
+            <button type="button" role="tab" aria-selected="true" data-tab="posts" class="tab-btn px-4 py-2 text-xs font-black uppercase tracking-widest border-b-2 border-trueBlue text-retroGrey">Posts</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="offers" class="tab-btn px-4 py-2 text-xs font-black uppercase tracking-widest border-b-2 border-transparent text-gray-500 hover:text-retroGrey">Ofertas</button>
+        </div>
+
+        <div id="tab-posts" class="grid lg:grid-cols-3 gap-6 lg:gap-8">
+            <!-- Form -->
+            <section class="lg:col-span-1 bg-white rounded-2xl p-6 lg:p-8 h-fit shadow-sm" aria-labelledby="novo-post-heading">
+                <div class="flex items-start justify-between gap-3 mb-6">
+                    <h2 id="novo-post-heading" class="font-black uppercase text-lg"><span id="formMode">Novo post</span></h2>
+                    <button type="button" id="resetBtn" class="hidden text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-retroGrey">Novo</button>
+                </div>
+                <div id="formStatus" role="status" aria-live="polite" class="sr-only"></div>
+                <form id="postForm" enctype="multipart/form-data" class="space-y-5" novalidate>
+                    <input type="hidden" name="post_id" id="post_id" value="">
+
+                    <div>
+                        <label for="title" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Título</label>
+                        <input type="text" name="title" id="title" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue transition-colors" required>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Category</label>
-                        <select name="category" id="category" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm">
-                            <option value="News">News</option>
-                            <option value="Release Dates">Release Dates</option>
-                            <option value="Manoel Gomes">Manoel Gomes</option>
-                            <option value="Other">Other</option>
+
+                    <div>
+                        <label for="category" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Categoria</label>
+                        <select name="category" id="category" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue transition-colors bg-white">
+                            <optgroup label="Editorias">
+                                <option value="Wmns">Wmns</option>
+                                <option value="SnkrBeats">SnkrBeats</option>
+                                <option value="SnkrView">SnkrView</option>
+                                <option value="Style Icon">Style Icon</option>
+                                <option value="Culture Conection">Culture Conection</option>
+                                <option value="SnkWeek">SnkWeek</option>
+                            </optgroup>
+                            <optgroup label="Conteúdo">
+                                <option value="Ofertas">Ofertas</option>
+                                <option value="Lançamentos">Lançamentos</option>
+                                <option value="Cupons">Cupons</option>
+                                <option value="Notícias">Notícias</option>
+                            </optgroup>
+                            <optgroup label="Marcas">
+                                <option value="Nike">Nike</option>
+                                <option value="Adidas">Adidas</option>
+                                <option value="New Balance">New Balance</option>
+                                <option value="Jordan">Jordan</option>
+                            </optgroup>
                         </select>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Image</label>
-                        <input type="file" name="image" id="image" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100" required>
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700">Content</label>
-                        <textarea name="content" id="content" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm" required></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-black text-white py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">Publish Post</button>
-                </form>
-            </div>
 
-            <!-- List of Posts -->
-            <div class="w-2/3 bg-white p-6 rounded shadow-md">
-                <h2 class="text-xl font-oswald font-bold mb-4">Manage Posts</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <fieldset class="border-t border-gray-100 pt-4 space-y-4">
+                        <legend class="text-[10px] font-black uppercase tracking-widest text-gray-500">Ficha técnica</legend>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label for="brand" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Marca</label>
+                                <input type="text" name="brand" id="brand" placeholder="Nike" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                            </div>
+                            <div>
+                                <label for="model" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Modelo</label>
+                                <input type="text" name="model" id="model" placeholder="Air Max 95" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                            </div>
+                            <div>
+                                <label for="sku" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">SKU</label>
+                                <input type="text" name="sku" id="sku" placeholder="IG0176-100" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm font-mono">
+                            </div>
+                            <div>
+                                <label for="color" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Cor</label>
+                                <input type="text" name="color" id="color" placeholder="WHITE/SPEED RED" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                            </div>
+                            <div>
+                                <label for="price" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Preço (R$)</label>
+                                <input type="number" step="0.01" min="0" name="price" id="price" placeholder="899.90" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                            </div>
+                            <div>
+                                <label for="retail_price" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Retail (R$)</label>
+                                <input type="number" step="0.01" min="0" name="retail_price" id="retail_price" placeholder="1099.00" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                            </div>
+                            <div class="col-span-2">
+                                <label for="release_date" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Data de lançamento</label>
+                                <input type="datetime-local" name="release_date" id="release_date" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div>
+                        <label for="excerpt" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Resumo (excerpt)</label>
+                        <textarea name="excerpt" id="excerpt" rows="2" placeholder="Aparece após a imagem principal." class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label for="content" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Conteúdo</label>
+                        <textarea name="content" id="content" rows="6" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue transition-colors resize-none" required></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="author" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Autor</label>
+                            <input type="text" name="author" id="author" placeholder="ALI ALBAGSHI" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                        </div>
+                        <div>
+                            <label for="tags" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Tags (vírgula)</label>
+                            <input type="text" name="tags" id="tags" placeholder="Nike, Air Max, AM95" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-4 text-xs">
+                        <label class="inline-flex items-center gap-2">
+                            <input type="checkbox" name="is_pinned" id="is_pinned" value="true" class="w-4 h-4 accent-trueBlue">
+                            <span class="font-black uppercase tracking-widest text-gray-700">Fixar destaque</span>
+                        </label>
+                        <label class="inline-flex items-center gap-2">
+                            <input type="checkbox" name="is_sponsored" id="is_sponsored" value="true" class="w-4 h-4 accent-starfish">
+                            <span class="font-black uppercase tracking-widest text-gray-700">Patrocinado</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label for="image" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Imagem principal <span id="imageHint" class="text-gray-400 normal-case tracking-normal font-normal"></span></label>
+                        <input type="file" name="image" id="image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-trueBlue file:text-white hover:file:bg-retroBlue file:cursor-pointer">
+                        <p id="imageCurrent" class="mt-2 text-[10px] font-mono text-gray-500 hidden"></p>
+                    </div>
+
+                    <div>
+                        <label for="gallery" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Galeria (múltiplas)</label>
+                        <input type="file" name="gallery" id="gallery" accept="image/*" multiple class="w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-retroGrey file:text-white hover:file:bg-trueBlue file:cursor-pointer">
+                        <p id="galleryCurrent" class="mt-2 text-[10px] font-mono text-gray-500 hidden"></p>
+                    </div>
+
+                    <fieldset class="border-t border-gray-100 pt-4 space-y-3">
+                        <legend class="text-[10px] font-black uppercase tracking-widest text-gray-500">Onde comprar</legend>
+                        <div id="storesList" class="space-y-2"></div>
+                        <button type="button" id="addStoreBtn" class="text-[10px] font-black uppercase tracking-widest text-trueBlue hover:text-retroBlue">+ Adicionar loja</button>
+                    </fieldset>
+
+                    <fieldset class="border-t border-gray-100 pt-4 space-y-3">
+                        <legend class="text-[10px] font-black uppercase tracking-widest text-gray-500">Related Releases <span class="text-gray-400 font-normal normal-case tracking-normal">(opcional, 3–4)</span></legend>
+                        <div id="relatedList" class="space-y-2"></div>
+                        <button type="button" id="addRelatedBtn" class="text-[10px] font-black uppercase tracking-widest text-trueBlue hover:text-retroBlue">+ Adicionar relacionado</button>
+                    </fieldset>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-trueBlue hover:bg-retroBlue text-white font-black uppercase tracking-wide text-sm py-4 rounded-full transition-colors">Publicar post</button>
+                </form>
+            </section>
+
+            <!-- Clicks dashboard -->
+            <section class="lg:col-span-3 bg-white rounded-2xl p-6 lg:p-8 shadow-sm" aria-labelledby="clicks-heading">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                    <h2 id="clicks-heading" class="font-black uppercase text-lg">Cliques · afiliados e cupons</h2>
+                    <div class="flex gap-1 bg-gray-100 rounded-full p-1" role="group" aria-label="Período">
+                        <button type="button" data-range="24h" class="range-btn text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">24h</button>
+                        <button type="button" data-range="7d" class="range-btn text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-retroGrey text-white" aria-pressed="true">7d</button>
+                        <button type="button" data-range="30d" class="range-btn text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">30d</button>
+                        <button type="button" data-range="all" class="range-btn text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">Total</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-offWhite rounded-xl p-4">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">24h</p>
+                        <p id="stat-24h" class="text-2xl font-black">—</p>
+                    </div>
+                    <div class="bg-offWhite rounded-xl p-4">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">7 dias</p>
+                        <p id="stat-7d" class="text-2xl font-black">—</p>
+                    </div>
+                    <div class="bg-offWhite rounded-xl p-4">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">30 dias</p>
+                        <p id="stat-30d" class="text-2xl font-black">—</p>
+                    </div>
+                    <div class="bg-trueBlue text-white rounded-xl p-4">
+                        <p class="text-[10px] font-black uppercase tracking-widest opacity-80">Total</p>
+                        <p id="stat-total" class="text-2xl font-black">—</p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">Cliques por dia · últimos 14 dias</p>
+                    <div id="chart" class="flex items-end gap-1 h-28 bg-offWhite rounded-xl p-3" role="img" aria-label="Gráfico de cliques por dia"></div>
+                </div>
+
+                <div class="overflow-x-auto -mx-6 lg:-mx-8 px-6 lg:px-8">
+                    <table class="min-w-full">
+                        <caption class="sr-only">Cliques agrupados por label, ordenados pelo volume.</caption>
+                        <thead>
+                            <tr class="border-b-2 border-gray-100">
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Label</th>
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Cliques</th>
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Participação</th>
+                                <th scope="col" class="text-right py-3 text-[10px] font-black uppercase tracking-widest text-gray-500">Último</th>
                             </tr>
                         </thead>
-                        <tbody id="postsTableBody" class="bg-white divide-y divide-gray-200">
-                            <!-- Rows will be populated by JS -->
-                        </tbody>
+                        <tbody id="labelTableBody" class="divide-y divide-gray-100" aria-live="polite" aria-busy="true"></tbody>
                     </table>
                 </div>
-            </div>
+            </section>
+
+            <!-- List -->
+            <section class="lg:col-span-2 bg-white rounded-2xl p-6 lg:p-8 shadow-sm" aria-labelledby="posts-heading">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 id="posts-heading" class="font-black uppercase text-lg">Posts publicados</h2>
+                    <span id="postCount" class="text-xs font-black uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full" aria-live="polite">0 posts</span>
+                </div>
+                <div class="overflow-x-auto -mx-6 lg:-mx-8 px-6 lg:px-8">
+                    <table class="min-w-full">
+                        <caption class="sr-only">Lista de posts publicados com imagem, título, categoria, data e ação de exclusão.</caption>
+                        <thead>
+                            <tr class="border-b-2 border-gray-100">
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Imagem</th>
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Título</th>
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Categoria</th>
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Data</th>
+                                <th scope="col" class="text-right py-3 text-[10px] font-black uppercase tracking-widest text-gray-500">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="postsTableBody" class="divide-y divide-gray-100" aria-live="polite" aria-busy="true"></tbody>
+                    </table>
+                </div>
+            </section>
         </div>
-    </div>
+
+        <div id="tab-offers" class="hidden grid lg:grid-cols-3 gap-6 lg:gap-8">
+            <!-- Form de oferta -->
+            <section class="lg:col-span-1 bg-white rounded-2xl p-6 lg:p-8 h-fit shadow-sm" aria-labelledby="nova-oferta-heading">
+                <div class="flex items-start justify-between gap-3 mb-6">
+                    <h2 id="nova-oferta-heading" class="font-black uppercase text-lg"><span id="offerFormMode">Nova oferta</span></h2>
+                    <button type="button" id="offerResetBtn" class="hidden text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-retroGrey">Novo</button>
+                </div>
+                <div id="offerFormStatus" role="status" aria-live="polite" class="sr-only"></div>
+                <form id="offerForm" enctype="multipart/form-data" class="space-y-4" novalidate>
+                    <input type="hidden" name="offer_id" id="offer_id" value="">
+
+                    <div>
+                        <label for="offer_title" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Título</label>
+                        <input type="text" name="title" id="offer_title" placeholder="Air Force 1 Low 'Oil Green'" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm" required>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="offer_brand" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Marca</label>
+                            <input type="text" name="brand" id="offer_brand" placeholder="Nike" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm" required>
+                        </div>
+                        <div>
+                            <label for="offer_category" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Categoria</label>
+                            <select name="category" id="offer_category" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm bg-white">
+                                <option value="">—</option>
+                                <option value="Lifestyle">Lifestyle</option>
+                                <option value="Basquete">Basquete</option>
+                                <option value="Futebol">Futebol</option>
+                                <option value="Treino">Treino</option>
+                                <option value="Skateboarding">Skateboarding</option>
+                                <option value="Running">Running</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="offer_image" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Imagem <span id="offerImageHint" class="text-gray-400 normal-case tracking-normal font-normal"></span></label>
+                        <input type="file" name="image" id="offer_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-trueBlue file:text-white hover:file:bg-retroBlue file:cursor-pointer">
+                        <p id="offerImageCurrent" class="mt-2 text-[10px] font-mono text-gray-500 hidden"></p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="offer_price" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Preço (R$)</label>
+                            <input type="number" step="0.01" min="0" name="price" id="offer_price" placeholder="449.99" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm" required>
+                        </div>
+                        <div>
+                            <label for="offer_retail_price" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Preço tabela</label>
+                            <input type="number" step="0.01" min="0" name="retail_price" id="offer_retail_price" placeholder="799.99" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="offer_coupon" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Cupom</label>
+                            <input type="text" name="coupon" id="offer_coupon" placeholder="CASUAL30" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm uppercase">
+                        </div>
+                        <div>
+                            <label for="offer_badge" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Badge <span class="text-gray-400 normal-case tracking-normal font-normal">(máx 24)</span></label>
+                            <input type="text" name="badge" id="offer_badge" maxlength="24" placeholder="Menor preço" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="offer_affiliate_url" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">URL afiliado</label>
+                        <input type="url" name="affiliate_url" id="offer_affiliate_url" placeholder="https://www.nike.com.br/produto" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm" required>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 items-end">
+                        <div>
+                            <label for="offer_position" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Posição</label>
+                            <input type="number" min="0" step="1" name="position" id="offer_position" value="0" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-trueBlue text-sm">
+                        </div>
+                        <label class="inline-flex items-center gap-2 pb-2">
+                            <input type="checkbox" name="is_active" id="offer_is_active" value="true" checked class="w-4 h-4 accent-trueBlue">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-gray-700">Ativa</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" id="offerSubmitBtn" class="w-full bg-trueBlue hover:bg-retroBlue text-white font-black uppercase tracking-wide text-sm py-4 rounded-full transition-colors">Publicar oferta</button>
+                </form>
+            </section>
+
+            <!-- Lista de ofertas -->
+            <section class="lg:col-span-2 bg-white rounded-2xl p-6 lg:p-8 shadow-sm" aria-labelledby="offers-heading">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 id="offers-heading" class="font-black uppercase text-lg">Ofertas cadastradas</h2>
+                    <span id="offerCount" class="text-xs font-black uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full" aria-live="polite">0 ofertas</span>
+                </div>
+                <div class="overflow-x-auto -mx-6 lg:-mx-8 px-6 lg:px-8">
+                    <table class="min-w-full">
+                        <caption class="sr-only">Lista de ofertas com imagem, título, marca, preço, cupom, status e ações.</caption>
+                        <thead>
+                            <tr class="border-b-2 border-gray-100">
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Imagem</th>
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Título</th>
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Marca</th>
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Preço</th>
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Cupom</th>
+                                <th scope="col" class="text-left py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-gray-500">Status</th>
+                                <th scope="col" class="text-right py-3 text-[10px] font-black uppercase tracking-widest text-gray-500">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="offersTableBody" class="divide-y divide-gray-100" aria-live="polite" aria-busy="true"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
 
     <script>
+        const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await fetch('/admin/logout', { method: 'POST' });
             window.location.href = '/admin/login';
         });
 
+        // --- Stores cache + dinâmico ---
+        let storesCache = [];
+        async function loadStores() {
+            try {
+                const res = await fetch('/admin/stores');
+                const { data } = await res.json();
+                storesCache = data || [];
+            } catch {}
+        }
+
+        function storeOptions(selectedId) {
+            return ['<option value="">— loja —</option>', ...storesCache.map(s =>
+                `<option value="${s.id}" ${Number(s.id) === Number(selectedId) ? 'selected' : ''}>${escapeHtml(s.name)}</option>`
+            )].join('');
+        }
+
+        function addStoreRow(data = {}) {
+            const list = document.getElementById('storesList');
+            const row = document.createElement('div');
+            row.className = 'grid grid-cols-12 gap-2 items-start bg-gray-50 rounded-lg p-2';
+            row.innerHTML = `
+                <select class="store-id col-span-4 px-2 py-2 border border-gray-200 rounded text-xs bg-white" required>${storeOptions(data.store_id)}</select>
+                <input type="url" class="store-url col-span-4 px-2 py-2 border border-gray-200 rounded text-xs" placeholder="https://loja.com/produto" value="${escapeHtml(data.url || '')}" required>
+                <select class="store-status col-span-3 px-2 py-2 border border-gray-200 rounded text-xs bg-white">
+                    <option value="available_now" ${data.status==='available_now'?'selected':''}>Available now</option>
+                    <option value="coming_soon" ${data.status==='coming_soon'?'selected':''}>Coming soon</option>
+                    <option value="dropping_soon" ${data.status==='dropping_soon'?'selected':''}>Dropping soon</option>
+                    <option value="released" ${data.status==='released'?'selected':''}>Released</option>
+                </select>
+                <button type="button" class="remove-btn col-span-1 text-red-600 font-black text-lg leading-none" aria-label="Remover loja">×</button>
+                <input type="datetime-local" class="store-date col-span-12 px-2 py-2 border border-gray-200 rounded text-xs" value="${data.release_date ? String(data.release_date).replace(' ','T').slice(0,16) : ''}" placeholder="Data opcional">
+            `;
+            row.querySelector('.remove-btn').addEventListener('click', () => row.remove());
+            list.appendChild(row);
+        }
+
+        function addRelatedRow(data = {}) {
+            const list = document.getElementById('relatedList');
+            const idx = list.children.length;
+            const row = document.createElement('div');
+            row.className = 'bg-gray-50 rounded-lg p-2 space-y-2';
+            const currentImg = data.image_url
+                ? `<p class="text-[10px] font-mono text-gray-500 truncate">Atual: ${escapeHtml(data.image_url)}</p>`
+                : '';
+            row.innerHTML = `
+                <div class="grid grid-cols-12 gap-2 items-center">
+                    <input type="text" class="related-name col-span-6 px-2 py-2 border border-gray-200 rounded text-xs" placeholder="Nome" value="${escapeHtml(data.name || '')}">
+                    <input type="url" class="related-url col-span-5 px-2 py-2 border border-gray-200 rounded text-xs" placeholder="URL loja" value="${escapeHtml(data.store_url || '')}">
+                    <button type="button" class="remove-btn col-span-1 text-red-600 font-black text-lg leading-none" aria-label="Remover relacionado">×</button>
+                </div>
+                <input type="file" class="related-file" accept="image/*" data-index="${idx}">
+                <input type="hidden" class="related-image-url" value="${escapeHtml(data.image_url || '')}">
+                ${currentImg}
+            `;
+            row.querySelector('.remove-btn').addEventListener('click', () => row.remove());
+            list.appendChild(row);
+        }
+
+        document.getElementById('addStoreBtn').addEventListener('click', () => addStoreRow());
+        document.getElementById('addRelatedBtn').addEventListener('click', () => addRelatedRow());
+
+        // --- Form submission ---
+        function toIsoOrNull(localValue) {
+            if (!localValue) return null;
+            // datetime-local é "YYYY-MM-DDTHH:mm" sem timezone; devolve string plain que o SQLite aceita
+            return localValue.replace('T', ' ') + ':00';
+        }
+
+        function collectStores() {
+            return Array.from(document.querySelectorAll('#storesList > div')).map(row => ({
+                store_id: row.querySelector('.store-id').value || null,
+                url: row.querySelector('.store-url').value,
+                status: row.querySelector('.store-status').value,
+                release_date: toIsoOrNull(row.querySelector('.store-date').value)
+            })).filter(s => s.store_id && s.url);
+        }
+
+        function collectRelated(fd) {
+            const rows = Array.from(document.querySelectorAll('#relatedList > div'));
+            const meta = [];
+            let fileIndex = 0;
+            rows.forEach(row => {
+                const file = row.querySelector('.related-file').files[0];
+                const existingUrl = row.querySelector('.related-image-url').value;
+                const entry = {
+                    name: row.querySelector('.related-name').value || null,
+                    store_url: row.querySelector('.related-url').value || null
+                };
+                if (file) {
+                    fd.append('related_images', file);
+                    entry.image_index = fileIndex++;
+                } else if (existingUrl) {
+                    entry.image_url = existingUrl;
+                } else {
+                    return; // sem imagem → pula
+                }
+                meta.push(entry);
+            });
+            return meta;
+        }
+
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData();
-            formData.append('title', document.getElementById('title').value);
-            formData.append('category', document.getElementById('category').value);
-            formData.append('image', document.getElementById('image').files[0]);
-            formData.append('content', document.getElementById('content').value);
+            const status = document.getElementById('formStatus');
+            const submitBtn = document.getElementById('submitBtn');
+            const id = document.getElementById('post_id').value;
 
-            const res = await fetch('/admin/posts', {
-                method: 'POST',
-                body: formData
+            const fd = new FormData();
+            const simple = ['title','category','brand','model','sku','color','price','retail_price','excerpt','content','author','tags'];
+            simple.forEach(k => {
+                const v = document.getElementById(k)?.value;
+                if (v != null && v !== '') fd.append(k, v);
             });
+            const releaseLocal = document.getElementById('release_date').value;
+            if (releaseLocal) fd.append('release_date', toIsoOrNull(releaseLocal));
+            fd.append('is_pinned', document.getElementById('is_pinned').checked ? 'true' : 'false');
+            fd.append('is_sponsored', document.getElementById('is_sponsored').checked ? 'true' : 'false');
 
-            if (res.ok) {
-                alert('Post published successfully!');
-                document.getElementById('postForm').reset();
+            const hero = document.getElementById('image').files[0];
+            if (hero) fd.append('image', hero);
+            const gallery = document.getElementById('gallery').files;
+            for (let i = 0; i < gallery.length; i++) fd.append('gallery', gallery[i]);
+
+            fd.append('stores', JSON.stringify(collectStores()));
+            fd.append('related', JSON.stringify(collectRelated(fd)));
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = id ? 'Salvando…' : 'Publicando…';
+
+            try {
+                const url = id ? `/admin/posts/${id}` : '/admin/posts';
+                const method = id ? 'PUT' : 'POST';
+                const res = await fetch(url, { method, body: fd });
+                if (!res.ok) {
+                    const msg = await res.json().catch(() => ({ error: 'erro desconhecido' }));
+                    throw new Error(msg.error || 'fail');
+                }
+                status.textContent = id ? 'Post atualizado.' : 'Post publicado.';
+                resetForm();
                 loadPosts();
-            } else {
-                alert('Error publishing post.');
+            } catch (err) {
+                status.textContent = 'Erro: ' + err.message;
+                alert('Erro ao salvar: ' + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = document.getElementById('post_id').value ? 'Salvar alterações' : 'Publicar post';
             }
         });
 
-        async function deletePost(id) {
-            if(confirm('Are you sure you want to delete this post?')) {
-                const res = await fetch(`/admin/posts/${id}`, { method: 'DELETE' });
-                if (res.ok) {
-                    loadPosts();
-                } else {
-                    alert('Error deleting post.');
-                }
+        function resetForm() {
+            const f = document.getElementById('postForm');
+            f.reset();
+            document.getElementById('post_id').value = '';
+            document.getElementById('storesList').innerHTML = '';
+            document.getElementById('relatedList').innerHTML = '';
+            document.getElementById('formMode').textContent = 'Novo post';
+            document.getElementById('submitBtn').textContent = 'Publicar post';
+            document.getElementById('resetBtn').classList.add('hidden');
+            document.getElementById('imageCurrent').classList.add('hidden');
+            document.getElementById('galleryCurrent').classList.add('hidden');
+            document.getElementById('imageHint').textContent = '';
+            document.getElementById('image').required = true;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.getElementById('resetBtn').addEventListener('click', resetForm);
+
+        async function startEdit(id) {
+            try {
+                const res = await fetch(`/admin/posts/${id}`);
+                if (!res.ok) throw new Error('fail');
+                const { data } = await res.json();
+
+                document.getElementById('post_id').value = data.id;
+                document.getElementById('formMode').textContent = `Editando #${data.id}`;
+                document.getElementById('submitBtn').textContent = 'Salvar alterações';
+                document.getElementById('resetBtn').classList.remove('hidden');
+                document.getElementById('image').required = false;
+
+                document.getElementById('title').value = data.title || '';
+                document.getElementById('category').value = data.category || '';
+                document.getElementById('brand').value = data.brand || '';
+                document.getElementById('model').value = data.model || '';
+                document.getElementById('sku').value = data.sku || '';
+                document.getElementById('color').value = data.color || '';
+                document.getElementById('price').value = data.price_cents != null ? (data.price_cents / 100).toFixed(2) : '';
+                document.getElementById('retail_price').value = data.retail_price_cents != null ? (data.retail_price_cents / 100).toFixed(2) : '';
+                document.getElementById('release_date').value = data.release_date ? String(data.release_date).replace(' ','T').slice(0,16) : '';
+                document.getElementById('excerpt').value = data.excerpt || '';
+                document.getElementById('content').value = data.content || '';
+                document.getElementById('author').value = data.author || '';
+                document.getElementById('tags').value = data.tags || '';
+                document.getElementById('is_pinned').checked = !!data.is_pinned;
+                document.getElementById('is_sponsored').checked = !!data.is_sponsored;
+
+                const imgCur = document.getElementById('imageCurrent');
+                document.getElementById('imageHint').textContent = '(deixe vazio pra manter)';
+                if (data.image_url) { imgCur.textContent = `Atual: ${data.image_url}`; imgCur.classList.remove('hidden'); }
+                const galCur = document.getElementById('galleryCurrent');
+                if (data.images?.length) { galCur.textContent = `Galeria atual: ${data.images.length} imagem(ns). Enviar novas substitui.`; galCur.classList.remove('hidden'); }
+
+                document.getElementById('storesList').innerHTML = '';
+                (data.stores || []).forEach(s => addStoreRow(s));
+
+                document.getElementById('relatedList').innerHTML = '';
+                (data.related_products || []).forEach(r => addRelatedRow(r));
+
+                document.getElementById('title').focus();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch {
+                alert('Erro ao carregar post para edição.');
             }
+        }
+        window.startEdit = startEdit;
+
+        async function deletePost(id, title) {
+            if (!confirm(`Excluir o post "${title}"?`)) return;
+            const res = await fetch(`/admin/posts/${id}`, { method: 'DELETE' });
+            if (res.ok) loadPosts();
+            else alert('Erro ao excluir.');
         }
 
         async function loadPosts() {
             const res = await fetch('/api/posts');
-            const data = await res.json();
+            const { data } = await res.json();
             const tbody = document.getElementById('postsTableBody');
+            const count = document.getElementById('postCount');
             tbody.innerHTML = '';
 
-            if(data.data) {
-                data.data.forEach(post => {
-                    const date = new Date(post.published_at).toLocaleDateString();
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-sm text-gray-500">Nenhum post ainda.</td></tr>';
+                count.textContent = '0 posts';
+                tbody.setAttribute('aria-busy', 'false');
+                return;
+            }
+
+            count.textContent = `${data.length} ${data.length === 1 ? 'post' : 'posts'}`;
+            data.forEach(post => {
+                const iso = new Date(post.published_at).toISOString();
+                const date = new Date(post.published_at).toLocaleDateString('pt-BR');
+                const title = escapeHtml(post.title);
+                const category = escapeHtml(post.category);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-4 pr-4"><img src="${escapeHtml(post.image_url)}" alt="Imagem do post: ${title}" loading="lazy" class="h-12 w-12 object-cover rounded-lg"></td>
+                    <td class="py-4 pr-4 text-sm font-bold truncate max-w-xs">${title}</td>
+                    <td class="py-4 pr-4"><span class="text-[10px] font-black uppercase tracking-widest bg-trueBlue text-white px-2 py-1 rounded">${category}</span></td>
+                    <td class="py-4 pr-4 text-xs text-gray-500"><time datetime="${iso}">${date}</time></td>
+                    <td class="py-4 text-right whitespace-nowrap">
+                        ${post.slug ? `<a href="/post/${encodeURIComponent(post.slug)}" target="_blank" rel="noopener" class="text-xs font-black uppercase tracking-widest text-gray-500 hover:text-retroGrey mr-3">Ver ↗</a>` : ''}
+                        <button type="button" onclick="startEdit(${post.id})" class="text-xs font-black uppercase tracking-widest text-trueBlue hover:text-retroBlue mr-3">Editar</button>
+                        <button type="button" aria-label="Excluir post: ${title}" onclick="deletePost(${post.id}, ${JSON.stringify(title)})" class="text-xs font-black uppercase tracking-widest text-red-600 hover:text-red-800">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            tbody.setAttribute('aria-busy', 'false');
+        }
+
+        loadStores();
+        loadPosts();
+
+        // --- Clicks dashboard ---
+        let currentRange = '7d';
+
+        function timeAgo(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso.replace(' ', 'T') + 'Z');
+            const diff = (Date.now() - d.getTime()) / 1000;
+            if (diff < 60) return 'agora';
+            if (diff < 3600) return `${Math.floor(diff/60)} min`;
+            if (diff < 86400) return `${Math.floor(diff/3600)} h`;
+            return `${Math.floor(diff/86400)} d`;
+        }
+
+        function renderChart(byDay) {
+            const chart = document.getElementById('chart');
+            chart.innerHTML = '';
+            if (!byDay.length) {
+                chart.innerHTML = '<p class="text-xs text-gray-400 m-auto">Sem dados</p>';
+                return;
+            }
+            const map = new Map(byDay.map(r => [r.day, r.count]));
+            const max = Math.max(...byDay.map(r => r.count), 1);
+            const days = [];
+            for (let i = 13; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                days.push(d.toISOString().slice(0, 10));
+            }
+            chart.innerHTML = days.map(day => {
+                const c = map.get(day) || 0;
+                const h = Math.round((c / max) * 100);
+                const label = new Date(day).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                return `<div class="flex-1 flex flex-col items-center justify-end gap-1" title="${label}: ${c} cliques">
+                    <div class="w-full bg-trueBlue rounded-t" style="height:${Math.max(h, 2)}%"></div>
+                    <span class="text-[9px] text-gray-400 font-bold">${label.slice(0, 2)}</span>
+                </div>`;
+            }).join('');
+        }
+
+        function renderLabels(byLabel) {
+            const tbody = document.getElementById('labelTableBody');
+            if (!byLabel.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-sm text-gray-500">Nenhum clique registrado nesse período.</td></tr>';
+                tbody.setAttribute('aria-busy', 'false');
+                return;
+            }
+            const total = byLabel.reduce((s, r) => s + r.count, 0);
+            tbody.innerHTML = byLabel.map(row => {
+                const pct = total ? Math.round((row.count / total) * 100) : 0;
+                return `<tr>
+                    <td class="py-3 pr-4 text-sm font-bold">${escapeHtml(row.label)}</td>
+                    <td class="py-3 pr-4 text-sm font-black">${row.count}</td>
+                    <td class="py-3 pr-4">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden max-w-[180px]">
+                                <div class="h-full bg-trueBlue" style="width:${pct}%"></div>
+                            </div>
+                            <span class="text-xs text-gray-500 font-bold w-10">${pct}%</span>
+                        </div>
+                    </td>
+                    <td class="py-3 text-right text-xs text-gray-500">${timeAgo(row.last_seen)}</td>
+                </tr>`;
+            }).join('');
+            tbody.setAttribute('aria-busy', 'false');
+        }
+
+        async function loadStats() {
+            const tbody = document.getElementById('labelTableBody');
+            tbody.setAttribute('aria-busy', 'true');
+            try {
+                const res = await fetch(`/admin/clicks/stats?range=${currentRange}`);
+                if (!res.ok) throw new Error('fail');
+                const { totals, byLabel, byDay } = await res.json();
+                document.getElementById('stat-24h').textContent = totals.last24h ?? 0;
+                document.getElementById('stat-7d').textContent = totals.last7d ?? 0;
+                document.getElementById('stat-30d').textContent = totals.last30d ?? 0;
+                document.getElementById('stat-total').textContent = totals.total ?? 0;
+                renderChart(byDay || []);
+                renderLabels(byLabel || []);
+            } catch {
+                tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-sm text-red-500">Erro ao carregar stats.</td></tr>';
+                tbody.setAttribute('aria-busy', 'false');
+            }
+        }
+
+        document.querySelectorAll('.range-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentRange = btn.dataset.range;
+                document.querySelectorAll('.range-btn').forEach(b => {
+                    const active = b === btn;
+                    b.classList.toggle('bg-retroGrey', active);
+                    b.classList.toggle('text-white', active);
+                    b.setAttribute('aria-pressed', active ? 'true' : 'false');
+                });
+                loadStats();
+            });
+        });
+
+        loadStats();
+
+        // --- Abas Posts | Ofertas ---
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    const active = b.dataset.tab === target;
+                    b.setAttribute('aria-selected', active ? 'true' : 'false');
+                    b.classList.toggle('border-trueBlue', active);
+                    b.classList.toggle('border-transparent', !active);
+                    b.classList.toggle('text-retroGrey', active);
+                    b.classList.toggle('text-gray-500', !active);
+                });
+                document.getElementById('tab-posts').classList.toggle('hidden', target !== 'posts');
+                document.getElementById('tab-offers').classList.toggle('hidden', target !== 'offers');
+                if (target === 'offers') loadOffers();
+            });
+        });
+
+        // --- Offers CRUD ---
+        function formatPrice(cents) {
+            if (cents == null) return '';
+            return (cents / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
+
+        async function loadOffers() {
+            const tbody = document.getElementById('offersTableBody');
+            const count = document.getElementById('offerCount');
+            try {
+                const res = await fetch('/admin/offers');
+                const { data } = await res.json();
+                tbody.innerHTML = '';
+                count.textContent = `${data.length} ${data.length === 1 ? 'oferta' : 'ofertas'}`;
+                if (!data.length) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-sm text-gray-500">Nenhuma oferta cadastrada.</td></tr>';
+                    tbody.setAttribute('aria-busy', 'false');
+                    return;
+                }
+                data.forEach(o => {
                     const tr = document.createElement('tr');
+                    const img = o.image_url
+                        ? `<img src="${escapeHtml(o.image_url)}" alt="" loading="lazy" class="h-12 w-12 object-cover rounded-lg">`
+                        : '<div class="h-12 w-12 rounded-lg bg-gray-100"></div>';
+                    const activeBadge = o.is_active
+                        ? '<span class="text-[10px] font-black uppercase tracking-widest bg-trueBlue text-white px-2 py-1 rounded">Ativa</span>'
+                        : '<span class="text-[10px] font-black uppercase tracking-widest bg-gray-200 text-gray-600 px-2 py-1 rounded">Inativa</span>';
                     tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap"><img src="${post.image_url}" class="h-10 w-10 object-cover rounded"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 truncate max-w-xs">${post.title}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${post.category}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${date}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button onclick="deletePost(${post.id})" class="text-red-600 hover:text-red-900">Delete</button>
+                        <td class="py-4 pr-4">${img}</td>
+                        <td class="py-4 pr-4 text-sm font-bold truncate max-w-xs">${escapeHtml(o.title)}</td>
+                        <td class="py-4 pr-4 text-xs text-gray-600">${escapeHtml(o.brand)}</td>
+                        <td class="py-4 pr-4 text-xs font-mono">R$ ${formatPrice(o.price_cents)}</td>
+                        <td class="py-4 pr-4 text-xs font-mono">${o.coupon ? escapeHtml(o.coupon) : '—'}</td>
+                        <td class="py-4 pr-4">${activeBadge}</td>
+                        <td class="py-4 text-right whitespace-nowrap">
+                            <button type="button" class="edit-offer-btn text-xs font-black uppercase tracking-widest text-trueBlue hover:text-retroBlue mr-3" data-id="${o.id}">Editar</button>
+                            <button type="button" class="del-offer-btn text-xs font-black uppercase tracking-widest text-red-600 hover:text-red-800" data-id="${o.id}" data-title="${escapeHtml(o.title)}">Excluir</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
+                tbody.setAttribute('aria-busy', 'false');
+                tbody.querySelectorAll('.edit-offer-btn').forEach(b => b.addEventListener('click', () => startEditOffer(b.dataset.id)));
+                tbody.querySelectorAll('.del-offer-btn').forEach(b => b.addEventListener('click', () => deleteOffer(b.dataset.id, b.dataset.title)));
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-sm text-red-600">Erro: ${err.message}</td></tr>`;
             }
         }
 
-        // Load posts on init
-        loadPosts();
+        function resetOfferForm() {
+            const f = document.getElementById('offerForm');
+            f.reset();
+            document.getElementById('offer_id').value = '';
+            document.getElementById('offer_is_active').checked = true;
+            document.getElementById('offer_position').value = '0';
+            document.getElementById('offerFormMode').textContent = 'Nova oferta';
+            document.getElementById('offerSubmitBtn').textContent = 'Publicar oferta';
+            document.getElementById('offerResetBtn').classList.add('hidden');
+            document.getElementById('offerImageCurrent').classList.add('hidden');
+            document.getElementById('offerImageHint').textContent = '';
+            document.getElementById('offer_image').required = false;
+        }
+
+        document.getElementById('offerResetBtn').addEventListener('click', resetOfferForm);
+
+        async function startEditOffer(id) {
+            try {
+                const res = await fetch(`/admin/offers/${id}`);
+                if (!res.ok) throw new Error('fail');
+                const { data } = await res.json();
+                document.getElementById('offer_id').value = data.id;
+                document.getElementById('offer_title').value = data.title || '';
+                document.getElementById('offer_brand').value = data.brand || '';
+                document.getElementById('offer_category').value = data.category || '';
+                document.getElementById('offer_price').value = data.price_cents != null ? (data.price_cents / 100).toFixed(2) : '';
+                document.getElementById('offer_retail_price').value = data.retail_price_cents != null ? (data.retail_price_cents / 100).toFixed(2) : '';
+                document.getElementById('offer_coupon').value = data.coupon || '';
+                document.getElementById('offer_badge').value = data.badge || '';
+                document.getElementById('offer_affiliate_url').value = data.affiliate_url || '';
+                document.getElementById('offer_position').value = data.position ?? 0;
+                document.getElementById('offer_is_active').checked = !!data.is_active;
+                document.getElementById('offerFormMode').textContent = `Editando #${data.id}`;
+                document.getElementById('offerSubmitBtn').textContent = 'Salvar alterações';
+                document.getElementById('offerResetBtn').classList.remove('hidden');
+                const current = document.getElementById('offerImageCurrent');
+                if (data.image_url) {
+                    current.textContent = 'Atual: ' + data.image_url;
+                    current.classList.remove('hidden');
+                    document.getElementById('offerImageHint').textContent = '(opcional — envie só se for trocar)';
+                } else {
+                    current.classList.add('hidden');
+                    document.getElementById('offerImageHint').textContent = '';
+                }
+                document.getElementById('offer_image').required = false;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch {
+                alert('Erro ao carregar oferta.');
+            }
+        }
+
+        async function deleteOffer(id, title) {
+            if (!confirm(`Excluir a oferta "${title}"?`)) return;
+            const res = await fetch(`/admin/offers/${id}`, { method: 'DELETE' });
+            if (res.ok) loadOffers();
+            else alert('Erro ao excluir.');
+        }
+
+        document.getElementById('offerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const status = document.getElementById('offerFormStatus');
+            const submitBtn = document.getElementById('offerSubmitBtn');
+            const id = document.getElementById('offer_id').value;
+
+            const fd = new FormData();
+            ['title','brand','category','price','retail_price','coupon','badge','affiliate_url','position'].forEach(k => {
+                const el = document.getElementById('offer_' + k);
+                const v = el?.value;
+                if (v != null && v !== '') fd.append(k, v);
+            });
+            fd.append('is_active', document.getElementById('offer_is_active').checked ? 'true' : 'false');
+            const img = document.getElementById('offer_image').files[0];
+            if (img) fd.append('image', img);
+
+            if (!id && !img) {
+                alert('Imagem é obrigatória em ofertas novas.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = id ? 'Salvando…' : 'Publicando…';
+
+            try {
+                const url = id ? `/admin/offers/${id}` : '/admin/offers';
+                const method = id ? 'PUT' : 'POST';
+                const res = await fetch(url, { method, body: fd });
+                if (!res.ok) {
+                    const msg = await res.json().catch(() => ({ error: 'erro desconhecido' }));
+                    throw new Error(msg.error || 'fail');
+                }
+                status.textContent = id ? 'Oferta atualizada.' : 'Oferta publicada.';
+                resetOfferForm();
+                loadOffers();
+            } catch (err) {
+                alert('Erro ao salvar: ' + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = document.getElementById('offer_id').value ? 'Salvar alterações' : 'Publicar oferta';
+            }
+        });
     </script>
 </body>
 </html>

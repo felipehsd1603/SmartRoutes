@@ -1,403 +1,759 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SDM Smeaker</title>
+    <title>SDM Links — O maior canal de sneakers do Brasil</title>
+    <meta name="description" content="O maior canal de sneakers do Brasil. Cupons exclusivos Nike, Adidas, New Balance, drops em primeira mão e ofertas relâmpago. 265K no Telegram.">
+    <meta name="robots" content="index,follow">
+    <meta name="theme-color" content="#0065FC">
+    <link rel="canonical" href="https://sdmlinks.com.br/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="SDM Links">
+    <meta property="og:title" content="SDM Links — O maior canal de sneakers do Brasil">
+    <meta property="og:description" content="Cupons exclusivos, drops em primeira mão e ofertas relâmpago de Nike, Adidas, New Balance e Jordan.">
+    <meta property="og:url" content="https://sdmlinks.com.br/">
+    <meta property="og:image" content="https://sdmlinks.com.br/og-cover.svg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SDM Links — O maior canal de sneakers do Brasil">
+    <meta name="twitter:description" content="Cupons exclusivos, drops e ofertas relâmpago de sneakers.">
+    <meta name="twitter:image" content="https://sdmlinks.com.br/og-cover.svg">
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "name": "SDM Links",
+                "url": "https://sdmlinks.com.br/",
+                "logo": "https://sdmlinks.com.br/logo.svg",
+                "sameAs": [
+                    "https://www.instagram.com/sdmlinks/",
+                    "https://t.me/s/sneakersdomionlinks",
+                    "https://www.tiktok.com/@sdmlinks",
+                    "https://x.com/sdmlinks"
+                ]
+            },
+            {
+                "@type": "WebSite",
+                "name": "SDM Links",
+                "url": "https://sdmlinks.com.br/",
+                "inLanguage": "pt-BR"
+            }
+        ]
+    }
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        oswald: ['Oswald', 'sans-serif'],
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Archivo', 'sans-serif'],
+                        display: ['"Archivo Black"', 'Archivo', 'sans-serif'],
+                        serif: ['"Libre Caslon Display"', 'serif']
                     },
                     colors: {
-                        heatRed: '#e10600',
+                        retroBlue: '#003F9E',
+                        trueBlue: '#0065FC',
+                        uncBlue: '#00AAFF',
+                        starfish: '#FF6600',
+                        polem: '#FFC600',
+                        infrared: '#FF002A',
+                        darkMocha: '#4C3A30',
+                        retroGrey: '#2E2E2E',
+                        offWhite: '#FFFFFF'
                     }
                 }
             }
         }
     </script>
     <style>
-        .heat-gradient {
-            background: linear-gradient(90deg, #ff4e00, #ec9f05);
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .product-bg { background: radial-gradient(circle at 30% 30%, #f3f4f6, #d1d5db); }
+
+        .marquee { animation: marquee 30s linear infinite; }
+        .marquee-slow { animation: marquee 45s linear infinite; }
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        .blob { animation: blob 18s ease-in-out infinite; filter: blur(40px); will-change: transform; }
+        .blob-2 { animation: blob 22s ease-in-out infinite reverse; }
+        @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(40px, -30px) scale(1.1); }
+            66% { transform: translate(-30px, 20px) scale(0.95); }
+        }
+
+        .shine {
+            background: linear-gradient(90deg, #FFC600 0%, #ffffff 50%, #FFC600 100%);
+            background-size: 200% 100%;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
         }
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
+        @keyframes shine { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+        .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+        .reveal.in { opacity: 1; transform: none; }
+
+        .pulse-dot { animation: pulseDot 1.4s ease-in-out infinite; }
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .4; transform: scale(1.3); }
         }
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+
+        @media (prefers-reduced-motion: reduce) {
+            .marquee, .marquee-slow, .blob, .blob-2, .shine, .pulse-dot, .animate-ping { animation: none; }
+            .reveal { opacity: 1; transform: none; }
         }
+
+        /* Acessibilidade */
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+        .skip-link {
+            position: absolute; top: -100px; left: 1rem; z-index: 100;
+            background: #0065FC; color: #fff; padding: .75rem 1.25rem;
+            border-radius: .5rem; font-weight: 900; text-transform: uppercase;
+            letter-spacing: .1em; font-size: .875rem;
+            transition: top .2s ease;
+        }
+        .skip-link:focus { top: 1rem; }
+        :focus-visible {
+            outline: 3px solid #0065FC;
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+        .bg-trueBlue :focus-visible, .bg-retroGrey :focus-visible {
+            outline-color: #FFC600;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed; left: 50%; bottom: 1.5rem; transform: translate(-50%, 150%);
+            background: #2E2E2E; color: #fff; padding: .75rem 1.25rem; border-radius: 999px;
+            font-weight: 800; font-size: .8125rem; letter-spacing: .05em; text-transform: uppercase;
+            box-shadow: 0 12px 40px rgba(0,0,0,.3); z-index: 90;
+            transition: transform .3s ease;
+        }
+        .toast.show { transform: translate(-50%, 0); }
+
+        /* Cookie banner */
+        .cookie-banner {
+            position: fixed; left: 1rem; right: 1rem; bottom: 1rem; z-index: 80;
+            background: #2E2E2E; color: #fff; border-radius: 1rem;
+            padding: 1rem 1.25rem; display: none; gap: 1rem; align-items: center;
+            box-shadow: 0 12px 40px rgba(0,0,0,.3);
+            max-width: 720px; margin-left: auto; margin-right: auto;
+        }
+        .cookie-banner.show { display: flex; flex-wrap: wrap; }
     </style>
 </head>
-<body class="bg-white text-black font-sans antialiased overflow-x-hidden">
+<body class="bg-white text-retroGrey font-sans antialiased overflow-x-hidden">
 
-    <!-- Affiliate Banner -->
-    <div class="bg-black text-white text-[10px] sm:text-xs font-bold tracking-widest text-center py-2 px-4 uppercase">
-        We independently choose all products featured on our site. We may receive a commission when you click on links to those products. You can learn more about our affiliate policy in our terms of use.
+    <a href="#main" class="skip-link">Pular para o conteúdo</a>
+
+    <header>
+    <!-- Top announcement bar (decorativo, conteúdo repetido no footer) -->
+    <div class="bg-trueBlue text-white text-xs font-bold tracking-widest uppercase overflow-hidden" aria-hidden="true">
+        <div class="flex whitespace-nowrap marquee py-2">
+            <span class="mx-8">O maior canal de sneakers do Brasil</span><span class="mx-8">·</span>
+            <span class="mx-8">Telegram 265K</span><span class="mx-8">·</span>
+            <span class="mx-8">Instagram 186K</span><span class="mx-8">·</span>
+            <span class="mx-8">Cupons exclusivos Nike, Adidas, NB</span><span class="mx-8">·</span>
+            <span class="mx-8">O maior canal de sneakers do Brasil</span><span class="mx-8">·</span>
+            <span class="mx-8">Telegram 265K</span><span class="mx-8">·</span>
+            <span class="mx-8">Instagram 186K</span><span class="mx-8">·</span>
+            <span class="mx-8">Cupons exclusivos Nike, Adidas, NB</span><span class="mx-8">·</span>
+        </div>
     </div>
 
-    <!-- App Banner -->
-    <div class="bg-gray-100 border-b border-gray-200 text-sm py-2 px-4 flex justify-between items-center md:hidden">
-        <span class="font-semibold uppercase tracking-wide text-xs">New SDM Smeaker app released!</span>
-        <button class="bg-black text-white text-xs px-3 py-1 font-bold uppercase rounded-sm">Download</button>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="border-b border-gray-200 sticky top-0 bg-white z-50">
-        <div class="max-w-[1600px] mx-auto px-4 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
-            <!-- Left: Hamburger -->
-            <div class="flex items-center">
-                <button class="p-2 -ml-2 text-black hover:text-gray-600 focus:outline-none">
-                    <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+    <!-- Navegação principal -->
+    <nav class="border-b border-gray-200 sticky top-0 bg-white z-50" aria-label="Navegação principal">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="/" class="flex items-center gap-3" aria-label="SDM Links — página inicial">
+                    <svg viewBox="0 0 200 200" class="w-10 h-10 sm:w-12 sm:h-12" role="img" aria-hidden="true" focusable="false">
+                        <circle cx="100" cy="100" r="100" fill="#0065FC"/>
+                        <text x="100" y="132" text-anchor="middle" font-family="'Archivo Black', Archivo, sans-serif" font-weight="900" font-size="78" fill="white" letter-spacing="-4">SDM</text>
                     </svg>
-                </button>
-            </div>
-
-            <!-- Center: Logo -->
-            <div class="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-                <a href="#" class="font-oswald text-2xl sm:text-4xl font-bold tracking-tighter uppercase leading-none">
-                    SDM Smeaker
+                    <span class="hidden sm:block font-serif italic text-2xl text-retroGrey" aria-hidden="true">Links</span>
                 </a>
             </div>
 
-            <!-- Right: Icons -->
-            <div class="flex items-center space-x-3 sm:space-x-5">
-                <button class="text-black hover:text-gray-600">
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </button>
-                <button class="hidden sm:block text-black hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
+            <div class="hidden lg:flex items-center gap-8 text-sm font-bold uppercase tracking-wide">
+                <a href="#ofertas" class="hover:text-trueBlue transition-colors">Ofertas</a>
+                <a href="#lancamentos" class="hover:text-trueBlue transition-colors">Lançamentos</a>
+                <a href="#categorias" class="hover:text-trueBlue transition-colors">Categorias</a>
+                <a href="#cupons" class="hover:text-trueBlue transition-colors">Cupons</a>
+                <a href="https://www.nike.com.br/hotsite/sdmlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=nav-hotsite-nike" target="_blank" rel="noopener" data-track="nav-hotsite-nike" class="hover:text-trueBlue transition-colors">Hotsite Nike</a>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <a href="https://t.me/s/sneakersdomionlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=nav-telegram" target="_blank" rel="noopener noreferrer" data-track="nav-telegram" class="hidden sm:inline-flex items-center gap-2 bg-trueBlue text-white text-xs font-bold uppercase tracking-wide px-4 py-2.5 rounded-full hover:bg-retroBlue transition-colors">
+                    Entrar no Telegram<span class="sr-only"> (abre em nova aba)</span>
+                </a>
+                <button type="button" class="lg:hidden p-2 -mr-2" aria-label="Abrir menu de navegação" aria-expanded="false">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
             </div>
         </div>
     </nav>
+    </header>
 
-    <!-- Main Content -->
-    <main class="max-w-[1600px] mx-auto">
+    <main id="main" tabindex="-1">
 
-        <!-- Hero Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-4 lg:gap-6 p-4 md:p-6 lg:p-8">
+    <!-- Hero -->
+    <section class="bg-trueBlue text-white relative overflow-hidden">
+        <!-- animated blobs -->
+        <div class="absolute -left-20 -top-20 w-72 h-72 rounded-full bg-polem/20 blob pointer-events-none"></div>
+        <div class="absolute right-0 top-10 w-80 h-80 rounded-full bg-retroBlue/60 blob blob-2 pointer-events-none"></div>
+        <div class="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-white/5 blob pointer-events-none"></div>
 
-            <!-- Main Hero (Large) -->
-            <div class="lg:col-span-2 relative group cursor-pointer overflow-hidden">
-                <img src="https://cdn.sanity.io/images/pu5wtzfc/production/ec293daca60f4d4738c0cf4961cce994ad240a7d-2500x3371.jpg/air-manoel-release-dates.jpg?w=1200&h=800&auto=format&fit=crop" alt="Manoel Gomes Release Dates 2026" class="w-full h-[50vh] md:h-[60vh] lg:h-[75vh] object-cover transition-transform duration-700 group-hover:scale-105">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 md:p-10">
-                    <h1 class="font-oswald text-4xl md:text-5xl lg:text-7xl font-bold text-white uppercase leading-none mb-3">Manoel Gomes Release Dates 2026</h1>
-                    <p class="text-white font-medium uppercase tracking-widest text-sm md:text-base">Updated Today</p>
-                </div>
-            </div>
-
-            <!-- Secondary Hero Items (Right Column on Desktop) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-1 md:gap-4 lg:gap-6">
-                <!-- Item 1 -->
-                <div class="relative group cursor-pointer overflow-hidden h-[40vh] md:h-auto md:flex-1">
-                    <img src="https://cdn.sanity.io/images/pu5wtzfc/production/bd20c6528550625ccba20400c7f81a05ae29c9ed-2000x1250.png/adidas-Adislide-Sandals-Release.png?w=600&h=400&auto=format&fit=crop" alt="adidas Adislide" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-5">
-                        <h2 class="font-oswald text-2xl md:text-3xl font-bold text-white leading-tight uppercase mb-2">adidas Quietly Released What Could Be Summer's "It" Slides</h2>
-                        <div class="flex justify-between items-end">
-                            <span class="text-white font-medium uppercase text-xs tracking-widest">Dropped</span>
-                            <div class="flex items-center">
-                                <span class="font-oswald font-bold text-white text-lg">65.00°</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 2 -->
-                <div class="relative group cursor-pointer overflow-hidden h-[40vh] md:h-auto md:flex-1">
-                    <img src="https://cdn.sanity.io/images/pu5wtzfc/production/74e73450a2cb99985552ca4c90252b161e0af7df-1250x703.jpg/2026-UEFA-Champions-League-Shopping-Guide.jpeg?w=600&h=400&auto=format&fit=crop" alt="UEFA Champions League" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-5">
-                        <h2 class="font-oswald text-2xl md:text-3xl font-bold text-white leading-tight uppercase mb-2">Gear Up for Glory: Your 2026 UEFA Champions League Quarter-Finals Shopping Guide</h2>
-                        <div class="flex flex-wrap gap-2 text-white font-medium uppercase text-xs tracking-widest">
-                            <span>football</span>
-                            <span>Adidas Originals</span>
-                            <span>+</span>
-                        </div>
-                    </div>
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 pt-10 pb-8 sm:pt-14 sm:pb-10 lg:pt-20 lg:pb-14 relative z-10">
+            <div class="max-w-3xl">
+                <span class="inline-flex items-center gap-2 bg-polem text-retroGrey text-xs font-black uppercase tracking-widest px-3 py-1.5 mb-5">
+                    <span class="relative inline-flex w-2.5 h-2.5">
+                        <span class="absolute inline-flex h-full w-full rounded-full bg-infrared opacity-75 animate-ping"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-infrared"></span>
+                    </span>
+                    Ao vivo · drops, cupons, promoções
+                </span>
+                <h1 class="font-black uppercase leading-[0.9] text-4xl sm:text-6xl lg:text-7xl tracking-tighter mb-5">
+                    Achamos o tênis<br>certo. Pelo preço<br><span class="shine">certo.</span>
+                </h1>
+                <p class="text-base sm:text-lg text-white/80 max-w-xl mb-7 font-medium">O maior canal de sneakers do Brasil. Cupons exclusivos e drops em primeira mão.</p>
+                <div class="flex flex-wrap gap-2 sm:gap-3">
+                    <a href="https://t.me/s/sneakersdomionlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=hero-telegram" target="_blank" rel="noopener" data-track="hero-telegram" class="inline-flex items-center gap-2 bg-white text-trueBlue font-black uppercase tracking-wide text-xs sm:text-sm px-5 py-3 rounded-full hover:bg-polem hover:text-retroGrey hover:scale-105 transition-all">
+                        Telegram · 265K
+                    </a>
+                    <a href="https://www.instagram.com/sdmlinks/?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=hero-instagram" target="_blank" rel="noopener" data-track="hero-instagram" class="inline-flex items-center gap-2 border-2 border-white text-white font-black uppercase tracking-wide text-xs sm:text-sm px-5 py-3 rounded-full hover:bg-white hover:text-trueBlue hover:scale-105 transition-all">
+                        Instagram · 186K
+                    </a>
+                    <a href="https://www.tiktok.com/@sdmlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=hero-tiktok" target="_blank" rel="noopener" data-track="hero-tiktok" class="inline-flex items-center gap-2 border-2 border-white/30 text-white font-black uppercase tracking-wide text-xs sm:text-sm px-5 py-3 rounded-full hover:border-white hover:scale-105 transition-all">
+                        TikTok · 24.5K
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Upcoming Releases Section -->
-        <section class="py-10 px-4 md:px-8">
-            <div class="flex justify-between items-end mb-6">
+        <!-- Live offers ticker -->
+        <div class="relative z-10 bg-retroGrey/30 backdrop-blur border-t border-white/10 overflow-hidden" aria-hidden="true">
+            <div class="flex whitespace-nowrap marquee-slow py-2.5 text-xs font-bold uppercase tracking-widest">
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>AF1 Oil Green <span class="text-polem">R$ 449,99</span></span>
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>JA 1 Smoke Grey <span class="text-polem">R$ 535,99</span></span>
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>Air Max Solo <span class="text-polem">R$ 389,99</span></span>
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>NB 530 Wolf Grey <span class="text-polem">cupom SDMLINKS</span></span>
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>Cortez White/Black <span class="text-polem">cupom CASUAL30</span></span>
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>AF1 GS Black/Gold <span class="text-polem">cupom NIKE20</span></span>
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>AF1 Oil Green <span class="text-polem">R$ 449,99</span></span>
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>JA 1 Smoke Grey <span class="text-polem">R$ 535,99</span></span>
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>Air Max Solo <span class="text-polem">R$ 389,99</span></span>
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>NB 530 Wolf Grey <span class="text-polem">cupom SDMLINKS</span></span>
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>Cortez White/Black <span class="text-polem">cupom CASUAL30</span></span>
+                <span class="mx-6 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-polem pulse-dot"></span>AF1 GS Black/Gold <span class="text-polem">cupom NIKE20</span></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categorias chips -->
+    <section id="categorias" class="border-b border-gray-200" aria-labelledby="categorias-heading">
+        <h2 id="categorias-heading" class="sr-only">Filtrar por categoria</h2>
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 py-6">
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar" role="group" aria-label="Filtrar por marca ou estilo">
+                <button type="button" aria-pressed="true" class="flex-none bg-retroGrey text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full">Todos</button>
+                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Nike</button>
+                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Adidas</button>
+                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">New Balance</button>
+                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Jordan</button>
+                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Lifestyle</button>
+                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Treino</button>
+                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Futebol</button>
+                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Skateboarding</button>
+                <button type="button" aria-pressed="false" class="flex-none bg-gray-100 hover:bg-trueBlue hover:text-white text-xs font-black uppercase tracking-wide px-5 py-3 rounded-full transition-colors">Basquete</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ofertas Relâmpago -->
+    <section id="ofertas" class="py-12 lg:py-20">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="flex items-end justify-between mb-8 lg:mb-12 reveal">
                 <div>
-                    <h2 class="font-oswald text-3xl md:text-5xl font-bold uppercase leading-none">Upcoming Releases</h2>
+                    <span class="inline-block bg-polem text-retroGrey text-xs font-black uppercase tracking-widest px-3 py-1 mb-3">Relâmpago</span>
+                    <h2 class="text-4xl sm:text-5xl lg:text-6xl font-display uppercase tracking-tighter leading-none">Ofertas de hoje</h2>
                 </div>
-                <a href="#" class="font-bold uppercase text-xs md:text-sm tracking-widest border-b-2 border-black pb-1 hover:text-gray-500 hover:border-gray-500 transition-colors">View all</a>
+                <a href="#" class="hidden sm:inline-block text-sm font-bold uppercase tracking-wide hover:text-trueBlue">Ver todas →</a>
             </div>
 
-            <!-- Filters -->
-            <div class="flex gap-4 mb-8">
-                <button class="bg-black text-white font-bold uppercase text-sm tracking-widest px-6 py-2 rounded-full">Upcoming</button>
-                <button class="bg-gray-100 text-gray-500 font-bold uppercase text-sm tracking-widest px-6 py-2 rounded-full hover:bg-gray-200 transition-colors">Dropped</button>
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 reveal">
+                <!-- Card 1 -->
+                <article aria-labelledby="card-af1-oil" class="group bg-white border border-gray-200 hover:border-trueBlue rounded-2xl overflow-hidden transition-all hover:shadow-xl">
+                    <div class="product-bg aspect-square relative overflow-hidden" aria-hidden="true">
+                        <span class="absolute top-3 left-3 bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">-44%</span>
+                        <span class="absolute top-3 right-3 bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Menor preço</span>
+                        <div class="absolute inset-0 flex items-center justify-center text-2xl sm:text-4xl font-black uppercase text-gray-400 tracking-tighter text-center px-4">AF1<br>Oil Green</div>
+                    </div>
+                    <div class="p-4 lg:p-5">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-trueBlue mb-1">Nike · Lifestyle</p>
+                        <h3 id="card-af1-oil" class="font-black text-base lg:text-lg leading-tight mb-3 uppercase">Air Force 1 Low 'Oil Green' · -44%</h3>
+                        <div class="flex items-baseline gap-2 mb-4">
+                            <span class="text-xs line-through text-gray-400">R$ 799,99</span>
+                            <span class="text-xl lg:text-2xl font-black text-trueBlue">R$ 449,99</span>
+                        </div>
+                        <a href="https://www.nike.com.br/" target="_blank" rel="noopener" data-track="offer-af1-oil" class="block w-full bg-retroGrey text-white text-center text-xs font-black uppercase tracking-widest py-3 rounded-full hover:bg-trueBlue transition-colors">Pegar oferta</a>
+                    </div>
+                </article>
+
+                <!-- Card 2 -->
+                <article aria-labelledby="card-cortez" class="group bg-white border border-gray-200 hover:border-trueBlue rounded-2xl overflow-hidden transition-all hover:shadow-xl">
+                    <div class="product-bg aspect-square relative overflow-hidden" aria-hidden="true">
+                        <span class="absolute top-3 left-3 bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">-33%</span>
+                        <div class="absolute inset-0 flex items-center justify-center text-2xl sm:text-4xl font-black uppercase text-gray-400 tracking-tighter text-center px-4">Cortez<br>White/Black</div>
+                    </div>
+                    <div class="p-4 lg:p-5">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-trueBlue mb-1">Nike · Lifestyle</p>
+                        <h3 id="card-cortez" class="font-black text-base lg:text-lg leading-tight mb-3 uppercase">Nike Cortez 'White Black' · -33%</h3>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <span class="text-xs line-through text-gray-400">R$ 649,99</span>
+                            <span class="text-xl lg:text-2xl font-black text-trueBlue">R$ 432,24</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 mb-4">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-retroGrey">Cupom</span>
+                            <button type="button" data-coupon="CASUAL30" data-track="coupon-inline" class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded hover:brightness-95" aria-label="Copiar cupom CASUAL30">CASUAL30</button>
+                        </div>
+                        <a href="https://www.nike.com.br/" target="_blank" rel="noopener" data-coupon="CASUAL30" data-track="offer-cortez" class="block w-full bg-retroGrey text-white text-center text-xs font-black uppercase tracking-widest py-3 rounded-full hover:bg-trueBlue transition-colors">Pegar oferta · cupom CASUAL30</a>
+                    </div>
+                </article>
+
+                <!-- Card 3 -->
+                <article aria-labelledby="card-nb530" class="group bg-white border border-gray-200 hover:border-trueBlue rounded-2xl overflow-hidden transition-all hover:shadow-xl">
+                    <div class="product-bg aspect-square relative overflow-hidden" aria-hidden="true">
+                        <span class="absolute top-3 left-3 bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">-20%</span>
+                        <div class="absolute inset-0 flex items-center justify-center text-2xl sm:text-4xl font-black uppercase text-gray-400 tracking-tighter text-center px-4">NB 530<br>Wolf Grey</div>
+                    </div>
+                    <div class="p-4 lg:p-5">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-trueBlue mb-1">New Balance · Lifestyle</p>
+                        <h3 id="card-nb530" class="font-black text-base lg:text-lg leading-tight mb-3 uppercase">New Balance 530 'Wolf Grey' · -20%</h3>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <span class="text-xs line-through text-gray-400">R$ 749,99</span>
+                            <span class="text-xl lg:text-2xl font-black text-trueBlue">R$ 598,49</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 mb-4">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-retroGrey">Cupom</span>
+                            <button type="button" data-coupon="SDMLINKS" data-track="coupon-inline" class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded hover:brightness-95" aria-label="Copiar cupom SDMLINKS">SDMLINKS</button>
+                        </div>
+                        <a href="https://www.newbalance.com.br/" target="_blank" rel="noopener" data-coupon="SDMLINKS" data-track="offer-nb530" class="block w-full bg-retroGrey text-white text-center text-xs font-black uppercase tracking-widest py-3 rounded-full hover:bg-trueBlue transition-colors">Pegar oferta · cupom SDMLINKS</a>
+                    </div>
+                </article>
+
+                <!-- Card 4 -->
+                <article aria-labelledby="card-af1-gs" class="group bg-white border border-gray-200 hover:border-trueBlue rounded-2xl overflow-hidden transition-all hover:shadow-xl">
+                    <div class="product-bg aspect-square relative overflow-hidden" aria-hidden="true">
+                        <span class="absolute top-3 left-3 bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">-40%</span>
+                        <span class="absolute top-3 right-3 bg-retroGrey text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">+30% Volta</span>
+                        <div class="absolute inset-0 flex items-center justify-center text-2xl sm:text-4xl font-black uppercase text-gray-400 tracking-tighter text-center px-4">AF1 GS<br>Black/Gold</div>
+                    </div>
+                    <div class="p-4 lg:p-5">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-trueBlue mb-1">Nike · Lifestyle</p>
+                        <h3 id="card-af1-gs" class="font-black text-base lg:text-lg leading-tight mb-3 uppercase">Air Force 1 Low GS 'Black Gold' · -40%</h3>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <span class="text-xs line-through text-gray-400">R$ 699,99</span>
+                            <span class="text-xl lg:text-2xl font-black text-trueBlue">R$ 417,99</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 mb-4">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-retroGrey">Cupom</span>
+                            <button type="button" data-coupon="NIKE20" data-track="coupon-inline" class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded hover:brightness-95" aria-label="Copiar cupom NIKE20">NIKE20</button>
+                        </div>
+                        <a href="https://www.nike.com.br/" target="_blank" rel="noopener" data-coupon="NIKE20" data-track="offer-af1-gs" class="block w-full bg-retroGrey text-white text-center text-xs font-black uppercase tracking-widest py-3 rounded-full hover:bg-trueBlue transition-colors">Pegar oferta · cupom NIKE20</a>
+                    </div>
+                </article>
+
+                <!-- Card 5 -->
+                <article aria-labelledby="card-ja1" class="group bg-white border border-gray-200 hover:border-trueBlue rounded-2xl overflow-hidden transition-all hover:shadow-xl">
+                    <div class="product-bg aspect-square relative overflow-hidden" aria-hidden="true">
+                        <span class="absolute top-3 left-3 bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">-55%</span>
+                        <div class="absolute inset-0 flex items-center justify-center text-2xl sm:text-4xl font-black uppercase text-gray-400 tracking-tighter text-center px-4">JA 1<br>Smoke Grey</div>
+                    </div>
+                    <div class="p-4 lg:p-5">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-trueBlue mb-1">Nike · Basquete</p>
+                        <h3 id="card-ja1" class="font-black text-base lg:text-lg leading-tight mb-3 uppercase">Nike JA 1 'Smoke Grey' · -55%</h3>
+                        <div class="flex items-baseline gap-2 mb-2">
+                            <span class="text-xs line-through text-gray-400">R$ 1.199,99</span>
+                            <span class="text-xl lg:text-2xl font-black text-trueBlue">R$ 535,99</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 mb-4">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-retroGrey">Cupom</span>
+                            <button type="button" data-coupon="NIKE20" data-track="coupon-inline" class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded hover:brightness-95" aria-label="Copiar cupom NIKE20">NIKE20</button>
+                        </div>
+                        <a href="https://www.nike.com.br/" target="_blank" rel="noopener" data-coupon="NIKE20" data-track="offer-ja1" class="block w-full bg-retroGrey text-white text-center text-xs font-black uppercase tracking-widest py-3 rounded-full hover:bg-trueBlue transition-colors">Pegar oferta · cupom NIKE20</a>
+                    </div>
+                </article>
+
+                <!-- Card 6 -->
+                <article aria-labelledby="card-airmax" class="group bg-white border border-gray-200 hover:border-trueBlue rounded-2xl overflow-hidden transition-all hover:shadow-xl">
+                    <div class="product-bg aspect-square relative overflow-hidden" aria-hidden="true">
+                        <span class="absolute top-3 left-3 bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">-51%</span>
+                        <div class="absolute inset-0 flex items-center justify-center text-2xl sm:text-4xl font-black uppercase text-gray-400 tracking-tighter text-center px-4">Air Max<br>Solo</div>
+                    </div>
+                    <div class="p-4 lg:p-5">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-trueBlue mb-1">Nike · Lifestyle</p>
+                        <h3 id="card-airmax" class="font-black text-base lg:text-lg leading-tight mb-3 uppercase">Nike Air Max Solo · -51%</h3>
+                        <div class="flex items-baseline gap-2 mb-4">
+                            <span class="text-xs line-through text-gray-400">R$ 799,99</span>
+                            <span class="text-xl lg:text-2xl font-black text-trueBlue">R$ 389,99</span>
+                        </div>
+                        <a href="https://www.nike.com.br/" target="_blank" rel="noopener" data-track="offer-airmax" class="block w-full bg-retroGrey text-white text-center text-xs font-black uppercase tracking-widest py-3 rounded-full hover:bg-trueBlue transition-colors">Pegar oferta</a>
+                    </div>
+                </article>
             </div>
+        </div>
+    </section>
 
-            <!-- Brands Filter (Horizontal Scroll) -->
-            <div class="flex space-x-2 md:space-x-3 overflow-x-auto hide-scrollbar mb-8 pb-2">
-                <button class="flex-none bg-gray-100 hover:bg-gray-200 text-black font-bold uppercase text-xs tracking-widest px-4 py-2 rounded-sm whitespace-nowrap transition-colors">Filter Brand</button>
-                <button class="flex-none border border-gray-200 hover:border-black text-black font-bold uppercase text-xs tracking-widest px-4 py-2 rounded-sm whitespace-nowrap transition-colors">Manoel Gomes</button>
-                <button class="flex-none border border-gray-200 hover:border-black text-black font-bold uppercase text-xs tracking-widest px-4 py-2 rounded-sm whitespace-nowrap transition-colors">Nike</button>
-                <button class="flex-none border border-gray-200 hover:border-black text-black font-bold uppercase text-xs tracking-widest px-4 py-2 rounded-sm whitespace-nowrap transition-colors">Adidas</button>
-                <button class="flex-none border border-gray-200 hover:border-black text-black font-bold uppercase text-xs tracking-widest px-4 py-2 rounded-sm whitespace-nowrap transition-colors">New Balance</button>
-                <button class="flex-none border border-gray-200 hover:border-black text-black font-bold uppercase text-xs tracking-widest px-4 py-2 rounded-sm whitespace-nowrap transition-colors">Asics</button>
-                <button class="flex-none border border-gray-200 hover:border-black text-black font-bold uppercase text-xs tracking-widest px-4 py-2 rounded-sm whitespace-nowrap transition-colors">Salomon</button>
-                <button class="flex-none border border-gray-200 hover:border-black text-black font-bold uppercase text-xs tracking-widest px-4 py-2 rounded-sm whitespace-nowrap transition-colors">Vans</button>
-                <button class="flex-none border border-gray-200 hover:border-black text-black font-bold uppercase text-xs tracking-widest px-4 py-2 rounded-sm whitespace-nowrap transition-colors">Crocs</button>
-                <button class="flex-none border border-gray-200 hover:border-black text-black font-bold uppercase text-xs tracking-widest px-4 py-2 rounded-sm whitespace-nowrap transition-colors">Puma</button>
-                <button class="flex-none border border-gray-200 hover:border-black text-black font-bold uppercase text-xs tracking-widest px-4 py-2 rounded-sm whitespace-nowrap transition-colors">Converse</button>
+    <!-- Banner Nike parceria -->
+    <section class="bg-retroGrey text-white py-12 lg:py-16">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div>
+                <span class="inline-block bg-polem text-retroGrey text-xs font-black uppercase tracking-widest px-3 py-1 mb-3">Parceria oficial</span>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-display uppercase tracking-tighter leading-none mb-2">Hotsite Nike × SDM</h2>
+                <p class="text-gray-400 text-sm lg:text-base">Produtos exclusivos com cupom <span class="text-polem font-black">NIKE20</span> · descontos de 5% a 41%</p>
             </div>
+            <a href="https://www.nike.com.br/hotsite/sdmlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=banner-hotsite-nike" target="_blank" rel="noopener" data-track="banner-hotsite-nike" class="inline-flex items-center gap-2 bg-trueBlue hover:bg-retroBlue text-white font-black uppercase tracking-wide text-sm px-8 py-4 rounded-full transition-colors whitespace-nowrap">
+                Acessar hotsite →
+            </a>
+        </div>
+    </section>
 
-            <!-- Product Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-                <!-- Product 1 -->
-                <div class="group cursor-pointer flex flex-col">
-                    <div class="relative bg-gray-100 aspect-[4/3] flex items-center justify-center overflow-hidden mb-4">
-                        <img src="https://cdn.sanity.io/images/pu5wtzfc/production/ac3c7027fa44f38f669b18b9a2ca595985c50319-2000x1250.png/nike-air-force-1-low-roses-if0498-100.png?w=600&h=400&auto=format" alt="Nike AF1 Roses" class="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Dropped</span>
-                        <div class="font-oswald font-bold text-lg text-red-600">89.40°</div>
-                    </div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Nike</p>
-                    <h3 class="font-oswald text-xl font-bold uppercase leading-tight group-hover:text-gray-600 transition-colors">Nike Air Force 1 Low "Roses" (White)</h3>
-                </div>
-
-                <!-- Product 2 -->
-                <div class="group cursor-pointer flex flex-col">
-                    <div class="relative bg-gray-100 aspect-[4/3] flex items-center justify-center overflow-hidden mb-4">
-                        <img src="https://cdn.sanity.io/images/pu5wtzfc/production/0c7e5ea91e97dadcbfc1f10c94a96e2cd9f99533-2000x1250.png/Erling-Haaland-Nike-Phantom-6-Low-Hot-Punch-Green-Strike-HQ2332-603-0.png?w=600&h=400&auto=format" alt="Erling Haaland Nike Phantom 6" class="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-xs font-bold uppercase tracking-widest text-gray-500">--.--.--</span>
-                        <div class="font-oswald font-bold text-lg text-red-600">76.80°</div>
-                    </div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Nike</p>
-                    <h3 class="font-oswald text-xl font-bold uppercase leading-tight group-hover:text-gray-600 transition-colors">Erling Haaland x Nike Phantom 6 Low Elite FG "Hot Punch/Green Strike"</h3>
-                </div>
-
-                <!-- Product 3 -->
-                <div class="group cursor-pointer flex flex-col">
-                    <div class="relative bg-gray-100 aspect-[4/3] flex items-center justify-center overflow-hidden mb-4">
-                        <img src="https://cdn.sanity.io/images/pu5wtzfc/production/f4a759b272a4ceacb9b2a57826f80ec46de289b0-2000x1250.png/Kith-adidas-Originals-Spring-2026-Collection-0.png?w=600&h=400&auto=format" alt="Kith x adidas BW Army" class="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-xs font-bold uppercase tracking-widest text-gray-500">--.--.--</span>
-                        <div class="font-oswald font-bold text-lg text-red-600">88.50°</div>
-                    </div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Adidas</p>
-                    <h3 class="font-oswald text-xl font-bold uppercase leading-tight group-hover:text-gray-600 transition-colors">Kith x adidas BW Army Spring 2026 Collection</h3>
-                </div>
-
-                <!-- Product 4 -->
-                <div class="group cursor-pointer flex flex-col">
-                    <div class="relative bg-gray-100 aspect-[4/3] flex items-center justify-center overflow-hidden mb-4">
-                        <img src="https://cdn.sanity.io/images/pu5wtzfc/production/a34f51dd987e20c4e25300842b2868766516eefb-2000x1250.png/dot-swoosh-nike-reactx-rejuven8-slide-touch-grass-ir0459-001.png?w=600&h=400&auto=format" alt="Nike ReactX Rejuven8 Slide" class="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-xs font-bold uppercase tracking-widest text-gray-500">April 2026</span>
-                        <div class="font-oswald font-bold text-lg text-red-600">82.70°</div>
-                    </div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Nike</p>
-                    <h3 class="font-oswald text-xl font-bold uppercase leading-tight group-hover:text-gray-600 transition-colors">.SWOOSH Nike ReactX Rejuven8 Slide "Touch Grass"</h3>
-                </div>
-            </div>
-
-            <!-- Mobile App Promo -->
-            <div class="mt-16 w-full bg-black relative overflow-hidden flex flex-col md:flex-row items-center justify-between p-8 md:p-12 cursor-pointer group">
-                <div class="z-10 text-center md:text-left mb-8 md:mb-0">
-                    <h2 class="font-oswald text-5xl md:text-7xl font-bold text-white uppercase leading-none mb-6">App dropped.</h2>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                        <button class="bg-white text-black font-bold uppercase text-sm tracking-widest px-8 py-3 rounded-full hover:bg-gray-200 transition-colors">iPhone</button>
-                        <button class="bg-transparent border border-white text-white font-bold uppercase text-sm tracking-widest px-8 py-3 rounded-full hover:bg-white hover:text-black transition-colors">Android</button>
-                    </div>
-                </div>
-                <div class="relative w-full md:w-1/2 flex justify-center md:justify-end z-10 pointer-events-none">
-                     <img src="https://cdn.sanity.io/images/pu5wtzfc/production/4edc73d324df5eca2a2c1ae5d382535d7c5cf6f6-3342x3493.png/4edc73d324df5eca2a2c1ae5d382535d7c5cf6f6.png?rect=480,0,2237,3159&w=400&auto=format" alt="App Preview" class="w-64 md:w-80 object-contain transform translate-y-4 group-hover:-translate-y-2 transition-transform duration-500">
-                </div>
-            </div>
-        </section>
-
-        <!-- Latest News Section -->
-        <section class="py-10 px-4 md:px-8 border-t border-gray-200">
-            <div class="flex justify-between items-end mb-6">
+    <!-- Lançamentos -->
+    <section id="lancamentos" class="py-12 lg:py-20 bg-offWhite">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="flex items-end justify-between mb-8 lg:mb-12 reveal">
                 <div>
-                    <h2 class="font-oswald text-3xl md:text-5xl font-bold uppercase leading-none">Latest News</h2>
+                    <span class="inline-block bg-trueBlue text-white text-xs font-black uppercase tracking-widest px-3 py-1 mb-3">Drops</span>
+                    <h2 class="text-4xl sm:text-5xl lg:text-6xl font-display uppercase tracking-tighter leading-none">Próximos lançamentos</h2>
+                </div>
+                <a href="#" class="hidden sm:inline-block text-sm font-bold uppercase tracking-wide hover:text-trueBlue">Ver todos →</a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 reveal">
+                <article aria-labelledby="launch-afkobe" class="group bg-white rounded-2xl overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow">
+                    <div class="product-bg sm:w-2/5 aspect-square sm:aspect-auto flex items-center justify-center text-2xl font-black uppercase text-gray-400 tracking-tighter text-center p-6" aria-hidden="true">AF1 × Kobe<br>Lower Merion</div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex gap-2 mb-3">
+                                <span class="bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Novo</span>
+                                <span class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Homenagem</span>
+                            </div>
+                            <h3 id="launch-afkobe" class="font-black text-xl lg:text-2xl leading-tight mb-2 uppercase">AF1 × Kobe 'Lower Merion High'</h3>
+                            <p class="text-base text-gray-600 mb-4 font-serif leading-snug">Homenagem ao legado de Kobe Bryant. Duas versões inspiradas na época de colégio. Grade 36 ao 48BR.</p>
+                        </div>
+                        <a href="#" class="inline-flex items-center gap-2 text-trueBlue font-black uppercase tracking-wide text-sm hover:gap-3 transition-all">Ver detalhes →</a>
+                    </div>
+                </article>
+
+                <article aria-labelledby="launch-mercurial" class="group bg-white rounded-2xl overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow">
+                    <div class="product-bg sm:w-2/5 aspect-square sm:aspect-auto flex items-center justify-center text-2xl font-black uppercase text-gray-400 tracking-tighter text-center p-6" aria-hidden="true">Mercurial<br>Superfly CR7</div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex gap-2 mb-3">
+                                <span class="bg-infrared text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Limitado</span>
+                                <span class="bg-retroGrey text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Nike App</span>
+                            </div>
+                            <h3 id="launch-mercurial" class="font-black text-xl lg:text-2xl leading-tight mb-2 uppercase">Mercurial Superfly 2009 'CR7'</h3>
+                            <p class="text-base text-gray-600 mb-4 font-serif leading-snug">Colaboração Cristiano Ronaldo × Nike. Estoque extremamente limitado. Grade 37 ao 45BR.</p>
+                        </div>
+                        <a href="#" class="inline-flex items-center gap-2 text-trueBlue font-black uppercase tracking-wide text-sm hover:gap-3 transition-all">Ver detalhes →</a>
+                    </div>
+                </article>
+
+                <article aria-labelledby="launch-adizero" class="group bg-white rounded-2xl overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow">
+                    <div class="product-bg sm:w-2/5 aspect-square sm:aspect-auto flex items-center justify-center text-2xl font-black uppercase text-gray-400 tracking-tighter text-center p-6" aria-hidden="true">Adizero<br>Evo SL</div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex gap-2 mb-3">
+                                <span class="bg-starfish text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Copa 2026</span>
+                                <span class="bg-polem text-retroGrey text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">8 cores</span>
+                            </div>
+                            <h3 id="launch-adizero" class="font-black text-xl lg:text-2xl leading-tight mb-2 uppercase">Adizero Evo SL · Copa do Mundo</h3>
+                            <p class="text-base text-gray-600 mb-4 font-serif leading-snug">Edição especial Copa do Mundo em 8 cores. Grade 34 ao 46BR na adidas.</p>
+                        </div>
+                        <a href="#" class="inline-flex items-center gap-2 text-trueBlue font-black uppercase tracking-wide text-sm hover:gap-3 transition-all">Ver detalhes →</a>
+                    </div>
+                </article>
+
+                <article aria-labelledby="launch-dunk" class="group bg-white rounded-2xl overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow">
+                    <div class="product-bg sm:w-2/5 aspect-square sm:aspect-auto flex items-center justify-center text-2xl font-black uppercase text-gray-400 tracking-tighter text-center p-6" aria-hidden="true">Dunk Low<br>Rainbow Swoosh</div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex gap-2 mb-3">
+                                <span class="bg-trueBlue text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">Edição especial</span>
+                                <span class="bg-retroGrey text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded">GS</span>
+                            </div>
+                            <h3 id="launch-dunk" class="font-black text-xl lg:text-2xl leading-tight mb-2 uppercase">Dunk Low 'Rainbow Swoosh'</h3>
+                            <p class="text-base text-gray-600 mb-4 font-serif leading-snug">Edição especial colorida. Grade 34 ao 38BR na Nike. Estoque limitado.</p>
+                        </div>
+                        <a href="#" class="inline-flex items-center gap-2 text-trueBlue font-black uppercase tracking-wide text-sm hover:gap-3 transition-all">Ver detalhes →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cupons -->
+    <section id="cupons" class="py-12 lg:py-20">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="mb-8 lg:mb-12 reveal">
+                <span class="inline-block bg-polem text-retroGrey text-xs font-black uppercase tracking-widest px-3 py-1 mb-3">Cupons ativos</span>
+                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-display uppercase tracking-tighter leading-none">Usa agora, economiza hoje</h2>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4 reveal">
+                <button type="button" data-coupon="NIKE20" data-track="coupon" class="text-left bg-trueBlue text-white p-6 rounded-2xl flex flex-col justify-between min-h-[160px] hover:scale-[1.02] transition-transform" aria-label="Copiar cupom NIKE20 da Nike">
+                    <p class="text-xs font-bold uppercase tracking-widest opacity-80">Nike</p>
+                    <div>
+                        <p class="text-2xl lg:text-3xl font-black mb-1">NIKE20</p>
+                        <p class="text-xs opacity-90">Toque para copiar · 30% cashback</p>
+                    </div>
+                </button>
+                <button type="button" data-coupon="SDMLINKS" data-track="coupon" class="text-left bg-retroGrey text-white p-6 rounded-2xl flex flex-col justify-between min-h-[160px] hover:scale-[1.02] transition-transform" aria-label="Copiar cupom SDMLINKS da New Balance">
+                    <p class="text-xs font-bold uppercase tracking-widest opacity-60">New Balance</p>
+                    <div>
+                        <p class="text-2xl lg:text-3xl font-black mb-1 text-polem">SDMLINKS</p>
+                        <p class="text-xs opacity-90">Toque para copiar · 20% OFF</p>
+                    </div>
+                </button>
+                <button type="button" data-coupon="CASUAL30" data-track="coupon" class="text-left bg-polem text-retroGrey p-6 rounded-2xl flex flex-col justify-between min-h-[160px] hover:scale-[1.02] transition-transform" aria-label="Copiar cupom CASUAL30 para casuais Nike">
+                    <p class="text-xs font-bold uppercase tracking-widest opacity-80">Casual</p>
+                    <div>
+                        <p class="text-2xl lg:text-3xl font-black mb-1">CASUAL30</p>
+                        <p class="text-xs">Toque para copiar · 30% OFF</p>
+                    </div>
+                </button>
+                <a href="https://t.me/s/sneakersdomionlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=cupom-secreto" target="_blank" rel="noopener" data-track="coupon-secret" class="border-2 border-retroGrey p-6 rounded-2xl flex flex-col justify-between min-h-[160px] hover:bg-retroGrey hover:text-white transition-colors">
+                    <p class="text-xs font-bold uppercase tracking-widest">Adidas</p>
+                    <div>
+                        <p class="text-2xl lg:text-3xl font-black mb-1 text-trueBlue">SECRETO</p>
+                        <p class="text-xs text-gray-600 group-hover:text-white/80">Abrir no Telegram<span class="sr-only"> (abre em nova aba)</span> →</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Posts do admin (dinâmico) -->
+    <section id="posts" class="py-12 lg:py-20 bg-offWhite">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="mb-8 lg:mb-12 reveal">
+                <span class="inline-block bg-retroGrey text-white text-xs font-black uppercase tracking-widest px-3 py-1 mb-3">Feed SDM</span>
+                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-display uppercase tracking-tighter leading-none">Últimas do canal</h2>
+            </div>
+            <div id="postsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" aria-live="polite" aria-busy="true">
+                <p class="text-gray-500 col-span-full text-sm">Carregando posts…</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter / CTA final -->
+    <section class="bg-trueBlue text-white py-16 lg:py-24">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8 text-center">
+            <h2 class="text-4xl sm:text-6xl lg:text-7xl font-display uppercase tracking-tighter leading-none mb-6">Não perde nenhum drop.</h2>
+            <p class="text-lg lg:text-xl text-white/80 max-w-2xl mx-auto mb-10">Entra no Telegram e recebe lançamentos, promoções e cupons em primeira mão. 265 mil sneakerheads já estão dentro.</p>
+            <a href="https://t.me/s/sneakersdomionlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=cta-final-telegram" target="_blank" rel="noopener" data-track="cta-final-telegram" class="inline-flex items-center gap-3 bg-polem text-retroGrey font-black uppercase tracking-wide text-base lg:text-lg px-10 py-5 rounded-full hover:bg-white transition-colors">
+                Entrar no Telegram agora →
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-retroGrey text-white py-12 lg:py-16">
+        <div class="max-w-[1400px] mx-auto px-4 lg:px-8">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+                <div class="col-span-2 lg:col-span-1">
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg viewBox="0 0 200 200" class="w-12 h-12" role="img" aria-hidden="true" focusable="false">
+                            <circle cx="100" cy="100" r="100" fill="#0065FC"/>
+                            <text x="100" y="132" text-anchor="middle" font-family="'Archivo Black', Archivo, sans-serif" font-weight="900" font-size="78" fill="white" letter-spacing="-4">SDM</text>
+                        </svg>
+                        <span class="font-serif italic text-2xl text-white">Links</span>
+                    </div>
+                    <p class="text-base text-gray-400 max-w-xs font-serif italic leading-snug">O maior canal de lançamentos, promoções e conteúdos de sneakers do Brasil.</p>
+                </div>
+                <div>
+                    <p class="text-xs font-black uppercase tracking-widest mb-4">Navegação</p>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#ofertas" class="hover:text-polem">Ofertas</a></li>
+                        <li><a href="#lancamentos" class="hover:text-polem">Lançamentos</a></li>
+                        <li><a href="#cupons" class="hover:text-polem">Cupons</a></li>
+                        <li><a href="#categorias" class="hover:text-polem">Categorias</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="text-xs font-black uppercase tracking-widest mb-4">Redes</p>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="https://www.instagram.com/sdmlinks/?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=footer-instagram" target="_blank" rel="noopener" data-track="footer-instagram" class="hover:text-polem">Instagram · 186K</a></li>
+                        <li><a href="https://t.me/s/sneakersdomionlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=footer-telegram" target="_blank" rel="noopener" data-track="footer-telegram" class="hover:text-polem">Telegram · 265K</a></li>
+                        <li><a href="https://www.tiktok.com/@sdmlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=footer-tiktok" target="_blank" rel="noopener" data-track="footer-tiktok" class="hover:text-polem">TikTok · 24.5K</a></li>
+                        <li><a href="https://x.com/sdmlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=footer-x" target="_blank" rel="noopener" data-track="footer-x" class="hover:text-polem">X (Twitter)</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="text-xs font-black uppercase tracking-widest mb-4">Parcerias</p>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="https://www.nike.com.br/hotsite/sdmlinks?utm_source=sdmlinks&amp;utm_medium=site&amp;utm_campaign=footer-hotsite-nike" target="_blank" rel="noopener" data-track="footer-hotsite-nike" class="hover:text-polem">Hotsite Nike</a></li>
+                        <li><a href="/admin/login" class="hover:text-polem">Área admin</a></li>
+                    </ul>
                 </div>
             </div>
-
-            <!-- Filters -->
-            <div class="flex gap-4 mb-8">
-                <button class="bg-black text-white font-bold uppercase text-sm tracking-widest px-6 py-2 rounded-full">Latest</button>
-                <button class="bg-gray-100 text-gray-500 font-bold uppercase text-sm tracking-widest px-6 py-2 rounded-full hover:bg-gray-200 transition-colors">Trending</button>
-            </div>
-
-            <!-- News Grid -->
-
-            <!-- News Grid -->
-            <div id="dynamicNewsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                <!-- Posts will be loaded here dynamically via JS -->
-            </div>
-
-            <div class="mt-12 text-center">
-                <button class="bg-transparent border-b-2 border-black text-black font-bold uppercase text-sm tracking-widest pb-1 hover:text-gray-500 hover:border-gray-500 transition-colors">Loading more</button>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer / Newsletter -->
-    <footer class="bg-black text-white mt-12 py-16 px-4 md:px-8 border-t border-gray-800">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="font-oswald text-4xl md:text-6xl font-bold uppercase leading-none mb-6">InboxHeat°</h2>
-            <p class="font-bold uppercase tracking-widest text-sm text-gray-400 mb-8">Subscribe in one tap</p>
-
-            <form class="flex flex-col sm:flex-row max-w-xl mx-auto gap-4 mb-8">
-                <input type="email" placeholder="Email us" class="flex-1 bg-white/10 border border-white/20 text-white px-6 py-4 outline-none focus:border-white transition-colors" required>
-                <button type="submit" class="bg-white text-black font-bold uppercase tracking-widest px-8 py-4 hover:bg-gray-200 transition-colors">Subscribe</button>
-            </form>
-
-            <p class="text-xs text-gray-500 uppercase tracking-widest leading-relaxed mb-12 max-w-2xl mx-auto">
-                By signing up, you confirm you are over 16 years of age and you want to receive SDM Smeaker emails. Please see our <a href="#" class="border-b border-gray-500 hover:text-white transition-colors">Terms</a> and <a href="#" class="border-b border-gray-500 hover:text-white transition-colors">Privacy</a> for more details.
-            </p>
-
-            <div class="flex justify-center items-center gap-8">
-                <span class="font-bold uppercase tracking-widest text-sm text-gray-400">Follow</span>
-                <div class="flex gap-4">
-                    <a href="#" class="text-white hover:text-gray-400 transition-colors">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
-                    </a>
-                    <a href="#" class="text-white hover:text-gray-400 transition-colors">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-                    </a>
-                    <a href="#" class="text-white hover:text-gray-400 transition-colors">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.597 0 0 .597 0 1.325v21.351C0 23.403.597 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.597 1.323-1.325V1.325C24 .597 23.403 0 22.675 0z"/></svg>
-                    </a>
-                </div>
-            </div>
-
-            <div class="mt-12 text-center text-xs font-bold uppercase tracking-widest text-gray-600">
-                &copy; 2026 SDM Smeaker. All Rights Reserved.
+            <div class="border-t border-white/10 pt-6 text-xs text-gray-500">
+                <p>© 2026 SDM Links. Conteúdo com parcerias de afiliado.</p>
             </div>
         </div>
     </footer>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Mobile menu toggle
-        const mobileMenuButton = document.querySelector('header button svg').parentElement;
-        const mobileMenu = document.createElement('div');
-        mobileMenu.className = 'fixed inset-0 bg-black z-50 transform translate-x-full transition-transform duration-300 flex flex-col p-8';
-        mobileMenu.innerHTML = `
-            <div class="flex justify-between items-center mb-12">
-                <a href="#" class="font-oswald text-2xl font-bold tracking-tighter uppercase text-white">SDM Smeaker</a>
-                <button class="text-white hover:text-gray-300 focus:outline-none">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <nav class="flex flex-col gap-6 font-oswald text-3xl font-bold uppercase text-white">
-                <a href="#" class="hover:text-gray-400">News</a>
-                <a href="#" class="hover:text-gray-400">Releases</a>
-                <a href="#" class="hover:text-gray-400">Brands</a>
-            </nav>
-        `;
-        document.body.appendChild(mobileMenu);
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "Ofertas de hoje — SDM Links",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "item": { "@type": "Product", "name": "Nike Air Force 1 Low 'Oil Green'", "brand": "Nike", "category": "Lifestyle", "offers": { "@type": "Offer", "priceCurrency": "BRL", "price": "449.99", "availability": "https://schema.org/InStock" } } },
+            { "@type": "ListItem", "position": 2, "item": { "@type": "Product", "name": "Nike Cortez 'White Black'", "brand": "Nike", "category": "Lifestyle", "offers": { "@type": "Offer", "priceCurrency": "BRL", "price": "432.24", "availability": "https://schema.org/InStock" } } },
+            { "@type": "ListItem", "position": 3, "item": { "@type": "Product", "name": "New Balance 530 'Wolf Grey'", "brand": "New Balance", "category": "Lifestyle", "offers": { "@type": "Offer", "priceCurrency": "BRL", "price": "598.49", "availability": "https://schema.org/InStock" } } },
+            { "@type": "ListItem", "position": 4, "item": { "@type": "Product", "name": "Nike Air Force 1 Low GS 'Black Gold'", "brand": "Nike", "category": "Lifestyle", "offers": { "@type": "Offer", "priceCurrency": "BRL", "price": "417.99", "availability": "https://schema.org/InStock" } } },
+            { "@type": "ListItem", "position": 5, "item": { "@type": "Product", "name": "Nike JA 1 'Smoke Grey'", "brand": "Nike", "category": "Basquete", "offers": { "@type": "Offer", "priceCurrency": "BRL", "price": "535.99", "availability": "https://schema.org/InStock" } } },
+            { "@type": "ListItem", "position": 6, "item": { "@type": "Product", "name": "Nike Air Max Solo", "brand": "Nike", "category": "Lifestyle", "offers": { "@type": "Offer", "priceCurrency": "BRL", "price": "389.99", "availability": "https://schema.org/InStock" } } }
+        ]
+    }
+    </script>
 
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.remove('translate-x-full');
-        });
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-        mobileMenu.querySelector('button').addEventListener('click', () => {
-            mobileMenu.classList.add('translate-x-full');
-        });
+    <div id="cookieBanner" class="cookie-banner" role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-desc">
+        <div class="flex-1 min-w-[240px]">
+            <p id="cookie-title" class="font-black uppercase tracking-widest text-xs mb-1">Privacidade</p>
+            <p id="cookie-desc" class="text-sm text-gray-300">Oi! Usamos cookies e medimos cliques em cupons e links afiliados para melhorar o conteúdo. Nenhum dado pessoal é vendido.</p>
+        </div>
+        <div class="flex gap-2 ml-auto">
+            <button type="button" id="cookieReject" class="bg-white/10 hover:bg-white/20 text-white text-xs font-black uppercase tracking-widest px-4 py-2 rounded-full transition-colors">Recusar</button>
+            <button type="button" id="cookieAccept" class="bg-polem text-retroGrey text-xs font-black uppercase tracking-widest px-4 py-2 rounded-full hover:brightness-95 transition">Aceitar</button>
+        </div>
+    </div>
 
-        // Simple interactive filters demo
-        const filterButtons = document.querySelectorAll('.overflow-x-auto button');
-        filterButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                filterButtons.forEach(b => {
-                    b.classList.remove('bg-black', 'text-white');
-                    b.classList.add('text-black', 'bg-transparent');
-                });
-                this.classList.remove('text-black', 'bg-transparent');
-                this.classList.add('bg-black', 'text-white');
-            });
-        });
-
-        // Form submission demo
-        const subscribeForm = document.querySelector('form');
-        if(subscribeForm) {
-            subscribeForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const email = subscribeForm.querySelector('input[type="email"]').value;
-                alert('Inscrição realizada para: ' + email + '!');
-                subscribeForm.reset();
-            });
-        }
-
-        // Load more demo
-        const loadMoreBtn = document.querySelector('button.border-b-2');
-        if(loadMoreBtn) {
-            loadMoreBtn.addEventListener('click', function() {
-                this.innerText = 'Carregando...';
-                setTimeout(() => {
-                    this.innerText = 'Não há mais itens!';
-                    this.disabled = true;
-                }, 1000);
-            });
-        }
-    });
-</script>
-
-    <!-- Dynamic Fetch Script -->
     <script>
-        async function fetchPosts() {
+        // --- Consent (LGPD) ---
+        const CONSENT_KEY = 'sdm-consent';
+        function getConsent() { return localStorage.getItem(CONSENT_KEY); }
+        function setConsent(v) { localStorage.setItem(CONSENT_KEY, v); }
+
+        const banner = document.getElementById('cookieBanner');
+        if (!getConsent()) banner.classList.add('show');
+        document.getElementById('cookieAccept').addEventListener('click', () => {
+            setConsent('accepted'); banner.classList.remove('show');
+        });
+        document.getElementById('cookieReject').addEventListener('click', () => {
+            setConsent('rejected'); banner.classList.remove('show');
+        });
+
+        // --- Toast ---
+        const toast = document.getElementById('toast');
+        let toastTimer;
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+        }
+
+        // --- Copiar cupom ---
+        document.addEventListener('click', async (e) => {
+            const btn = e.target.closest('[data-coupon]');
+            if (!btn) return;
+            const code = btn.dataset.coupon;
+            try {
+                await navigator.clipboard.writeText(code);
+                showToast(`Cupom ${code} copiado`);
+            } catch {
+                showToast(`Cupom: ${code}`);
+            }
+        });
+
+        // --- Click tracking (opt-in) ---
+        function trackClick(label, href) {
+            if (getConsent() !== 'accepted') return;
+            try {
+                const body = JSON.stringify({ label, href: href || null });
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon('/api/track', new Blob([body], { type: 'text/plain' }));
+                } else {
+                    fetch('/api/track', { method: 'POST', body, keepalive: true, headers: { 'Content-Type': 'text/plain' } });
+                }
+            } catch {}
+        }
+        document.addEventListener('click', (e) => {
+            const el = e.target.closest('[data-track]');
+            if (!el) return;
+            trackClick(el.dataset.track, el.href || null);
+        }, true);
+
+        // Reveal on scroll
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+        const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        async function loadPosts() {
+            const grid = document.getElementById('postsGrid');
             try {
                 const res = await fetch('/api/posts');
-                const data = await res.json();
-                const grid = document.getElementById('dynamicNewsGrid');
-                grid.innerHTML = '';
-
-                if(data.data && data.data.length > 0) {
-                    data.data.forEach(post => {
-                        const date = new Date(post.published_at).toLocaleDateString();
-                        const html = `
-                            <div class="group cursor-pointer">
-                                <div class="relative overflow-hidden mb-4 h-64 bg-gray-100">
-                                    <img src="${post.image_url}" alt="${post.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                                </div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs font-bold uppercase tracking-widest text-gray-500">${date} - ${post.category}</span>
-                                    <div class="font-oswald font-bold text-lg text-red-600">NEW</div>
-                                </div>
-                                <h3 class="font-oswald text-2xl font-bold uppercase leading-tight group-hover:text-gray-600 transition-colors">${post.title}</h3>
-                            </div>
-                        `;
-                        grid.innerHTML += html;
-                    });
-                } else {
-                    grid.innerHTML = '<p class="col-span-full text-center text-gray-500">No posts available yet.</p>';
+                const { data } = await res.json();
+                if (!data || data.length === 0) {
+                    grid.innerHTML = '<p class="text-gray-500 col-span-full text-sm">Nenhum post publicado ainda.</p>';
+                    grid.setAttribute('aria-busy', 'false');
+                    return;
                 }
+                grid.innerHTML = data.slice(0, 6).map((post, i) => {
+                    const title = escapeHtml(post.title);
+                    const category = escapeHtml(post.category);
+                    const iso = new Date(post.published_at).toISOString();
+                    const human = new Date(post.published_at).toLocaleDateString('pt-BR');
+                    const headingId = `feed-post-${i}`;
+                    return `
+                    <article aria-labelledby="${headingId}" class="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-shadow group">
+                        <div class="aspect-video overflow-hidden bg-gray-100">
+                            <img src="${escapeHtml(post.image_url)}" alt="${category}: ${title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                        </div>
+                        <div class="p-5">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-trueBlue mb-2">${category}</p>
+                            <h3 id="${headingId}" class="font-black text-lg leading-tight uppercase mb-3">${title}</h3>
+                            <p class="text-xs text-gray-500"><time datetime="${iso}">${human}</time></p>
+                        </div>
+                    </article>`;
+                }).join('');
             } catch (err) {
-                console.error("Failed to fetch posts:", err);
+                grid.innerHTML = '<p class="text-gray-500 col-span-full text-sm" role="alert">Erro ao carregar posts.</p>';
+            } finally {
+                grid.setAttribute('aria-busy', 'false');
             }
         }
-
-        // Call it immediately after DOM is parsed
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchPosts();
-        });
+        loadPosts();
     </script>
 </body>
 </html>

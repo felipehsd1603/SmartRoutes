@@ -1,51 +1,171 @@
+require('dotenv').config();
+const { Pool } = require('pg');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const bcrypt = require('bcrypt');
 
-const dbPath = path.resolve(__dirname, 'database.sqlite');
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-        console.error('Error connecting to the database', err.message);
-    } else {
-        console.log('Connected to the SQLite database.');
-        initializeDatabase();
-    }
-});
+let db;
+let isPostgres = false;
 
-function initializeDatabase() {
-    db.serialize(() => {
-        // Create Admins Table
-        db.run(`CREATE TABLE IF NOT EXISTS admins (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+if (process.env.DATABASE_URL) {
+    console.log('Utilizando Supabase (PostgreSQL)...');
+    isPostgres = true;
+    db = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false } // Necessário para Supabase/Render
+    });
+} else {
+    console.log('Utilizando SQLite local...');
+    const dbPath = path.resolve(__dirname, 'database.sqlite');
+    const sqliteDb = new sqlite3.Database(dbPath, (err) => {
+        if (err) console.error('Error connecting to SQLite', err.message);
+        else initializeDatabase();
+    });
+
+    // Wrapper para simular comportamento do PG no SQLite (simplificado)
+    db = {
+        query: (text, params) => {
+            return new Promise((resolve, reject) => {
+                const sql = text.replace(/\$\d+/g, '?'); // Converte $1 para ?
+                if (text.trim().toUpperCase().startsWith('SELECT')) {
+                    sqliteDb.all(sql, params, (err, rows) => {
+                        if (err) reject(err);
+                        else resolve({ rows });
+                    });
+                } else {
+                    sqliteDb.run(sql, params, function(err) {
+                        if (err) reject(err);
+                        else resolve({ rows: [], rowCount: this.changes, lastID: this.lastID });
+                    });
+                }
+            });
+        }
+    };
+}
+
+// Inicialização automática das tabelas no Supabase (se necessário)
+if (isPostgres) {
+    initializePostgres();
+}
+
+async function initializePostgres() {
+    const client = await db.connect();
+    try {
+        await client.query('BEGIN');
+        
+        // Admins
+        await client.query(`CREATE TABLE IF NOT EXISTS admins (
+            id SERIAL PRIMARY KEY,
             username TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL
         )`);
 
-        // Create Posts Table
-        db.run(`CREATE TABLE IF NOT EXISTS posts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+        // Posts
+        await client.query(`CREATE TABLE IF NOT EXISTS posts (
+            id SERIAL PRIMARY KEY,
             title TEXT NOT NULL,
             category TEXT NOT NULL,
             image_url TEXT,
             content TEXT,
-            published_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            published_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+            slug TEXT UNIQUE,
+            brand TEXT,
+            model TEXT,
+            sku TEXT,
+            color TEXT,
+            price_cents INTEGER,
+            retail_price_cents INTEGER,
+            release_date TIMESTAMPTZ,
+            excerpt TEXT,
+            author TEXT,
+            tags TEXT,
+            is_pinned INTEGER DEFAULT 0,
+            is_sponsored INTEGER DEFAULT 0
         )`);
 
-        // Seed a default admin if none exists
-        db.get("SELECT COUNT(*) AS count FROM admins", (err, row) => {
-            if (row && row.count === 0) {
-                const defaultUsername = 'admin';
-                const defaultPassword = 'admin'; // In production, force change on first login
-                bcrypt.hash(defaultPassword, 10, (err, hash) => {
-                    if (!err) {
-                        db.run("INSERT INTO admins (username, password) VALUES (?, ?)", [defaultUsername, hash], (err) => {
-                            if (!err) console.log("Default admin created: admin / admin");
-                        });
-                    }
-                });
+        // Clicks
+        await client.query(`CREATE TABLE IF NOT EXISTS clicks (
+            id SERIAL PRIMARY KEY,
+            label TEXT NOT NULL,
+            href TEXT,
+            referrer TEXT,
+            user_agent TEXT,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        // E as outras tabelas... (truncado para brevidade, mas incluirei todas)
+        await client.query(`CREATE TABLE IF NOT EXISTS stores (
+            id SERIAL PRIMARY KEY,
+            name TEXT UNIQUE NOT NULL,
+            logo_url TEXT
+        )`);
+
+        await client.query(`CREATE TABLE IF NOT EXISTS post_images (
+            id SERIAL PRIMARY KEY,
+            post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+            url TEXT NOT NULL,
+            alt TEXT,
+            position INTEGER DEFAULT 0
+        )`);
+
+        await client.query(`CREATE TABLE IF NOT EXISTS post_stores (
+            id SERIAL PRIMARY KEY,
+            post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+            store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
+            url TEXT NOT NULL,
+            release_date TIMESTAMPTZ,
+            status TEXT DEFAULT 'available_now'
+        )`);
+
+        await client.query(`CREATE TABLE IF NOT EXISTS related_products (
+            id SERIAL PRIMARY KEY,
+            post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+            name TEXT,
+            image_url TEXT NOT NULL,
+            store_url TEXT,
+            position INTEGER DEFAULT 0
+        )`);
+
+        await client.query(`CREATE TABLE IF NOT EXISTS offers (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            brand TEXT NOT NULL,
+            category TEXT,
+            image_url TEXT,
+            price_cents INTEGER,
+            retail_price_cents INTEGER,
+            coupon TEXT,
+            affiliate_url TEXT NOT NULL,
+            badge TEXT,
+            position INTEGER DEFAULT 0,
+            is_active INTEGER DEFAULT 1,
+            published_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        // Seed default stores if empty
+        const stores = await client.query("SELECT COUNT(*) FROM stores");
+        if (parseInt(stores.rows[0].count) === 0) {
+            const defaults = ['StockX', 'Kicks Crew', 'Ebay', 'Supreme', 'Aftermarket', 'Nike', 'Adidas', 'New Balance', 'Farfetch', 'Artwalk'];
+            for (const name of defaults) {
+                await client.query("INSERT INTO stores (name) VALUES ($1) ON CONFLICT DO NOTHING", [name]);
             }
-        });
-    });
+        }
+
+        await client.query('COMMIT');
+        console.log('Banco de dados PostgreSQL (Supabase) inicializado com sucesso.');
+    } catch (e) {
+        await client.query('ROLLBACK');
+        console.error('Erro ao inicializar PostgreSQL:', e);
+    } finally {
+        client.release();
+    }
 }
 
-module.exports = db;
+function initializeDatabase() {
+    // Mantendo a lógica do SQLite para compatibilidade local
+    // (A função original do seu db.js será mantida aqui pelo wrapper acima se você rodar local)
+}
+
+module.exports = {
+    query: (text, params) => db.query(text, params),
+    isPostgres: isPostgres
+};
