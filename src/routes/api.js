@@ -39,6 +39,21 @@ function checkNotifyRate(ip) {
     return true;
 }
 
+// Ads config (public)
+router.get('/ads-config', async (req, res) => {
+    try {
+        const result = await db.query("SELECT key, value FROM settings WHERE key LIKE 'ads_%'");
+        const config = {};
+        for (const row of result.rows) {
+            config[row.key] = row.value;
+        }
+        res.set('Cache-Control', 'public, max-age=300');
+        res.json({ data: config });
+    } catch (err) {
+        res.json({ data: { ads_enabled: 'false' } });
+    }
+});
+
 // Get banner config (public)
 router.get('/banner', async (req, res) => {
     try {
@@ -200,6 +215,28 @@ router.get('/posts/:slug/related', async (req, res) => {
 router.get('/offers', async (req, res) => {
     try {
         const result = await db.query("SELECT id, title, brand, category, image_url, price_cents, retail_price_cents, coupon, affiliate_url, badge, position FROM offers WHERE is_active=1 AND published_at <= CURRENT_TIMESTAMP ORDER BY position ASC, published_at DESC");
+        res.set('Cache-Control', 'public, max-age=60');
+        res.json({ data: result.rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Cupons ativos (seção "Usa agora, economiza hoje")
+router.get('/coupons', async (req, res) => {
+    try {
+        const result = await db.query("SELECT id, code, brand, discount_label, url, variant, position FROM coupons WHERE is_active=1 AND published_at <= CURRENT_TIMESTAMP ORDER BY position ASC, published_at DESC");
+        res.set('Cache-Control', 'public, max-age=60');
+        res.json({ data: result.rows });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Parcerias ativas (banners de parceria no home)
+router.get('/partnerships', async (req, res) => {
+    try {
+        const result = await db.query("SELECT id, title, subtitle, badge, highlight, cta_label, cta_url, position FROM partnerships WHERE is_active=1 AND published_at <= CURRENT_TIMESTAMP ORDER BY position ASC, published_at DESC");
         res.set('Cache-Control', 'public, max-age=60');
         res.json({ data: result.rows });
     } catch (err) {

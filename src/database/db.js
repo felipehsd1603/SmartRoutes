@@ -128,6 +128,31 @@ async function initializePostgres() {
             published_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         )`);
 
+        await client.query(`CREATE TABLE IF NOT EXISTS coupons (
+            id SERIAL PRIMARY KEY,
+            code TEXT NOT NULL,
+            brand TEXT,
+            discount_label TEXT,
+            url TEXT,
+            variant TEXT DEFAULT 'primary',
+            position INTEGER DEFAULT 0,
+            is_active INTEGER DEFAULT 1,
+            published_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        await client.query(`CREATE TABLE IF NOT EXISTS partnerships (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            subtitle TEXT,
+            badge TEXT,
+            highlight TEXT,
+            cta_label TEXT,
+            cta_url TEXT,
+            position INTEGER DEFAULT 0,
+            is_active INTEGER DEFAULT 1,
+            published_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        )`);
+
         await client.query(`CREATE TABLE IF NOT EXISTS settings (
             key TEXT PRIMARY KEY,
             value TEXT NOT NULL
@@ -140,7 +165,12 @@ async function initializePostgres() {
             ('banner_text', '🔔 Receba drops e promoções em tempo real! Junte-se ao nosso Telegram e WhatsApp.'),
             ('banner_telegram_url', 'https://t.me/s/sneakersdomionlinks'),
             ('banner_whatsapp_url', 'https://wa.me/5511999999999'),
-            ('banner_bg_color', '#0065FC')
+            ('banner_bg_color', '#0065FC'),
+            ('ads_enabled', 'false'),
+            ('ads_publisher_id', ''),
+            ('ads_slot_feed', ''),
+            ('ads_slot_post', ''),
+            ('ads_slot_sidebar', '')
             ON CONFLICT (key) DO NOTHING
         `);
 

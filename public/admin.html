@@ -461,6 +461,56 @@
                     </button>
                 </form>
             </section>
+
+            <!-- === Ads / Monetização === -->
+            <section class="bg-white rounded-2xl p-6 lg:p-8 shadow-sm mt-6" aria-labelledby="ads-heading">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="text-2xl">💰</span>
+                    <h2 id="ads-heading" class="font-black uppercase text-lg">Anúncios (AdSense)</h2>
+                </div>
+                <p class="text-xs text-gray-500 mb-6">Ativa banners programáticos do Google AdSense. Ads só aparecem para usuários que aceitaram cookies (LGPD). Desativa instantaneamente sem deploy.</p>
+
+                <form id="adsForm" class="space-y-5">
+                    <div class="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl">
+                        <div>
+                            <label for="ads_enabled" class="font-black uppercase text-sm cursor-pointer">Ativar anúncios</label>
+                            <p class="text-[11px] text-gray-500 mt-1">Off = site sem anúncios, com ads afiliados apenas</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="ads_enabled" class="sr-only peer" value="true">
+                            <div class="w-14 h-8 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-trueBlue/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-7 after:w-7 after:transition-all peer-checked:bg-trueBlue"></div>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label for="ads_publisher_id" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">Publisher ID</label>
+                        <input type="text" id="ads_publisher_id" placeholder="ca-pub-XXXXXXXXXXXXXXXX"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-trueBlue text-sm font-mono">
+                        <p class="text-[11px] text-gray-500 mt-1">Encontre em AdSense → Conta → Informações da conta</p>
+                    </div>
+
+                    <fieldset class="border-t border-gray-100 pt-4 space-y-3">
+                        <legend class="text-[10px] font-black uppercase tracking-widest text-gray-500">Slot IDs (opcionais)</legend>
+                        <div>
+                            <label for="ads_slot_feed" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Slot no feed (entre posts)</label>
+                            <input type="text" id="ads_slot_feed" placeholder="1234567890" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-mono">
+                        </div>
+                        <div>
+                            <label for="ads_slot_post" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Slot na página de post</label>
+                            <input type="text" id="ads_slot_post" placeholder="1234567890" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-mono">
+                        </div>
+                        <div>
+                            <label for="ads_slot_sidebar" class="block text-[10px] font-black uppercase tracking-widest text-gray-600 mb-1">Slot sidebar (reserva)</label>
+                            <input type="text" id="ads_slot_sidebar" placeholder="1234567890" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm font-mono">
+                        </div>
+                        <p class="text-[11px] text-gray-500">Deixe vazio para usar o formato "Auto ads" do AdSense (o Google decide onde colocar)</p>
+                    </fieldset>
+
+                    <button type="submit" class="w-full bg-retroGrey hover:bg-trueBlue text-white font-black uppercase tracking-wide text-sm py-4 rounded-full transition-colors">
+                        Salvar anúncios
+                    </button>
+                </form>
+            </section>
         </div>
     </main>
 
@@ -886,7 +936,7 @@
                 document.getElementById('tab-offers').classList.toggle('hidden', target !== 'offers');
                 document.getElementById('tab-settings').classList.toggle('hidden', target !== 'settings');
                 if (target === 'offers') loadOffers();
-                if (target === 'settings') loadBannerSettings();
+                if (target === 'settings') { loadBannerSettings(); loadAdsSettings(); }
             });
         });
 
@@ -1108,6 +1158,47 @@
                 updateBannerPreview(payload.banner_bg_color, payload.banner_active === 'true');
             } catch {
                 alert('Erro ao salvar. Tente novamente.');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // --- Ads Settings ---
+        async function loadAdsSettings() {
+            try {
+                const res = await fetch('/admin/settings/ads');
+                const { data } = await res.json();
+                document.getElementById('ads_enabled').checked = data.ads_enabled === 'true';
+                document.getElementById('ads_publisher_id').value = data.ads_publisher_id || '';
+                document.getElementById('ads_slot_feed').value = data.ads_slot_feed || '';
+                document.getElementById('ads_slot_post').value = data.ads_slot_post || '';
+                document.getElementById('ads_slot_sidebar').value = data.ads_slot_sidebar || '';
+            } catch {}
+        }
+
+        document.getElementById('adsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Salvando…';
+            try {
+                const payload = {
+                    ads_enabled: document.getElementById('ads_enabled').checked ? 'true' : 'false',
+                    ads_publisher_id: document.getElementById('ads_publisher_id').value.trim(),
+                    ads_slot_feed: document.getElementById('ads_slot_feed').value.trim(),
+                    ads_slot_post: document.getElementById('ads_slot_post').value.trim(),
+                    ads_slot_sidebar: document.getElementById('ads_slot_sidebar').value.trim()
+                };
+                const res = await fetch('/admin/settings/ads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error('fail');
+                btn.textContent = '✓ Salvo!';
+                setTimeout(() => btn.textContent = 'Salvar anúncios', 2000);
+            } catch {
+                alert('Erro ao salvar anúncios.');
             } finally {
                 btn.disabled = false;
             }

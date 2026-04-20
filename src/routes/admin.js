@@ -469,4 +469,33 @@ router.post('/settings/banner', isAuthenticated, async (req, res) => {
     }
 });
 
+// --- Settings / Ads ---
+router.get('/settings/ads', isAuthenticated, async (req, res) => {
+    try {
+        const result = await db.query("SELECT key, value FROM settings WHERE key LIKE 'ads_%'");
+        const config = {};
+        for (const row of result.rows) config[row.key] = row.value;
+        res.json({ data: config });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.post('/settings/ads', isAuthenticated, async (req, res) => {
+    try {
+        const fields = ['ads_enabled', 'ads_publisher_id', 'ads_slot_feed', 'ads_slot_post', 'ads_slot_sidebar'];
+        for (const key of fields) {
+            if (req.body[key] !== undefined) {
+                await db.query(
+                    "INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2",
+                    [key, String(req.body[key])]
+                );
+            }
+        }
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 module.exports = router;
